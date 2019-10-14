@@ -6,3 +6,4 @@
 * Statistiken
 * Bubbles
 * WebSockets und HTTP für Webhooks
+* Code als Nachricht senden (Syntax highlighting)
