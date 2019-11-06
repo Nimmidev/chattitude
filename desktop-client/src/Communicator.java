@@ -1,4 +1,4 @@
 
-class Comunicator {
+class Communicator {
 
 }
