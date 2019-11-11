@@ -2,3 +2,5 @@ desktop-client/.idea
 desktop-client/out
 desktop-client/desktop-client.iml
 .idea
+backend/out
+backend/db
