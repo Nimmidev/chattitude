@@ -30,11 +30,11 @@ public class ChattitudeWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-
+        System.out.println("Error in WebSocket: " + e);
     }
 
     @Override
     public void onStart() {
-
+        System.out.println("WebSocketServer started");
     }
 }
