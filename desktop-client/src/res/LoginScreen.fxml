@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="LoginScreen" prefHeight="397.0" prefWidth="263.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Main">
+<AnchorPane fx:id="LoginScreen" prefHeight="397.0" prefWidth="263.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
    <children>
       <AnchorPane layoutX="14.0" layoutY="13.0" prefHeight="372.0" prefWidth="237.0" style="-fx-background-color: #4363A4;">
          <children>
@@ -21,7 +21,7 @@
                   <DropShadow />
                </effect>
             </ImageView>
-            <JFXTextField fx:id="txtUsername" focusColor="#b53131" layoutX="40.0" layoutY="142.0" promptText="username" unFocusColor="WHITE">
+            <JFXTextField fx:id="txtUsername" focusColor="#b53131" labelFloat="true" layoutX="40.0" layoutY="142.0" promptText="username" unFocusColor="WHITE">
                <font>
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
@@ -36,12 +36,12 @@
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXPasswordField fx:id="txtPassword" focusColor="#b53131" layoutX="40.0" layoutY="212.0" promptText="password" unFocusColor="WHITE">
+            <JFXPasswordField fx:id="txtPassword" focusColor="#b53131" labelFloat="true" layoutX="40.0" layoutY="212.0" promptText="password" unFocusColor="WHITE">
                <font>
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
             </JFXPasswordField>
-            <JFXButton fx:id="btnExit" buttonType="RAISED" layoutX="205.0" onAction="#exitLoginScreen" text="x" textFill="#b53131">
+            <JFXButton fx:id="btnExit" buttonType="RAISED" layoutX="205.0" onAction="#exitWindow" text="x" textFill="#b53131">
                <font>
                   <Font name="Arial Rounded MT Bold" size="18.0" />
                </font>
