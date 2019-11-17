@@ -1,6 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,7 +22,7 @@ public class Window extends Application {
     }
 
     // Closes the LoginScreen with click on "X"
-    public void exitLoginScreen(){
+    public void exitWindow(){
         if(onCloseListener != null) onCloseListener.onClose();
         System.exit(0);
     }
