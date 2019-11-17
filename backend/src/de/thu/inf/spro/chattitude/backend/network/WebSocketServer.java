@@ -2,6 +2,8 @@ package de.thu.inf.spro.chattitude.backend.network;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import de.thu.inf.spro.chattitude.packet.Packet;
+import de.thu.inf.spro.chattitude.packet.PacketType;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 
@@ -18,7 +20,7 @@ class WebSocketServer extends org.java_websocket.server.WebSocketServer {
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("New Connection " + webSocket.getRemoteSocketAddress());
-        communicator.send(webSocket, Packet.Type.CONNECTED);
+        communicator.send(webSocket, new Packet(PacketType.CONNECTED));
     }
 
     @Override
@@ -30,10 +32,8 @@ class WebSocketServer extends org.java_websocket.server.WebSocketServer {
     public void onMessage(WebSocket webSocket, String s){
         if(communicator != null){
             JsonObject packetData = Json.parse(s).asObject();
-            int typeId = packetData.get("type").asInt();
-            Packet.Type type = Packet.Type.from(typeId);
-
-            communicator.onMessage(type, packetData);
+            Packet packet = Packet.of(packetData);
+            communicator.onPacket(webSocket, packet);
         }
     }
 

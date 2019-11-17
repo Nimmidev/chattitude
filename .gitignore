@@ -1,8 +1,15 @@
+.idea
+out
+
 desktop-client/.idea
 desktop-client/out
 desktop-client/desktop-client.iml
-.idea
+
+backend/.idea
 backend/out
 backend/db
 backend/backend.iml
-out
+
+packet/.idea
+packet/out
+packet/packet.iml

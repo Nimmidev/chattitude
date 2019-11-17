@@ -2,6 +2,8 @@ package de.thu.inf.spro.chattitude.desktop_client.network;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import de.thu.inf.spro.chattitude.packet.Packet;
+import de.thu.inf.spro.chattitude.packet.PacketType;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.MalformedURLException;
@@ -28,10 +30,8 @@ class WebSocketClient extends org.java_websocket.client.WebSocketClient {
     public void onMessage(String s) {
         if(communicator != null){
             JsonObject packetData = Json.parse(s).asObject();
-            int typeId = packetData.get("type").asInt();
-            Packet.Type type = Packet.Type.from(typeId);
-
-            communicator.onMessage(type, packetData);
+            Packet packet = Packet.of(packetData);
+            communicator.onPacket(packet);
         }
     }
 
