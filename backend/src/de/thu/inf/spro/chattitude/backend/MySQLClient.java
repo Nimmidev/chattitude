@@ -28,9 +28,9 @@ public class MySqlClient {
             createTables();
             try (Statement stmt = mySqlConnection.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SHOW TABLES;")) {
-                    System.out.println("Folgende Tabellen existieren: ");
+                    System.out.println("Current tables: ");
                     while (rs.next()) {
-                        System.out.println(rs.getString(1));
+                        System.out.println("\t" + rs.getString(1));
                     }
                     System.out.println();
                 }

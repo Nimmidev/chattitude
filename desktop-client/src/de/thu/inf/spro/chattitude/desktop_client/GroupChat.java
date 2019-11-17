@@ -1,3 +1,5 @@
+package de.thu.inf.spro.chattitude.desktop_client;
+
 import java.util.List;
 
 class GroupChat extends Chat {

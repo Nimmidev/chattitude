@@ -1,3 +1,5 @@
+package de.thu.inf.spro.chattitude.desktop_client.ui;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -5,16 +7,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class Main extends Application {
+public class Window extends Application {
 
-    public static void main(String[] args) {
-            launch(args);
-            System.out.println("Hello World!");
-    }
+    private OnCloseListener onCloseListener;
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/res/LoginScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/jfx/LoginScreen.fxml"));
         stage.initStyle(StageStyle.UNDECORATED);
         Scene scene = new Scene(root);
         stage.setScene(scene);
@@ -23,6 +22,7 @@ public class Main extends Application {
 
     // Closes the LoginScreen with click on "X"
     public void exitLoginScreen(){
+        if(onCloseListener != null) onCloseListener.onClose();
         System.exit(0);
     }
 
@@ -35,4 +35,13 @@ public class Main extends Application {
         // Methode schon mit Button "verlinkt"
         // TODO
     }
+
+    public void setOnCloseListener(OnCloseListener onCloseListener){
+        this.onCloseListener = onCloseListener;
+    }
+
+    public interface OnCloseListener {
+        void onClose();
+    }
+
 }

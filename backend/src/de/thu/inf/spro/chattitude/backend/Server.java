@@ -1,17 +1,17 @@
 package de.thu.inf.spro.chattitude.backend;
 
-import org.java_websocket.server.WebSocketServer;
+import de.thu.inf.spro.chattitude.backend.network.Communicator;
 
 import java.sql.Connection;
 
 public class Server {
+    private Communicator communicator;
     private MySqlClient mySqlClient;
-    private WebSocketServer webSocketServer;
+    private org.java_websocket.server.WebSocketServer webSocketServer;
 
     public Server() {
         mySqlClient = new MySqlClient();
-        webSocketServer = new ChattitudeWebSocketServer(8080);
-        webSocketServer.start();
+        communicator = new Communicator();
     }
 
     public Connection getMySqlConnection() {
@@ -20,5 +20,6 @@ public class Server {
 
     public void close() {
         mySqlClient.close();
+        communicator.stop();
     }
 }

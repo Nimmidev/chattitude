@@ -1,3 +1,4 @@
+package de.thu.inf.spro.chattitude.desktop_client;
 
 class ChatMessage {
 
