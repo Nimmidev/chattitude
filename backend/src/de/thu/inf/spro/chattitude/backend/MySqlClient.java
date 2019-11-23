@@ -109,6 +109,11 @@ public class MySqlClient {
                 );
 
             }
+
+            stmt.execute("CREATE TABLE `FileUpload` ( " +
+                    "`fileId` BINARY(252) NOT NULL PRIMARY KEY UNIQUE , " +
+                    "`data` LONGBLOB NOT NULL " +
+                ");");
         }
     }
 
