@@ -28,6 +28,7 @@ public class Packet {
         else if(type == PacketType.MESSAGE) return new MessagePacket(packetData);
         else if(type == PacketType.MESSAGE_HISTORY) return new MessageHistoryPacket(packetData);
         else if(type == PacketType.CONVERSATIONS) return new ConversationsPacket(packetData);
+        else if(type == PacketType.ATTACHMENT) return new AttachmentPacket(packetData);
         else throw new IllegalStateException("Invalid package type: " + type.name());
     }
 

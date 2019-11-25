@@ -58,4 +58,8 @@ public class RegisterPacket extends Packet {
         return successful;
     }
 
+    public Credentials asCredentials(){
+        return new Credentials(username, password, successful);
+    }
+
 }

@@ -1,7 +1,6 @@
 package de.thu.inf.spro.chattitude.packet;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import java.util.ArrayList;

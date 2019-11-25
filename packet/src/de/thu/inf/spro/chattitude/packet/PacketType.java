@@ -8,7 +8,8 @@ public enum PacketType {
     AUTHENTICATE,
     MESSAGE,
     MESSAGE_HISTORY,
-    CONVERSATIONS;
+    CONVERSATIONS,
+    ATTACHMENT;
 
     private static PacketType[] _values = values();
 
