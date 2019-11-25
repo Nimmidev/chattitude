@@ -110,7 +110,7 @@ public class MySqlClient {
 
             }
 
-            stmt.execute("CREATE TABLE `FileUpload` ( " +
+            stmt.execute("CREATE TABLE IF NOT EXISTS `FileUpload` ( " +
                     "`fileId` BINARY(252) NOT NULL PRIMARY KEY UNIQUE , " +
                     "`data` LONGBLOB NOT NULL " +
                 ");");
