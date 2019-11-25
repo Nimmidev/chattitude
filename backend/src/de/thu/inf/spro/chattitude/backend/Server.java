@@ -9,7 +9,8 @@ import java.sql.Connection;
 public class Server implements PacketHandler {
     private Communicator communicator;
     private MySqlClient mySqlClient;
-    private org.java_websocket.server.WebSocketServer webSocketServer;
+    private AuthenticationManager authennticationManager;
+
 
     public Server() {
         mySqlClient = new MySqlClient();

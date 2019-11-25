@@ -12,6 +12,8 @@ public class Main {
         System.out.println("Starting ChattitudeServer…");
         var server = new Server();
 
+
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down ChattitudeServer…");
             server.close();

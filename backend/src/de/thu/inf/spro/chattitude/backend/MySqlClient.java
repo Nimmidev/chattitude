@@ -128,4 +128,31 @@ public class MySqlClient {
             e.printStackTrace();
         }
     }
+
+    public void addUser(String name, String password) throws SQLException{
+        try (Statement stmt = mySqlConnection.createStatement()){
+            stmt.executeUpdate("INSERT INTO User(username, password) VALUE ('"+name+"','"+password+"')");
+        }
+    }
+
+    public boolean getUser(String name) throws SQLException{
+        boolean result;
+        try (Statement stmt = mySqlConnection.createStatement()){
+           result = stmt.execute("Select username FROM User WHERE username = '"+name+"' ");
+        }
+        return result;
+    }
+
+    public boolean checkUser(String name, String password) throws SQLException{
+        boolean result;
+        try (Statement stmt = mySqlConnection.createStatement()){
+            result = stmt.execute("Select username FROM User WHERE username = '"+name+"' AND password = '"+password+"' ");
+        }
+
+
+        return result;
+    }
+
+
+
 }
