@@ -9,6 +9,7 @@ public class Server {
     private MySqlClient mySqlClient;
     private AuthenticationManager authennticationManager;
 
+
     public Server() {
         mySqlClient = new MySqlClient();
         communicator = new Communicator();

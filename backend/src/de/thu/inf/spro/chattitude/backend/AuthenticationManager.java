@@ -7,10 +7,7 @@ import java.util.ArrayList;
 
 class AuthenticationManager {
 
-    static ArrayList Usernames;                                 //werden mit SQLDatenbank ausgetauscht
-    static ArrayList Passwords;
-
-    MySqlClient Mysqlclient;
+      MySqlClient Mysqlclient;
 
     public AuthenticationManager(MySqlClient mySqlClient) {
         this.Mysqlclient = mySqlClient;
