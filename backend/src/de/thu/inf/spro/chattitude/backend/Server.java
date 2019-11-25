@@ -7,11 +7,12 @@ import java.sql.Connection;
 public class Server {
     private Communicator communicator;
     private MySqlClient mySqlClient;
-    private org.java_websocket.server.WebSocketServer webSocketServer;
+    private AuthenticationManager authennticationManager;
 
     public Server() {
         mySqlClient = new MySqlClient();
         communicator = new Communicator();
+        authennticationManager = new AuthenticationManager(mySqlClient);
     }
 
     public Connection getMySqlConnection() {
