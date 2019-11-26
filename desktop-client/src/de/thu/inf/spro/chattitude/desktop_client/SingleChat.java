@@ -1,5 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
+import de.thu.inf.spro.chattitude.packet.User;
+
 class SingleChat extends Chat {
 
     private User recipiant;

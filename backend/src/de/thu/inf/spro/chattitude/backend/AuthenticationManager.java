@@ -1,44 +1,54 @@
 package de.thu.inf.spro.chattitude.backend;
 
-import java.security.MessageDigest;
+import de.thu.inf.spro.chattitude.packet.Credentials;
+import org.java_websocket.WebSocket;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 class AuthenticationManager {
 
-      MySqlClient Mysqlclient;
+    private MySqlClient mysqlClient;
 
     public AuthenticationManager(MySqlClient mySqlClient) {
-        this.Mysqlclient = mySqlClient;
-
+        this.mysqlClient = mySqlClient;
     }
 
-    public boolean register(String Name, String Password) throws SQLException {
-        if (Mysqlclient.getUser(Name) == false) {                           //Wenn name noch nicht in Datenbank
-            Mysqlclient.addUser(Name, sha256(Password));                    //User hinzufügen
+    public boolean register(Credentials credentials, WebSocket webSocket){
+        if(!mysqlClient.checkUserExistence(credentials.getUsername())){
+            mysqlClient.addUser(credentials.getUsername(), sha256(credentials.getPassword()));
+            updateCredentials(credentials, webSocket, true);
             return true;
         }
 
-        return false;                                                        // Sonst false return
+        return false;
     }
 
 
-    public boolean login(String Name, String Password) throws SQLException {
-        boolean result = Mysqlclient.checkUser(Name, sha256(Password));       // wenn user und passwort richtig return true
+    public boolean authenticate(Credentials credentials, WebSocket webSocket){
+        boolean authenticated = mysqlClient.checkUserCredentials(credentials.getUsername(), sha256(credentials.getPassword()));
+        updateCredentials(credentials, webSocket, authenticated);
 
-        return result;
+        return authenticated;
     }
 
-    public static String sha256(String base) {
+    private void updateCredentials(Credentials credentials, WebSocket webSocket, boolean success){
+        int userId = mysqlClient.getUserId(credentials.getUsername());
+
+        credentials.setUserId(userId);
+        credentials.setAuthenticated(success);
+        webSocket.setAttachment(credentials);
+    }
+
+    private String sha256(String base) {
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(base.getBytes("UTF-8"));
-            StringBuffer hexString = new StringBuffer();
+            byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
 
-            for (int i = 0; i < hash.length; i++) {
-                String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1) hexString.append('0');
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
 

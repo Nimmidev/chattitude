@@ -3,13 +3,17 @@ package de.thu.inf.spro.chattitude.packet;
 public enum PacketType {
 
     INVALID,
+    UNAUTHORIZED,
     CONNECTED,
     REGISTER,
     AUTHENTICATE,
     MESSAGE,
     MESSAGE_HISTORY,
-    CONVERSATIONS,
-    ATTACHMENT;
+    GET_CONVERSATIONS,
+    CREATE_CONVERSATION,
+    MODIFY_CONVERSATION_USER,
+    GET_ATTACHMENT,
+    SEARCH_USER;
 
     private static PacketType[] _values = values();
 

@@ -2,25 +2,29 @@ package de.thu.inf.spro.chattitude.backend.network;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import de.thu.inf.spro.chattitude.packet.Packet;
+import de.thu.inf.spro.chattitude.packet.Communicator;
 import de.thu.inf.spro.chattitude.packet.PacketHandler;
+import de.thu.inf.spro.chattitude.packet.PacketType;
+import de.thu.inf.spro.chattitude.packet.packets.Packet;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 
 import java.net.InetSocketAddress;
 
-class WebSocketServer extends org.java_websocket.server.WebSocketServer {
+public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
 
     private Communicator communicator;
 
-    WebSocketServer(int port) {
+    public WebSocketServer(PacketHandler handler, int port) {
         super(new InetSocketAddress(port));
+
+        communicator = new Communicator(handler);
     }
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("New Connection " + webSocket.getRemoteSocketAddress());
-        communicator.sendConnectedPackage(webSocket);
+        webSocket.send(new Packet(PacketType.CONNECTED).toString());
     }
 
     @Override
@@ -30,11 +34,9 @@ class WebSocketServer extends org.java_websocket.server.WebSocketServer {
 
     @Override
     public void onMessage(WebSocket webSocket, String s){
-        if(communicator != null){
-            JsonObject packetData = Json.parse(s).asObject();
-            Packet packet = Packet.of(packetData);
-            communicator.onPacket(packet, webSocket);
-        }
+        JsonObject packetData = Json.parse(s).asObject();
+        Packet packet = Packet.of(packetData);
+        communicator.onPacket(packet, webSocket);
     }
 
     @Override
@@ -45,10 +47,6 @@ class WebSocketServer extends org.java_websocket.server.WebSocketServer {
     @Override
     public void onStart() {
         System.out.println("WebSocketServer started");
-    }
-
-    public void setCommunicator(Communicator communicator){
-        this.communicator = communicator;
     }
 
 }

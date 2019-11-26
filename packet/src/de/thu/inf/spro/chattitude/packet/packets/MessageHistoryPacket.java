@@ -1,40 +1,36 @@
-package de.thu.inf.spro.chattitude.packet;
+package de.thu.inf.spro.chattitude.packet.packets;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import de.thu.inf.spro.chattitude.packet.Message;
+import de.thu.inf.spro.chattitude.packet.PacketType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MessageHistoryPacket extends Packet {
 
     private static final String FIELD_CONVERSATION_ID = "conversationId";
     private static final String FIELD_OFFSET = "offset";
-    private static final String FIELD_AMOUNT = "amount";
     private static final String FIELD_MESSAGES = "messages";
 
     private int conversationId;
     private int offset;
-    private int amount;
 
-    //Later on this would be replaced with a message array
-    private String[] messages;
+    private Message[] messages;
 
     public MessageHistoryPacket(JsonObject packetData) {
         super(packetData);
     }
 
-    public MessageHistoryPacket(int conversationId, int offset, int amount) {
-        this(conversationId, offset, amount, new String[]{});
-    }
-
-    public MessageHistoryPacket(int conversationId, int offset, int amount, String[] messages) {
+    public MessageHistoryPacket(int conversationId, int offset) {
         super(PacketType.MESSAGE_HISTORY);
 
         this.conversationId = conversationId;
         this.offset = offset;
-        this.amount = amount;
-        this.messages = messages;
+        this.messages = new Message[]{};
     }
 
     @Override
@@ -43,23 +39,28 @@ public class MessageHistoryPacket extends Packet {
 
         packetData.add(FIELD_CONVERSATION_ID, conversationId);
         packetData.add(FIELD_OFFSET, offset);
-        packetData.add(FIELD_AMOUNT, amount);
-        packetData.add(FIELD_MESSAGES, Json.array(messages));
+
+        JsonArray messagesArray = new JsonArray();
+        Arrays.stream(messages).map(Message::asJson).forEach(messagesArray::add);
+        packetData.add(FIELD_MESSAGES, messagesArray);
     }
 
     @Override
     protected void unpack(){
         super.unpack();
 
-        List<String> messageList = new ArrayList<>();
+        List<Message> messageList = new ArrayList<>();
 
         conversationId = packetData.get(FIELD_CONVERSATION_ID).asInt();
         offset = packetData.get(FIELD_OFFSET).asInt();
-        amount = packetData.get(FIELD_AMOUNT).asInt();
 
-        packetData.get(FIELD_MESSAGES).asArray().iterator().forEachRemaining(v -> messageList.add(v.asString()));
-        messages = new String[messageList.size()];
+        packetData.get(FIELD_MESSAGES).asArray().iterator().forEachRemaining(v -> messageList.add(new Message(v.asObject())));
+        messages = new Message[messageList.size()];
         messages = messageList.toArray(messages);
+    }
+
+    public void setMessages(Message[] messages){
+        this.messages = messages;
     }
 
     public int getConversationId(){
@@ -70,11 +71,7 @@ public class MessageHistoryPacket extends Packet {
         return offset;
     }
 
-    public int getAmount(){
-        return amount;
-    }
-
-    public String[] getMessages(){
+    public Message[] getMessages(){
         return messages;
     }
 
