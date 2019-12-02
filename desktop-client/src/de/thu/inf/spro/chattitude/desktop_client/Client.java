@@ -52,7 +52,7 @@ class Client implements PacketHandler {
         //MessagePacket packet = new MessagePacket(message);
         //MessageHistoryPacket packet = new MessageHistoryPacket(1, -1);
         //ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 10, 1);
-        //GetConversationsPacket packet = new GetConversationsPacket(10);
+        //GetConversationsPacket packet = new GetConversationsPacket();
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
 

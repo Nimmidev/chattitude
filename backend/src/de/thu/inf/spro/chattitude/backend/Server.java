@@ -87,7 +87,8 @@ public class Server implements PacketHandler {
 
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
-        List<Conversation> conversations = mySqlClient.getUserConversations(packet.getUserId());
+        Credentials credentials = webSocket.getAttachment();
+        List<Conversation> conversations = mySqlClient.getUserConversations(credentials.getUserId());
         packet.setSuccessful(true);
         packet.setConversations(conversations.toArray(new Conversation[]{}));
         send(webSocket, packet);
