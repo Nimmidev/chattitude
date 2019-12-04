@@ -1,7 +1,5 @@
 package de.thu.inf.spro.chattitude.backend;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
@@ -372,16 +370,10 @@ public class MySqlClient {
     }
 
     public List<Message> getMessageHistory(int conversationId, int offset, int limit){
-        String order = "DESC";
         String query = "SELECT User.userId, User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.conversationId, " +
                 "ChatMessage.fileId, ChatMessage.timestamp FROM ChatMessage INNER JOIN User ON User.userId = ChatMessage.sender " +
-                "WHERE ChatMessage.conversationId = ? ORDER BY messageId %s LIMIT ? OFFSET ?;";
-
-        if(offset == -1){
-            order = "ASC";
-            offset = 0;
-        }
-        query = String.format(query, order);
+                "WHERE ChatMessage.conversationId = ? ORDER BY messageId DESC LIMIT ? OFFSET ?;";
+        // TODO mit letzter MessageId machen statt mit offset
 
         try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
             pstmt.setInt(1,  conversationId);

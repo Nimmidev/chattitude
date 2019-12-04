@@ -45,7 +45,7 @@ public class MainScreenController {
 
     public void sendMessage() {
         System.out.println("Send");
-        Message message = new Message(selectedConversation, messageField.getText(), new User(1, "tomatensalat"));
+        Message message = new Message(selectedConversation, messageField.getText(), null);
 
         client.send(new MessagePacket(message));
     }
