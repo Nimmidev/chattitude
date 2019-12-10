@@ -22,6 +22,7 @@ public class Client implements PacketHandler {
     private Callback<Message> onMessage;
     private Callback<Conversation[]> onConversations;
     private Callback<Integer> onConversationCreated;
+    private Callback<Message[]> onMessageHistory;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -88,6 +89,8 @@ public class Client implements PacketHandler {
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
         if(packet.getMessages().length == 0) System.out.println("No Messages.");
         else for(Message message : packet.getMessages()) System.out.println(String.format("|%d| %s: %s", message.getId(), message.getUser().getName(), message.getContent()));
+        if (onMessageHistory != null)
+            onMessageHistory.call(packet.getMessages());
     }
 
     @Override
@@ -138,6 +141,10 @@ public class Client implements PacketHandler {
 
     public void setOnMessage(Callback<Message> onMessage) {
         this.onMessage = onMessage;
+    }
+
+    public void setOnMessageHistory(Callback<Message[]> onMessageHistory) {
+        this.onMessageHistory = onMessageHistory;
     }
 
     public void send(Packet packet){
