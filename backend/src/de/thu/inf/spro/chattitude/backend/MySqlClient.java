@@ -1,9 +1,9 @@
 package de.thu.inf.spro.chattitude.backend;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
+import org.mariadb.jdbc.MariaDbDataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,12 +19,11 @@ public class MySqlClient {
 
     private void connect() {
         try {
-            MysqlDataSource dataSource = new MysqlDataSource();
+            MariaDbDataSource dataSource = new MariaDbDataSource();
             dataSource.setUser(System.getenv("MYSQL_USER"));
             dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
             dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
             dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
-            dataSource.setAutoReconnect(true);
 
             mySqlConnection = dataSource.getConnection();
             System.out.println("Successfully connected to mysql server");
