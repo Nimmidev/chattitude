@@ -26,7 +26,8 @@ public class Message {
     public Message(JsonObject json){
         id = json.get(FIELD_ID).asInt();
         conversationId = json.get(FIELD_CONVERSATION_ID).asInt();
-        user = null;
+        if (json.get(FIELD_USER) != null)
+            user = new User(json.get(FIELD_USER).asObject());
         fileId = json.get(FIELD_DATA_UUID).asString();
         content = json.get(FIELD_TEXT).asString();
         timestamp = json.get(FIELD_TIMESTAMP).asLong();
