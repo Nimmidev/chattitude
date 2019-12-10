@@ -26,7 +26,7 @@ public class Message {
     public Message(JsonObject json){
         id = json.get(FIELD_ID).asInt();
         conversationId = json.get(FIELD_CONVERSATION_ID).asInt();
-        user = new User(json.get(FIELD_USER).asObject());
+        user = null;
         fileId = json.get(FIELD_DATA_UUID).asString();
         content = json.get(FIELD_TEXT).asString();
         timestamp = json.get(FIELD_TIMESTAMP).asLong();
@@ -91,6 +91,10 @@ public class Message {
         return user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public long getTimestamp(){
         return timestamp;
     }
@@ -100,7 +104,8 @@ public class Message {
 
         json.add(FIELD_ID, id);
         json.add(FIELD_CONVERSATION_ID, conversationId);
-        json.add(FIELD_USER, user.asJson());
+        if (user != null)
+            json.add(FIELD_USER, user.asJson());
         json.add(FIELD_DATA_UUID, fileId);
         json.add(FIELD_TEXT, content);
         json.add(FIELD_TIMESTAMP, timestamp);
