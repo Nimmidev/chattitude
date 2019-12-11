@@ -68,12 +68,18 @@ public class MainScreenController implements Initializable {
 
     private void showMessages() {
         System.out.println("Show messages for " + selectedConversation);
-        client.setOnMessageHistory(messages -> Platform.runLater(() -> {
-            for (Message message : messages) {
-                Label cell = new Label(message.getUser().getName() + ": " + message.getContent());
-                messageHistoryList.getItems().add(0, cell);
-            }
-        }));
+        int tmpSelectedConversation = selectedConversation;
+        client.setOnMessageHistory(messages -> {
+            client.setOnMessageHistory(null);
+            Platform.runLater(() -> {
+                if (selectedConversation != tmpSelectedConversation)
+                    return;
+                for (Message message : messages) {
+                    Label cell = new Label(message.getUser().getName() + ": " + message.getContent());
+                    messageHistoryList.getItems().add(0, cell);
+                }
+            });
+        });
         client.send(new MessageHistoryPacket(selectedConversation, 0));
 
         messageHistoryList.getItems().clear();
