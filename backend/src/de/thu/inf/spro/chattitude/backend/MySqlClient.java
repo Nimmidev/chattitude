@@ -14,37 +14,43 @@ public class MySqlClient {
     private Connection mySqlConnection;
 
     public MySqlClient() {
-        connect();
-    }
-
-    private void connect() {
         try {
-            MariaDbDataSource dataSource = new MariaDbDataSource();
-            dataSource.setUser(System.getenv("MYSQL_USER"));
-            dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
-            dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
-            dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
-
-            mySqlConnection = dataSource.getConnection();
-            System.out.println("Successfully connected to mysql server");
-            createTables();
-            try (Statement stmt = mySqlConnection.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("SHOW TABLES;")) {
-                    System.out.println("Current tables: ");
-                    while (rs.next()) {
-                        System.out.println("\t" + rs.getString(1));
-                    }
-                    System.out.println();
-                }
-            }
+            connect();
         } catch (SQLException e) {
             throw new RuntimeException("Error connecting to mysql server", e);
         }
     }
 
-    private void createTables() throws SQLException {
+    private void connect() throws SQLException {
+        MariaDbDataSource dataSource = new MariaDbDataSource();
+        dataSource.setUser(System.getenv("MYSQL_USER"));
+        dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
+        dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
+        dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
+
+        mySqlConnection = dataSource.getConnection();
+        System.out.println("Successfully connected to mysql server");
+        createTables();
         try (Statement stmt = mySqlConnection.createStatement()) {
-            var metaData = mySqlConnection.getMetaData();
+            try (ResultSet rs = stmt.executeQuery("SHOW TABLES;")) {
+                System.out.println("Current tables: ");
+                while (rs.next()) {
+                    System.out.println("\t" + rs.getString(1));
+                }
+                System.out.println();
+            }
+        }
+    }
+
+    private Connection getConnection() throws SQLException {
+        if (!mySqlConnection.isValid(5))
+            connect();
+        return mySqlConnection;
+    }
+
+    private void createTables() throws SQLException {
+        try (Statement stmt = getConnection().createStatement()) {
+            var metaData = getConnection().getMetaData();
             ResultSet res = metaData.getTables(null, null, "Conversation", new String[] {"TABLE"});
             boolean conversationExists = res.next();
 
@@ -137,7 +143,7 @@ public class MySqlClient {
         String query = "SELECT userId FROM User WHERE username=?;";
         int userId = -1;
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, username);
             pstmt.execute();
             if(pstmt.getResultSet().next()){
@@ -156,24 +162,24 @@ public class MySqlClient {
         int conversationId = -1;
 
         try {
-            mySqlConnection.setAutoCommit(false);
+            getConnection().setAutoCommit(false);
 
-            try (PreparedStatement insertPstmt = mySqlConnection.prepareStatement(insertQuery)){
+            try (PreparedStatement insertPstmt = getConnection().prepareStatement(insertQuery)){
                 insertPstmt.execute();
 
-                try (PreparedStatement selectPstmt = mySqlConnection.prepareStatement(selectQuery)){
+                try (PreparedStatement selectPstmt = getConnection().prepareStatement(selectQuery)){
                     selectPstmt.execute();
-                    mySqlConnection.commit();
+                    getConnection().commit();
 
                     if(selectPstmt.getResultSet() != null && selectPstmt.getResultSet().next()){
                         conversationId = selectPstmt.getResultSet().getInt("LAST_INSERT_ID()");
                     }
                 }
             } catch (SQLException e){
-                mySqlConnection.rollback();
+                getConnection().rollback();
                 e.printStackTrace();
             } finally {
-                mySqlConnection.setAutoCommit(true);
+                getConnection().setAutoCommit(true);
             }
         } catch(SQLException e){
             e.printStackTrace();
@@ -185,7 +191,7 @@ public class MySqlClient {
     public void addUserToConversation(int conversationId, int userId){
         String query = "INSERT INTO ConversationMember (conversationId, userId) VALUES (?, ?);";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  conversationId);
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
@@ -197,7 +203,7 @@ public class MySqlClient {
     public void removeUserFromConversation(int userId, int conversationId){
         String query = "DELETE FROM ConversationMember WHERE conversationId=? AND userId=?;";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  conversationId);
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
@@ -214,7 +220,7 @@ public class MySqlClient {
                 "INNER JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
                 "WHERE ConversationMember.userId = ?;";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  userId);
             pstmt.execute();
             return getUserConversationsResult(pstmt.getResultSet());
@@ -247,7 +253,7 @@ public class MySqlClient {
 
     public boolean saveMessage(Message message){
         try {
-            mySqlConnection.setAutoCommit(false);
+            getConnection().setAutoCommit(false);
 
             try {
                 if(message.getData().length != 0){
@@ -259,13 +265,13 @@ public class MySqlClient {
                 message.setId(getMessageId());
                 updateConversationLastMessage(message.getConversationId(), message.getId());
 
-                mySqlConnection.commit();
+                getConnection().commit();
             } catch (SQLException e){
-                mySqlConnection.rollback();
+                getConnection().rollback();
                 e.printStackTrace();
                 return false;
             } finally {
-                mySqlConnection.setAutoCommit(true);
+                getConnection().setAutoCommit(true);
             }
         } catch(SQLException e){
             e.printStackTrace();
@@ -278,7 +284,7 @@ public class MySqlClient {
         String query = "INSERT INTO FileUpload (fileId, data) VALUES (?, ?);";
         UUID fieldId = UUID.randomUUID();
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, fieldId.toString());
             pstmt.setBytes(2, data);
             pstmt.executeUpdate();
@@ -290,7 +296,7 @@ public class MySqlClient {
     private void _saveMessage(Message message) throws SQLException {
         String query = "INSERT INTO ChatMessage (conversationId, fileId, content, sender, timestamp) VALUES (?, ?, ?, ?, now());";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1, message.getConversationId());
             pstmt.setString(2, message.getFileId());
             pstmt.setString(3, message.getContent());
@@ -302,7 +308,7 @@ public class MySqlClient {
     private int getMessageId() throws SQLException {
         String query = "SELECT LAST_INSERT_ID();";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.execute();
 
             if(pstmt.getResultSet() != null && pstmt.getResultSet().next()){
@@ -316,7 +322,7 @@ public class MySqlClient {
     private void updateConversationLastMessage(int conversationid, int messageId) throws SQLException {
         String query = "UPDATE Conversation SET lastActivity = now(), lastMessageId = ? WHERE conversationId = ?";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1, messageId);
             pstmt.setInt(2, conversationid);
             pstmt.executeUpdate();
@@ -326,7 +332,7 @@ public class MySqlClient {
     public List<User> searchUsers(String searchQuery){
         String query = "SELECT userId, username FROM User WHERE username LIKE ?";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, "%" + searchQuery + "%");
             pstmt.execute();
 
@@ -353,7 +359,7 @@ public class MySqlClient {
     public boolean checkUserInConversation(int userId, int conversationId){
         String query = "SELECT userId FROM ConversationMember WHERE userId = ? AND conversationId = ?";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1, userId);
             pstmt.setInt(2, conversationId);
             pstmt.execute();
@@ -374,7 +380,7 @@ public class MySqlClient {
                 "WHERE ChatMessage.conversationId = ? ORDER BY messageId DESC LIMIT ? OFFSET ?;";
         // TODO mit letzter MessageId machen statt mit offset
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  conversationId);
             pstmt.setInt(2,  limit);
             pstmt.setInt(3,  offset);
@@ -408,7 +414,7 @@ public class MySqlClient {
     public byte[] getAttachment(String fieldId){
         String query = "SELECT data FROM FileUpload WHERE fileId = ?";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, fieldId);
             pstmt.execute();
 
@@ -425,7 +431,7 @@ public class MySqlClient {
     public void addUser(String username, String password){
         String query = "INSERT INTO User (username, password) VALUES (?,?);";
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.executeUpdate();
@@ -438,7 +444,7 @@ public class MySqlClient {
         String query = "Select username FROM User WHERE username = ?;";
         boolean result = false;
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, username);
             pstmt.execute();
 
@@ -456,7 +462,7 @@ public class MySqlClient {
         String query = "Select username FROM User WHERE username=? AND password=?;";
         boolean result = false;
 
-        try (PreparedStatement pstmt = mySqlConnection.prepareStatement(query)){
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.execute();
