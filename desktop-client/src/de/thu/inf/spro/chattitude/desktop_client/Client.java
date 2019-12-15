@@ -36,7 +36,7 @@ public class Client implements PacketHandler {
         User user = new User(1, "Nimmi");
         //Message message = new Message(4, "Hello new msg", user);
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
-        Message message = new Message(1, "Test data 123", user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
+        Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
 
         AuthenticationPacket authenticationPacket = new AuthenticationPacket(testCredientials);
         send(authenticationPacket);
@@ -44,8 +44,8 @@ public class Client implements PacketHandler {
         //RegisterPacket packet = new RegisterPacket(testCredientials);
         //CreateConversationPacket packet = new CreateConversationPacket(1);
         //MessagePacket packet = new MessagePacket(message);
-        //MessageHistoryPacket packet = new MessageHistoryPacket(1, -1);
-        //ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 10, 1);
+        //MessageHistoryPacket packet = new MessageHistoryPacket(1, 6);
+        ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 2, 1);
         //GetConversationsPacket packet = new GetConversationsPacket();
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
@@ -108,8 +108,13 @@ public class Client implements PacketHandler {
     }
 
     @Override
+    public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
+        System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
+    }
+
+    @Override
     public void onModifyConversationUser(ModifyConversationUserPacket packet, WebSocket webSocket) {
-        System.out.println("AddUserToConversationPacket");
+        System.out.println(String.format("AddUserToConversationPacket type: %s, user: %d, successful: %b", packet.getAction().name(), packet.getUserId(), packet.wasSuccessful()));
     }
 
     @Override

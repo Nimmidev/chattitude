@@ -24,6 +24,7 @@ public class Communicator {
             else if(type == PacketType.MESSAGE_HISTORY) packetHandler.onMessageHistory((MessageHistoryPacket) packet, webSocket);
             else if(type == PacketType.GET_CONVERSATIONS) packetHandler.onGetConversations((GetConversationsPacket) packet, webSocket);
             else if(type == PacketType.CREATE_CONVERSATION) packetHandler.onCreateConversation((CreateConversationPacket) packet, webSocket);
+            else if(type == PacketType.CONVERSATION_UPDATED) packetHandler.onConversationUpdated((ConversationUpdatedPacket) packet, webSocket);
             else if(type == PacketType.MODIFY_CONVERSATION_USER) packetHandler.onModifyConversationUser((ModifyConversationUserPacket) packet, webSocket);
             else if(type == PacketType.GET_ATTACHMENT) packetHandler.onGetAttachment((GetAttachmentPacket) packet, webSocket);
             else if(type == PacketType.SEARCH_USER) packetHandler.onSearchUser((SearchUserPacket) packet, webSocket);

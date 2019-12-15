@@ -14,7 +14,7 @@ public class ModifyConversationUserPacket extends Packet {
     private int userId;
 
     public enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE, PROMOTE_ADMIN, DEMOTE_ADMIN;
 
         private static Action[] _values = values();
 

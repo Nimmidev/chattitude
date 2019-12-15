@@ -90,6 +90,7 @@ public class MySqlClient {
             stmt.execute("CREATE TABLE IF NOT EXISTS ConversationMember (" +
                     "`conversationId` INT UNSIGNED NOT NULL," +
                     "`userId` INT UNSIGNED NOT NULL," +
+                    "`isAdmin` BOOLEAN NOT NULL DEFAULT false," +
                     "INDEX `constr_conversationId_idx` (`conversationId` ASC)," +
                     "INDEX `constr_userId_idx` (`userId` ASC)," +
                     "CONSTRAINT `CMember_conversationId_constr` " +
@@ -210,6 +211,42 @@ public class MySqlClient {
         } catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public void updateConversationAdmin(int conversationId, int userId, boolean admin){
+        String query = "UPDATE ConversationMember SET isAdmin = ? WHERE userId = ? AND conversationId = ?;";
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
+            pstmt.setBoolean(1,  admin);
+            pstmt.setInt(2, userId);
+            pstmt.setInt(3,  conversationId);
+            pstmt.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public List<User> getConversationUsers(int conversationId){
+        List<User> users = new ArrayList<>();
+        String query = "SELECT User.userId, User.username FROM ConversationMember " +
+                "INNER JOIN User ON ConversationMember.userId = User.userId " +
+                "WHERE ConversationMember.conversationId = ?";
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
+            pstmt.setInt(1,  conversationId);
+            pstmt.execute();
+            ResultSet resultSet = pstmt.getResultSet();
+
+            while(resultSet.next()){
+                int userId = resultSet.getInt("userId");
+                String username = resultSet.getString("username");
+                users.add(new User(userId, username));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
     public List<Conversation> getUserConversations(int userId){
@@ -374,16 +411,33 @@ public class MySqlClient {
         return false;
     }
 
-    public List<Message> getMessageHistory(int conversationId, int offset, int limit){
+    public boolean checkUserIsAdmin(int userId, int conversationId){
+        String query = "SELECT userId FROM ConversationMember WHERE userId = ? AND conversationId = ? AND isAdmin = true";
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, conversationId);
+            pstmt.execute();
+
+            if(pstmt.getResultSet() != null){
+                return pstmt.getResultSet().next();
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public List<Message> getMessageHistory(int conversationId, int lastMessageId, int limit){
         String query = "SELECT User.userId, User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.conversationId, " +
                 "ChatMessage.fileId, ChatMessage.timestamp FROM ChatMessage INNER JOIN User ON User.userId = ChatMessage.sender " +
-                "WHERE ChatMessage.conversationId = ? ORDER BY messageId DESC LIMIT ? OFFSET ?;";
-        // TODO mit letzter MessageId machen statt mit offset
+                "WHERE ChatMessage.conversationId = ? AND ChatMessage.messageId < ? ORDER BY messageId DESC LIMIT ?;";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  conversationId);
-            pstmt.setInt(2,  limit);
-            pstmt.setInt(3,  offset);
+            pstmt.setInt(2,  lastMessageId);
+            pstmt.setInt(3,  limit);
             pstmt.execute();
             return getMessageHistoryResult(pstmt.getResultSet());
         } catch (SQLException e){

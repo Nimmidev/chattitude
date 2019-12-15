@@ -3,11 +3,14 @@ package de.thu.inf.spro.chattitude.backend;
 import de.thu.inf.spro.chattitude.backend.network.WebSocketServer;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
+import javafx.util.Callback;
 import org.java_websocket.WebSocket;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Server implements PacketHandler {
 
@@ -18,12 +21,19 @@ public class Server implements PacketHandler {
     private MySqlClient mySqlClient;
     private AuthenticationManager authenticationManager;
 
+    private Map<Integer, WebSocket> connections;
 
     public Server() {
+        connections = new HashMap<>();
+
         mySqlClient = new MySqlClient();
         authenticationManager = new AuthenticationManager(mySqlClient);
 
         webSocketServer = new WebSocketServer(this,8080);
+        webSocketServer.setOnDisconnectCallback(integer -> {
+            connections.remove(integer);
+            return null;
+        });
         webSocketServer.start();
     }
 
@@ -47,6 +57,9 @@ public class Server implements PacketHandler {
     @Override
     public void onAuthenticate(AuthenticationPacket packet, WebSocket webSocket) {
         boolean success = authenticationManager.authenticate(packet.getCredentials(), webSocket);
+
+        if(success) connections.put(packet.getCredentials().getUserId(), webSocket);
+
         packet.setSuccessful(success);
         send(webSocket, packet);
     }
@@ -66,7 +79,14 @@ public class Server implements PacketHandler {
             packet.setSuccessful(false);
         }
 
-        //TODO: Send messages to connected recipients
+        List<User> users = mySqlClient.getConversationUsers(packet.getMessage().getConversationId());
+
+        for(User user : users){
+            if(connections.containsKey(user.getId())){
+                WebSocket userWebSocket = connections.get(user.getId());
+                if(!userWebSocket.isClosing() && !userWebSocket.isClosed()) send(userWebSocket, packet);
+            }
+        }
     }
 
     @Override
@@ -74,7 +94,7 @@ public class Server implements PacketHandler {
         Credentials credentials = webSocket.getAttachment();
 
         if(mySqlClient.checkUserInConversation(credentials.getUserId(), packet.getConversationId())){
-            List<Message> messages =  mySqlClient.getMessageHistory(packet.getConversationId(), packet.getOffset(), MESSAGE_HISTORY_FETCH_LIMIT);
+            List<Message> messages =  mySqlClient.getMessageHistory(packet.getConversationId(), packet.getLastMessageId(), MESSAGE_HISTORY_FETCH_LIMIT);
             packet.setMessages(messages.toArray(new Message[]{}));
             packet.setSuccessful(true);
             System.out.println("success");
@@ -110,15 +130,30 @@ public class Server implements PacketHandler {
         send(webSocket, packet);
     }
 
-    //TODO: Admin check
+    @Override
+    public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
+        System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
+    }
+
     @Override
     public void onModifyConversationUser(ModifyConversationUserPacket packet, WebSocket webSocket) {
-        if(packet.getAction() == ModifyConversationUserPacket.Action.REMOVE){
-            mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
-        } else {
-            mySqlClient.addUserToConversation(packet.getConversationId(), packet.getUserId());
+        Credentials credentials = webSocket.getAttachment();
+        boolean isAdmin = mySqlClient.checkUserIsAdmin(credentials.getUserId(), packet.getConversationId());
+
+        if(isAdmin){
+            if(packet.getAction() == ModifyConversationUserPacket.Action.REMOVE){
+                mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
+            } else if(packet.getAction() == ModifyConversationUserPacket.Action.ADD){
+                mySqlClient.addUserToConversation(packet.getConversationId(), packet.getUserId());
+            } else if(packet.getAction() == ModifyConversationUserPacket.Action.PROMOTE_ADMIN){
+                mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), true);
+            } else if(packet.getAction() == ModifyConversationUserPacket.Action.DEMOTE_ADMIN){
+                mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), false);
+            }
         }
-        packet.setSuccessful(true);
+
+        packet.setSuccessful(isAdmin);
+        send(webSocket, packet);
     }
 
     @Override

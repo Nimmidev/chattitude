@@ -14,6 +14,7 @@ public interface PacketHandler {
     void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket);
     void onGetConversations(GetConversationsPacket packet, WebSocket webSocket);
     void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket);
+    void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket);
     void onModifyConversationUser(ModifyConversationUserPacket packet, WebSocket webSocket);
     void onGetAttachment(GetAttachmentPacket packet, WebSocket webSocket);
     void onSearchUser(SearchUserPacket packet, WebSocket webSocket);

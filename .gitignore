@@ -4,6 +4,7 @@ out
 desktop-client/.idea
 desktop-client/out
 desktop-client/desktop-client.iml
+desktop-client/src/META-INF
 
 backend/.idea
 backend/out
