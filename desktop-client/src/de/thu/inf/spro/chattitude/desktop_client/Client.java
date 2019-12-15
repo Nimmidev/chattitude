@@ -1,7 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
 import de.thu.inf.spro.chattitude.desktop_client.network.WebSocketClient;
-import de.thu.inf.spro.chattitude.desktop_client.util.Callback;
+import de.thu.inf.spro.chattitude.packet.util.Callback;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import org.java_websocket.WebSocket;
@@ -9,7 +9,6 @@ import org.java_websocket.WebSocket;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 
 public class Client implements PacketHandler {
 
@@ -22,7 +21,7 @@ public class Client implements PacketHandler {
     private Callback<Message> onMessage;
     private Callback<Conversation[]> onConversations;
     private Callback<Integer> onConversationCreated;
-    private Callback<Message[]> onMessageHistory;
+    private Callback<MessageHistoryPacket> onMessageHistory;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -87,17 +86,12 @@ public class Client implements PacketHandler {
 
     @Override
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
-        if(packet.getMessages().length == 0) System.out.println("No Messages.");
-        else for(Message message : packet.getMessages()) System.out.println(String.format("|%d| %s: %s", message.getId(), message.getUser().getName(), message.getContent()));
-        if (onMessageHistory != null)
-            onMessageHistory.call(packet.getMessages());
+       if (onMessageHistory != null)
+            onMessageHistory.call(packet);
     }
 
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
-        for(Conversation conversation : packet.getConversations()){
-            System.out.println(String.format("|%d|%s: %s %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getLastActivity()));
-        }
         if (onConversations != null) onConversations.call(packet.getConversations());
     }
 
@@ -148,7 +142,7 @@ public class Client implements PacketHandler {
         this.onMessage = onMessage;
     }
 
-    public void setOnMessageHistory(Callback<Message[]> onMessageHistory) {
+    public void setOnMessageHistory(Callback<MessageHistoryPacket> onMessageHistory) {
         this.onMessageHistory = onMessageHistory;
     }
 

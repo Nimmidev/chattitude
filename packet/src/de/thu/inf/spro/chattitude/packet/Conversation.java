@@ -36,6 +36,10 @@ public class Conversation {
         return message;
     }
 
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
     public JsonObject asJson(){
         JsonObject json = new JsonObject();
 

@@ -3,7 +3,6 @@ package de.thu.inf.spro.chattitude.backend;
 import de.thu.inf.spro.chattitude.backend.network.WebSocketServer;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
-import javafx.util.Callback;
 import org.java_websocket.WebSocket;
 
 import java.io.IOException;
@@ -32,7 +31,6 @@ public class Server implements PacketHandler {
         webSocketServer = new WebSocketServer(this,8080);
         webSocketServer.setOnDisconnectCallback(integer -> {
             connections.remove(integer);
-            return null;
         });
         webSocketServer.start();
     }
