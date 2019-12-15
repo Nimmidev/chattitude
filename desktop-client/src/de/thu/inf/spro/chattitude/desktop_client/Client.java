@@ -1,38 +1,32 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
 import de.thu.inf.spro.chattitude.desktop_client.network.WebSocketClient;
-import de.thu.inf.spro.chattitude.desktop_client.ui.Window;
+import de.thu.inf.spro.chattitude.desktop_client.util.Callback;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
-import javafx.application.Application;
 import org.java_websocket.WebSocket;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
-class Client implements PacketHandler {
+public class Client implements PacketHandler {
 
-    private Window window;
     private WebSocketClient webSocketClient;
 
     private Credentials testCredientials = new Credentials("Nimmi", "qwer");
 
-    public Client() throws MalformedURLException, URISyntaxException {
-        window = new Window();
+    private Runnable onLoginSuccessful;
+    private Runnable onLoginFailed;
+    private Callback<Message> onMessage;
+    private Callback<Conversation[]> onConversations;
+    private Callback<Integer> onConversationCreated;
+    private Callback<Message[]> onMessageHistory;
 
+    public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
         webSocketClient.connect();
-
-        window.setOnCloseListener(() -> {
-            try {
-                webSocketClient.closeBlocking();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        Application.launch(Window.class);
     }
 
     @Override
@@ -52,7 +46,7 @@ class Client implements PacketHandler {
         //MessagePacket packet = new MessagePacket(message);
         //MessageHistoryPacket packet = new MessageHistoryPacket(1, -1);
         //ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 10, 1);
-        //GetConversationsPacket packet = new GetConversationsPacket(10);
+        //GetConversationsPacket packet = new GetConversationsPacket();
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
 
@@ -78,20 +72,25 @@ class Client implements PacketHandler {
     public void onAuthenticate(AuthenticationPacket packet, WebSocket webSocket) {
         if(packet.getCredentials().isAuthenticated()){
             System.out.println("Authenticated");
+            if (onLoginSuccessful != null) onLoginSuccessful.run();
         } else {
             System.out.println("Authentication failed");
+            if (onLoginSuccessful != null) onLoginFailed.run();
         }
     }
 
     @Override
     public void onMessage(MessagePacket packet, WebSocket webSocket) {
         System.out.println("MessagePacket");
+        if (onMessage != null) onMessage.call(packet.getMessage());
     }
 
     @Override
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
         if(packet.getMessages().length == 0) System.out.println("No Messages.");
         else for(Message message : packet.getMessages()) System.out.println(String.format("|%d| %s: %s", message.getId(), message.getUser().getName(), message.getContent()));
+        if (onMessageHistory != null)
+            onMessageHistory.call(packet.getMessages());
     }
 
     @Override
@@ -99,11 +98,13 @@ class Client implements PacketHandler {
         for(Conversation conversation : packet.getConversations()){
             System.out.println(String.format("|%d|%s: %s %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getLastActivity()));
         }
+        if (onConversations != null) onConversations.call(packet.getConversations());
     }
 
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
         System.out.println("CreateConversation: " + packet.getConversationId());
+        if (onConversationCreated != null) onConversationCreated.call(packet.getConversationId());
     }
 
     @Override
@@ -122,8 +123,40 @@ class Client implements PacketHandler {
         else for(User user : packet.getResults()) System.out.println(user.getName());
     }
 
-    private void send(Packet packet){
+    public void setOnConversationCreated(Callback<Integer> onConversationCreated) {
+        this.onConversationCreated = onConversationCreated;
+    }
+
+    public void setOnConversations(Callback<Conversation[]> onConversations) {
+        this.onConversations = onConversations;
+    }
+
+    public void setOnLoginSuccessful(Runnable onLoginSuccessful) {
+        this.onLoginSuccessful = onLoginSuccessful;
+    }
+
+    public void setOnLoginFailed(Runnable onLoginFailed) {
+        this.onLoginFailed = onLoginFailed;
+    }
+
+    public void setOnMessage(Callback<Message> onMessage) {
+        this.onMessage = onMessage;
+    }
+
+    public void setOnMessageHistory(Callback<Message[]> onMessageHistory) {
+        this.onMessageHistory = onMessageHistory;
+    }
+
+    public void send(Packet packet){
         webSocketClient.send(packet.toString());
+    }
+
+    public void close() {
+        try {
+            webSocketClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

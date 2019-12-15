@@ -55,6 +55,7 @@ public class Server implements PacketHandler {
     public void onMessage(MessagePacket packet, WebSocket webSocket) {
         Message message = packet.getMessage();
         Credentials credentials = webSocket.getAttachment();
+        message.setUser(new User(credentials.getUserId(), credentials.getUsername()));
 
         if(mySqlClient.checkUserInConversation(credentials.getUserId(), message.getConversationId())){
             if(message.getData().length < MAX_FILE_UPLOAD_SIZE){
@@ -87,7 +88,8 @@ public class Server implements PacketHandler {
 
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
-        List<Conversation> conversations = mySqlClient.getUserConversations(packet.getUserId());
+        Credentials credentials = webSocket.getAttachment();
+        List<Conversation> conversations = mySqlClient.getUserConversations(credentials.getUserId());
         packet.setSuccessful(true);
         packet.setConversations(conversations.toArray(new Conversation[]{}));
         send(webSocket, packet);

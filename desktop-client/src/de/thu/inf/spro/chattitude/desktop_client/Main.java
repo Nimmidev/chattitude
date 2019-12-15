@@ -1,15 +1,11 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import de.thu.inf.spro.chattitude.desktop_client.ui.App;
+import javafx.application.Application;
 
 public class Main {
 
     public static void main(String[] args) {
-        try {
-            new Client();
-        } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+        Application.launch(App.class);
     }
 }
