@@ -96,8 +96,8 @@ public class LoginScreenController {
             secondaryStage.setWidth(primaryScreenBounds.getWidth());
             secondaryStage.setHeight(primaryScreenBounds.getHeight());
             //
-            secondaryStage.setResizable(false);
-            secondaryStage.initStyle(StageStyle.UNDECORATED);
+            secondaryStage.setResizable(true);
+            //secondaryStage.initStyle(StageStyle.UNDECORATED);
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
             secondaryStage.show();

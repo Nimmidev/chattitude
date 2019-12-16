@@ -88,7 +88,7 @@
          <children>
             <HBox alignment="TOP_RIGHT" prefHeight="21.0" prefWidth="422.0">
                <children>
-                  <JFXButton text="Add User">
+                  <JFXButton fx:id="btnAddUser" onAction="#createDialog" text="Add User">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
