@@ -9,7 +9,7 @@ public class RegisterPacket extends Packet {
     private static final String FIELD_USER_ID = "userId";
     private static final String FIELD_USERNAME = "username";
     private static final String FIELD_PASSWORD = "password";
-    private static final String FIELD_AUTHENTICATED = "successful";
+    private static final String FIELD_AUTHENTICATED = "authenticated";
 
     private Credentials credentials;
 
@@ -43,10 +43,6 @@ public class RegisterPacket extends Packet {
         boolean authenticated = packetData.get(FIELD_AUTHENTICATED).asBoolean();
 
         credentials = new Credentials(userId, username, password, authenticated);
-    }
-
-    public void setCredentials(Credentials credentials){
-        this.credentials = credentials;
     }
 
     public Credentials getCredentials(){

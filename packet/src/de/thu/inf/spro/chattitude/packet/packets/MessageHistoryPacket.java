@@ -1,6 +1,5 @@
 package de.thu.inf.spro.chattitude.packet.packets;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import de.thu.inf.spro.chattitude.packet.Message;
@@ -13,11 +12,11 @@ import java.util.List;
 public class MessageHistoryPacket extends Packet {
 
     private static final String FIELD_CONVERSATION_ID = "conversationId";
-    private static final String FIELD_OFFSET = "offset";
+    private static final String FIELD_LAST_MESSAGE_ID = "lastMessageId";
     private static final String FIELD_MESSAGES = "messages";
 
     private int conversationId;
-    private int offset;
+    private int lastMessageId;
 
     private Message[] messages;
 
@@ -25,11 +24,11 @@ public class MessageHistoryPacket extends Packet {
         super(packetData);
     }
 
-    public MessageHistoryPacket(int conversationId, int offset) {
+    public MessageHistoryPacket(int conversationId, int lastMessageId) {
         super(PacketType.MESSAGE_HISTORY);
 
         this.conversationId = conversationId;
-        this.offset = offset;
+        this.lastMessageId = lastMessageId;
         this.messages = new Message[]{};
     }
 
@@ -38,7 +37,7 @@ public class MessageHistoryPacket extends Packet {
         super.pack();
 
         packetData.add(FIELD_CONVERSATION_ID, conversationId);
-        packetData.add(FIELD_OFFSET, offset);
+        packetData.add(FIELD_LAST_MESSAGE_ID, lastMessageId);
 
         JsonArray messagesArray = new JsonArray();
         Arrays.stream(messages).map(Message::asJson).forEach(messagesArray::add);
@@ -52,7 +51,7 @@ public class MessageHistoryPacket extends Packet {
         List<Message> messageList = new ArrayList<>();
 
         conversationId = packetData.get(FIELD_CONVERSATION_ID).asInt();
-        offset = packetData.get(FIELD_OFFSET).asInt();
+        lastMessageId = packetData.get(FIELD_LAST_MESSAGE_ID).asInt();
 
         packetData.get(FIELD_MESSAGES).asArray().iterator().forEachRemaining(v -> messageList.add(new Message(v.asObject())));
         messages = new Message[messageList.size()];
@@ -67,8 +66,8 @@ public class MessageHistoryPacket extends Packet {
         return conversationId;
     }
 
-    public int getOffset(){
-        return offset;
+    public int getLastMessageId(){
+        return lastMessageId;
     }
 
     public Message[] getMessages(){

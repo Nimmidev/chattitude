@@ -29,6 +29,12 @@ public class LoginScreenController {
     public JFXTextField txtUsername;
     public JFXPasswordField txtPassword;
 
+    @FXML
+    private JFXTextField txtUsername;
+
+    @FXML
+    private JFXPasswordField txtPassword;
+
     public LoginScreenController() {
         System.out.println("LoginScreenController");
         client = App.getClient();

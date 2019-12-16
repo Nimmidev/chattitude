@@ -33,6 +33,7 @@ public class Packet {
         else if(type == PacketType.MESSAGE_HISTORY) return new MessageHistoryPacket(packetData);
         else if(type == PacketType.GET_CONVERSATIONS) return new GetConversationsPacket(packetData);
         else if(type == PacketType.CREATE_CONVERSATION) return new CreateConversationPacket(packetData);
+        else if(type == PacketType.CONVERSATION_UPDATED) return new ConversationUpdatedPacket(packetData);
         else if(type == PacketType.MODIFY_CONVERSATION_USER) return new ModifyConversationUserPacket(packetData);
         else if(type == PacketType.GET_ATTACHMENT) return new GetAttachmentPacket(packetData);
         else if(type == PacketType.SEARCH_USER) return new SearchUserPacket(packetData);
