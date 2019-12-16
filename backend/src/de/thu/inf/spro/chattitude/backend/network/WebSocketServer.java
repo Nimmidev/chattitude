@@ -7,7 +7,7 @@ import de.thu.inf.spro.chattitude.packet.Credentials;
 import de.thu.inf.spro.chattitude.packet.PacketHandler;
 import de.thu.inf.spro.chattitude.packet.PacketType;
 import de.thu.inf.spro.chattitude.packet.packets.Packet;
-import javafx.util.Callback;
+import de.thu.inf.spro.chattitude.packet.util.Callback;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 
@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
 
     private Communicator communicator;
-    private Callback<Integer, Void> onDisconnectCallback;
+    private Callback<Integer> onDisconnectCallback;
 
     public WebSocketServer(PacketHandler handler, int port) {
         super(new InetSocketAddress(port));
@@ -59,7 +59,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         System.out.println("WebSocketServer started");
     }
 
-    public void setOnDisconnectCallback(Callback<Integer, Void> callback){
+    public void setOnDisconnectCallback(Callback<Integer> callback){
         onDisconnectCallback = callback;
     }
 

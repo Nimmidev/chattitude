@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
@@ -30,7 +31,7 @@
                   <Font name="Arial Rounded MT Bold" size="16.0" />
                </font>
             </Label>
-            <HBox prefHeight="22.0" prefWidth="578.0">
+            <HBox layoutX="-166.0" layoutY="-11.0" prefHeight="22.0" prefWidth="578.0">
                <effect>
                   <DropShadow />
                </effect>
@@ -63,6 +64,15 @@
                         <Insets left="10.0" top="5.0" />
                      </padding>
                   </Label>
+               </children>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXTextField fx:id="txtNewPartner" promptText="New chat partner" unFocusColor="#4d4d4d00">
+                     <font>
+                        <Font name="Arial Rounded MT Bold" size="14.0" />
+                     </font>
+                  </JFXTextField>
                   <JFXButton fx:id="btnNewChat" buttonType="RAISED" onAction="#newChat" prefHeight="25.0" prefWidth="48.0" text="+" textFill="#24ab36">
                      <font>
                         <Font name="Arial Rounded MT Bold" size="17.0" />

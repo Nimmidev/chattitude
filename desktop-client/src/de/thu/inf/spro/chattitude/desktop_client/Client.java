@@ -1,28 +1,27 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
 import de.thu.inf.spro.chattitude.desktop_client.network.WebSocketClient;
-import de.thu.inf.spro.chattitude.desktop_client.util.Callback;
+import de.thu.inf.spro.chattitude.packet.util.Callback;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
+import javafx.scene.control.Alert;
 import org.java_websocket.WebSocket;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 
 public class Client implements PacketHandler {
 
     private WebSocketClient webSocketClient;
-
-    private Credentials testCredientials = new Credentials("Nimmi", "qwer");
 
     private Runnable onLoginSuccessful;
     private Runnable onLoginFailed;
     private Callback<Message> onMessage;
     private Callback<Conversation[]> onConversations;
     private Callback<Integer> onConversationCreated;
-    private Callback<Message[]> onMessageHistory;
+    private Callback<MessageHistoryPacket> onMessageHistory;
+    private Callback<Conversation> onConversationUpdated;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -38,19 +37,19 @@ public class Client implements PacketHandler {
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
         Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
 
-        AuthenticationPacket authenticationPacket = new AuthenticationPacket(testCredientials);
-        send(authenticationPacket);
+        //AuthenticationPacket authenticationPacket = new AuthenticationPacket(new Credentials("Nimmi", "qwer"));
+        //send(authenticationPacket);
 
         //RegisterPacket packet = new RegisterPacket(testCredientials);
         //CreateConversationPacket packet = new CreateConversationPacket(1);
         //MessagePacket packet = new MessagePacket(message);
         //MessageHistoryPacket packet = new MessageHistoryPacket(1, 6);
         //ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 2, 1);
-        GetConversationsPacket packet = new GetConversationsPacket();
+        //GetConversationsPacket packet = new GetConversationsPacket();
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
 
-        send(packet);
+        //send(packet);
     }
 
     @Override
@@ -74,7 +73,6 @@ public class Client implements PacketHandler {
             System.out.println("Authenticated");
             if (onLoginSuccessful != null) onLoginSuccessful.run();
         } else {
-            System.out.println("Authentication failed");
             if (onLoginSuccessful != null) onLoginFailed.run();
         }
     }
@@ -87,10 +85,8 @@ public class Client implements PacketHandler {
 
     @Override
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
-        if(packet.getMessages().length == 0) System.out.println("No Messages.");
-        else for(Message message : packet.getMessages()) System.out.println(String.format("|%d| %s: %s", message.getId(), message.getUser().getName(), message.getContent()));
-        if (onMessageHistory != null)
-            onMessageHistory.call(packet.getMessages());
+       if (onMessageHistory != null)
+            onMessageHistory.call(packet);
     }
 
     @Override
@@ -98,6 +94,7 @@ public class Client implements PacketHandler {
         for(Conversation conversation : packet.getConversations()){
             System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
         }
+
         if (onConversations != null) onConversations.call(packet.getConversations());
     }
 
@@ -110,6 +107,7 @@ public class Client implements PacketHandler {
     @Override
     public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
         System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
+        if (onConversationUpdated != null) onConversationUpdated.call(packet.getConversation());
     }
 
     @Override
@@ -148,8 +146,12 @@ public class Client implements PacketHandler {
         this.onMessage = onMessage;
     }
 
-    public void setOnMessageHistory(Callback<Message[]> onMessageHistory) {
+    public void setOnMessageHistory(Callback<MessageHistoryPacket> onMessageHistory) {
         this.onMessageHistory = onMessageHistory;
+    }
+
+    public void setOnConversationUpdated(Callback<Conversation> onConversationUpdated) {
+        this.onConversationUpdated = onConversationUpdated;
     }
 
     public void send(Packet packet){

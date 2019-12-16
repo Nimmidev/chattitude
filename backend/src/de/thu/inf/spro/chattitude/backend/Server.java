@@ -3,7 +3,6 @@ package de.thu.inf.spro.chattitude.backend;
 import de.thu.inf.spro.chattitude.backend.network.WebSocketServer;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
-import javafx.util.Callback;
 import org.java_websocket.WebSocket;
 
 import java.io.IOException;
@@ -32,7 +31,6 @@ public class Server implements PacketHandler {
         webSocketServer = new WebSocketServer(this,8080);
         webSocketServer.setOnDisconnectCallback(integer -> {
             connections.remove(integer);
-            return null;
         });
         webSocketServer.start();
     }
@@ -117,13 +115,20 @@ public class Server implements PacketHandler {
 
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
+        Credentials credentials = webSocket.getAttachment();
         boolean success = false;
         int conversationId = mySqlClient.createConversation(packet.getConversation().getName());
 
         if(conversationId != -1){
             success = true;
+
             packet.getConversation().setId(conversationId);
-            for(User user : packet.getConversation().getUsers()) mySqlClient.addUserToConversation(conversationId, user.getId());
+            mySqlClient.addUserToConversation(conversationId, credentials.getUserId());
+            for(User user : packet.getConversation().getUsers()) {
+                if (user.getId() == credentials.getUserId()) continue;
+                mySqlClient.addUserToConversation(conversationId, user.getId());
+                // TODO ConversationUpdate Packet an alle Teilnehmer senden
+            }
         }
 
         packet.setSuccessful(success);

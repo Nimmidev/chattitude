@@ -26,7 +26,12 @@
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
             </JFXTextField>
-            <JFXButton fx:id="btnSignIn" buttonType="RAISED" layoutX="40.0" layoutY="289.0" onAction="#login" text="Sign In" textFill="WHITE">
+            <JFXPasswordField fx:id="txtPassword" focusColor="#b53131" labelFloat="true" layoutX="40.0" layoutY="212.0" promptText="password" unFocusColor="WHITE">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="14.0" />
+               </font>
+            </JFXPasswordField>
+            <JFXButton fx:id="btnSignIn" buttonType="RAISED" layoutX="40.0" layoutY="289.0" onAction="#signIn" text="Sign In" textFill="WHITE">
                <font>
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
@@ -36,11 +41,6 @@
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXPasswordField fx:id="txtPassword" focusColor="#b53131" labelFloat="true" layoutX="40.0" layoutY="212.0" promptText="password" unFocusColor="WHITE">
-               <font>
-                  <Font name="Arial Rounded MT Bold" size="14.0" />
-               </font>
-            </JFXPasswordField>
             <JFXButton fx:id="btnExit" buttonType="RAISED" layoutX="205.0" onAction="#exitWindow" text="x" textFill="#b53131">
                <font>
                   <Font name="Arial Rounded MT Bold" size="18.0" />

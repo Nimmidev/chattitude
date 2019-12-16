@@ -72,6 +72,9 @@ public class Conversation {
         users = new User[userList.size()];
         users = userList.toArray(users);
     }
+    public void setMessage(Message message) {
+        this.message = message;
+    }
 
     public JsonObject asJson(){
         JsonObject json = new JsonObject();
