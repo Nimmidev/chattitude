@@ -16,6 +16,7 @@ public class CreateConversationPacket extends Packet {
 
     public CreateConversationPacket(Conversation conversation){
         super(PacketType.CREATE_CONVERSATION);
+        this.conversation = conversation;
     }
 
     @Override

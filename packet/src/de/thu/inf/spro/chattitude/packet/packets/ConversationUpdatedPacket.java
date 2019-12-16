@@ -6,8 +6,6 @@ import de.thu.inf.spro.chattitude.packet.PacketType;
 
 public class ConversationUpdatedPacket extends Packet {
 
-    private static final String FIELD_CONVERSATION = "conversation";
-
     private Conversation conversation;
 
     public ConversationUpdatedPacket(JsonObject packetData) {
@@ -24,7 +22,7 @@ public class ConversationUpdatedPacket extends Packet {
     protected void pack() {
         super.pack();
 
-        packetData.add(FIELD_CONVERSATION, conversation.asJson());
+        packetData.merge(conversation.asJson());
     }
 
     @Override

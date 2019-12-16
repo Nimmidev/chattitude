@@ -275,8 +275,8 @@ public class MySqlClient {
         String query = "SELECT Conversation.conversationId, Conversation.name, User.userId, " +
                 "User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
                 "INNER JOIN Conversation ON Conversation.conversationId = ConversationMember.conversationId " +
-                "INNER JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
-                "INNER JOIN User ON User.userId = ChatMessage.sender " +
+                "LEFT JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
+                "LEFT JOIN User ON User.userId = ChatMessage.sender " +
                 "WHERE ConversationMember.userId = ?;";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -290,17 +290,23 @@ public class MySqlClient {
         Map<Integer, Conversation> conversations = new HashMap<>();
 
         while(resultSet.next()){
+            Message message = null;
+            String conversationName = "";
+
             int conversationId = resultSet.getInt("conversationId");
             int userId = resultSet.getInt("userId");
             int messageId = resultSet.getInt("messageId");
-            long timestamp = resultSet.getTimestamp("timestamp").getTime();
 
-            String conversationName = resultSet.getString("name");
-            String fileId = new String(resultSet.getBytes("fileId"));
-            String content = resultSet.getString("content");
-            String username = resultSet.getString("username");
-            User user = new User(userId, username);
-            Message message = new Message(messageId, conversationId, fileId, content, timestamp, user);
+            if(resultSet.wasNull()){
+                long timestamp = resultSet.getTimestamp("timestamp").getTime();
+
+                conversationName = resultSet.getString("name");
+                String fileId = new String(resultSet.getBytes("fileId"));
+                String content = resultSet.getString("content");
+                String username = resultSet.getString("username");
+                User user = new User(userId, username);
+                message = new Message(messageId, conversationId, fileId, content, timestamp, user);
+            }
 
             conversations.put(conversationId, new Conversation(conversationId, conversationName, message));
         }
