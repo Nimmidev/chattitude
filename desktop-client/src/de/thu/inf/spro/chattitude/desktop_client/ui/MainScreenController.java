@@ -6,15 +6,16 @@ import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
-import de.thu.inf.spro.chattitude.packet.packets.CreateConversationPacket;
-import de.thu.inf.spro.chattitude.packet.packets.GetConversationsPacket;
-import de.thu.inf.spro.chattitude.packet.packets.MessageHistoryPacket;
-import de.thu.inf.spro.chattitude.packet.packets.MessagePacket;
+import de.thu.inf.spro.chattitude.packet.User;
+import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 
+import javax.swing.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -29,7 +30,7 @@ public class MainScreenController implements Initializable {
     @FXML
     private JFXListView<Label> messageHistoryList;
     @FXML
-    public JFXTextField txtNewPartner;
+    public ComboBox comboBox;
 
     private Client client;
     private Conversation selectedConversation;
@@ -106,7 +107,7 @@ public class MainScreenController implements Initializable {
         client.setOnMessageHistory(packet -> {
             client.setOnMessageHistory(null);
             Platform.runLater(() -> {
-                if (selectedConversation.getId() != packet.getConversationId()) // TOdo offset auch checken
+                if (selectedConversation.getId() != packet.getConversationId()) // TODO offset auch checken
                     return;
                 for (Message message : packet.getMessages()) {
                     Label cell = createMessageItem(message);
@@ -152,20 +153,19 @@ public class MainScreenController implements Initializable {
             }
         }
         */
+        User[] userArray = new User[]{new User(1,"testUser1"), new User(2, "testUser2")};
 
-
-/*
-        CreateConversationPacket packet = new CreateConversationPacket(1,2);
+        Conversation dummyConversation = new Conversation(userArray); // Users have to exist
+        CreateConversationPacket packet = new CreateConversationPacket(dummyConversation);
         client.send(packet);
         client.setOnConversationCreated(conversationId -> Platform.runLater(() -> {
-            Conversation dummyConversation = new Conversation(conversationId, 0, null);
+
             Label cell = createConversationItem(dummyConversation);
             conversationsList.getItems().add(0, cell);
             conversationsList.getSelectionModel().select(cell);
             selectedConversation = dummyConversation;
             System.out.println("created " + conversationId);
         }));
-*/
 
     }
 

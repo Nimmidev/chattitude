@@ -29,12 +29,6 @@ public class LoginScreenController {
     public JFXTextField txtUsername;
     public JFXPasswordField txtPassword;
 
-    @FXML
-    private JFXTextField txtUsername;
-
-    @FXML
-    private JFXPasswordField txtPassword;
-
     public LoginScreenController() {
         System.out.println("LoginScreenController");
         client = App.getClient();
@@ -69,13 +63,19 @@ public class LoginScreenController {
             alert.setContentText("Sorry, your username and password needs at least 4 characters.");
             alert.show();
         } else {
+            client.setOnRegister(credentials -> Platform.runLater(() ->{
+                if (credentials.isAuthenticated()) {
+                    showMainScreen();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Registration failed");
+                    alert.setHeaderText("Username already taken.");
+                    alert.setContentText("XXX");
+                    alert.show();
+                }
+            }));
             Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
             client.send(new RegisterPacket(credentials));
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Registration successful.");
-            alert.setHeaderText("Welcome to Chattitude!");
-            alert.setContentText("Your account has been successfully created. You can now sign in.");
-            alert.show();
         }
     }
 

@@ -23,7 +23,7 @@ public class Conversation {
         id = json.get(FIELD_ID).asInt();
         name = json.get(FIELD_NAME).asString();
 
-        if(!json.get(FIELD_MESSAGE).isNull()) message = new Message(json.get(FIELD_MESSAGE).asObject());
+        if(json.get(FIELD_MESSAGE) != null) message = new Message(json.get(FIELD_MESSAGE).asObject());
         else message = null;
 
         List<User> userList = new ArrayList<>();
@@ -84,7 +84,6 @@ public class Conversation {
         json.add(FIELD_ID, id);
         json.add(FIELD_NAME, name);
         if(message != null) json.add(FIELD_MESSAGE, message.asJson());
-
         JsonArray usersArray = new JsonArray();
         Arrays.stream(users).map(User::asJson).forEach(usersArray::add);
         json.add(FIELD_USERS, usersArray);

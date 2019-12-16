@@ -16,13 +16,13 @@ public class CreateConversationPacket extends Packet {
 
     public CreateConversationPacket(Conversation conversation){
         super(PacketType.CREATE_CONVERSATION);
+        this.conversation = conversation;
     }
 
     @Override
     protected void pack() {
         super.pack();
-
-        packetData = conversation.asJson();
+        packetData.merge(conversation.asJson());
     }
 
     @Override

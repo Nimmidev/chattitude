@@ -22,6 +22,7 @@ public class Client implements PacketHandler {
     private Callback<Integer> onConversationCreated;
     private Callback<MessageHistoryPacket> onMessageHistory;
     private Callback<Conversation> onConversationUpdated;
+    private Callback<Credentials> onRegister;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -59,11 +60,15 @@ public class Client implements PacketHandler {
 
     @Override
     public void onRegister(RegisterPacket packet, WebSocket webSocket) {
-        if(packet.getCredentials().isAuthenticated()){
+        if (packet.getCredentials().isAuthenticated()){
             System.out.println("Registration successful");
             System.out.println("Authenticated");
         } else {
             System.out.println("Registration failed (username already taken)");
+        }
+
+        if (onRegister != null) {
+            onRegister.call(packet.getCredentials());
         }
     }
 
@@ -152,6 +157,10 @@ public class Client implements PacketHandler {
 
     public void setOnConversationUpdated(Callback<Conversation> onConversationUpdated) {
         this.onConversationUpdated = onConversationUpdated;
+    }
+
+    public void setOnRegister(Callback<Credentials> onRegister) {
+        this.onRegister = onRegister;
     }
 
     public void send(Packet packet){
