@@ -88,16 +88,13 @@ public class LoginScreenController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/jfx/MainScreen.fxml"));
             Parent root = (Parent) fxmlLoader.load();
             Stage secondaryStage = new Stage();
-            //
-            // Workaround for "stage.setMaximized(true) - This really hides the task bar
             Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+            secondaryStage.setTitle("Chattitude");
             secondaryStage.setX(primaryScreenBounds.getMinX());
             secondaryStage.setY(primaryScreenBounds.getMinY());
             secondaryStage.setWidth(primaryScreenBounds.getWidth());
             secondaryStage.setHeight(primaryScreenBounds.getHeight());
-            //
             secondaryStage.setResizable(true);
-            //secondaryStage.initStyle(StageStyle.UNDECORATED);
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
             secondaryStage.show();
@@ -114,10 +111,5 @@ public class LoginScreenController {
 
     private void onLoginFailed() {
         System.out.println("Login failed.");
-       //Alert alert2 = new Alert(Alert.AlertType.ERROR);
-       //alert2.setTitle("Authentication Error");
-       //alert2.setHeaderText("Login failed.");
-       //alert2.setContentText("Sorry, your username or password is incorrect.");
-       //alert2.show();
     }
 }

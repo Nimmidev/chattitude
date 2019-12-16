@@ -136,7 +136,8 @@ public class MainScreenController implements Initializable {
     }
 
     public void createDialog() {
-        SearchUserPopUp popUp = new SearchUserPopUp(client);
+        SearchUserPopUp popUp = new SearchUserPopUp(client, selectedConversation.getId());
+
     }
 
     public void newChat() {
