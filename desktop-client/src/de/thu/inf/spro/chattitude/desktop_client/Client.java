@@ -45,12 +45,12 @@ public class Client implements PacketHandler {
         //CreateConversationPacket packet = new CreateConversationPacket(1);
         //MessagePacket packet = new MessagePacket(message);
         //MessageHistoryPacket packet = new MessageHistoryPacket(1, 6);
-        ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 2, 1);
-        //GetConversationsPacket packet = new GetConversationsPacket();
+        //ModifyConversationUserPacket packet = new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.ADD, 2, 1);
+        GetConversationsPacket packet = new GetConversationsPacket();
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
 
-        //send(packet);
+        send(packet);
     }
 
     @Override
@@ -96,15 +96,15 @@ public class Client implements PacketHandler {
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
         for(Conversation conversation : packet.getConversations()){
-            System.out.println(String.format("|%d|%s: %s %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getLastActivity()));
+            System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
         }
         if (onConversations != null) onConversations.call(packet.getConversations());
     }
 
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
-        System.out.println("CreateConversation: " + packet.getConversationId());
-        if (onConversationCreated != null) onConversationCreated.call(packet.getConversationId());
+        System.out.println("CreateConversation: " + packet.getConversation().getId());
+        if (onConversationCreated != null) onConversationCreated.call(packet.getConversation().getId());
     }
 
     @Override

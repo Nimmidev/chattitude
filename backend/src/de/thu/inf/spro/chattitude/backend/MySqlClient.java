@@ -6,9 +6,7 @@ import de.thu.inf.spro.chattitude.packet.User;
 import org.mariadb.jdbc.MariaDbDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MySqlClient {
     private Connection mySqlConnection;
@@ -63,7 +61,7 @@ public class MySqlClient {
                 ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS Conversation (" +
                     "`conversationId` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY," +
-                    "`lastActivity` TIMESTAMP NOT NULL" +
+                    "`name` VARCHAR(64) NOT NULL DEFAULT ''" +
                     ",`lastMessageId` INT UNSIGNED" +
                 ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS ChatMessage (" +
@@ -157,8 +155,8 @@ public class MySqlClient {
         return userId;
     }
 
-    public int createConversation(){
-        String insertQuery = "INSERT INTO Conversation (lastActivity) VALUES (now());";
+    public int createConversation(String name){
+        String insertQuery = "INSERT INTO Conversation (name) VALUES (?);";
         String selectQuery = "SELECT LAST_INSERT_ID();";
         int conversationId = -1;
 
@@ -166,6 +164,7 @@ public class MySqlClient {
             getConnection().setAutoCommit(false);
 
             try (PreparedStatement insertPstmt = getConnection().prepareStatement(insertQuery)){
+                insertPstmt.setString(1, name);
                 insertPstmt.execute();
 
                 try (PreparedStatement selectPstmt = getConnection().prepareStatement(selectQuery)){
@@ -250,42 +249,108 @@ public class MySqlClient {
     }
 
     public List<Conversation> getUserConversations(int userId){
-        String query = "SELECT Conversation.conversationId, Conversation.lastActivity, User.userId, User.username, " +
-                "ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
-                "INNER JOIN Conversation ON Conversation.conversationId = ConversationMember.conversationId " +
-                "INNER JOIN User ON User.userId = ConversationMember.userId " +
-                "INNER JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
-                "WHERE ConversationMember.userId = ?;";
+        try {
+            getConnection().setAutoCommit(false);
 
-        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
-            pstmt.setInt(1,  userId);
-            pstmt.execute();
-            return getUserConversationsResult(pstmt.getResultSet());
-        } catch (SQLException e){
+            try {
+                Map<Integer, Conversation> conversations = _getUserConversations(userId);
+                _addUsersToConversations(userId, conversations);
+                getConnection().commit();
+
+                return new ArrayList<>(conversations.values());
+            } catch (SQLException e){
+                getConnection().rollback();
+                e.printStackTrace();
+            } finally {
+                getConnection().setAutoCommit(true);
+            }
+        } catch(SQLException e){
             e.printStackTrace();
         }
 
         return new ArrayList<>();
     }
 
-    private List<Conversation> getUserConversationsResult(ResultSet resultSet) throws SQLException {
-        List<Conversation> conversations = new ArrayList<>();
+    private Map<Integer, Conversation> _getUserConversations(int userId) throws SQLException {
+        String query = "SELECT Conversation.conversationId, Conversation.name, User.userId, " +
+                "User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
+                "INNER JOIN Conversation ON Conversation.conversationId = ConversationMember.conversationId " +
+                "INNER JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
+                "INNER JOIN User ON User.userId = ChatMessage.sender " +
+                "WHERE ConversationMember.userId = ?;";
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
+            pstmt.setInt(1,  userId);
+            pstmt.execute();
+            return _getUserConversationsResult(pstmt.getResultSet());
+        }
+    }
+
+    private Map<Integer, Conversation> _getUserConversationsResult(ResultSet resultSet) throws SQLException {
+        Map<Integer, Conversation> conversations = new HashMap<>();
 
         while(resultSet.next()){
             int conversationId = resultSet.getInt("conversationId");
             int userId = resultSet.getInt("userId");
             int messageId = resultSet.getInt("messageId");
-            long lastActivity = resultSet.getTimestamp("lastActivity").getTime();
             long timestamp = resultSet.getTimestamp("timestamp").getTime();
+
+            String conversationName = resultSet.getString("name");
             String fileId = new String(resultSet.getBytes("fileId"));
             String content = resultSet.getString("content");
             String username = resultSet.getString("username");
             User user = new User(userId, username);
             Message message = new Message(messageId, conversationId, fileId, content, timestamp, user);
-            conversations.add(new Conversation(conversationId, lastActivity, message));
+
+            conversations.put(conversationId, new Conversation(conversationId, conversationName, message));
         }
 
         return conversations;
+    }
+
+    private void _addUsersToConversations(int userId, Map<Integer, Conversation> conversations) throws SQLException {
+        String query = "SELECT cm2.conversationId, User.userId, User.username FROM `ConversationMember` cm1 " +
+                "INNER JOIN Conversation ON Conversation.conversationId = cm1.conversationId " +
+                "INNER JOIN ConversationMember cm2 ON cm2.conversationId = Conversation.conversationId " +
+                "INNER JOIN User ON cm2.userId = User.userId " +
+                "WHERE cm1.userId = ?;";
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
+            pstmt.setInt(1,  userId);
+            pstmt.execute();
+            _addUsersToConversationsResult(userId, pstmt.getResultSet(), conversations);
+        }
+    }
+
+    private void _addUsersToConversationsResult(int ogUserId, ResultSet resultSet, Map<Integer, Conversation> conversations) throws SQLException {
+        Map<Integer, List<User>> userMap = new HashMap<>();
+
+        while(resultSet.next()){
+            int conversationId = resultSet.getInt("conversationId");
+            int userId = resultSet.getInt("userId");
+            String username = resultSet.getString("username");
+            User user = new User(userId, username);
+            List currentUserList = userMap.get(conversationId);
+
+            if(currentUserList == null){
+                currentUserList = new ArrayList();
+                userMap.put(conversationId, currentUserList);
+            }
+            currentUserList.add(user);
+        }
+
+        Set<Integer> keys = userMap.keySet();
+        for(Integer conversationId : keys){
+            Conversation conversation = conversations.get(conversationId);
+            if(conversation != null){
+                List<User> userList = userMap.get(conversationId);
+                conversation.setUsers(userList);
+                if(userList.size() == 2){
+                    User other = userList.get(0).getId() == ogUserId ? userList.get(1) : userList.get(0);
+                    conversation.setName(other.getName());
+                }
+            }
+        }
     }
 
     public boolean saveMessage(Message message){
@@ -357,7 +422,7 @@ public class MySqlClient {
     }
 
     private void updateConversationLastMessage(int conversationid, int messageId) throws SQLException {
-        String query = "UPDATE Conversation SET lastActivity = now(), lastMessageId = ? WHERE conversationId = ?";
+        String query = "UPDATE Conversation SET lastMessageId = ? WHERE conversationId = ?";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1, messageId);

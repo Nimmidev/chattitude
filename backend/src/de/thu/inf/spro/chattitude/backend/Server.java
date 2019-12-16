@@ -118,12 +118,12 @@ public class Server implements PacketHandler {
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
         boolean success = false;
-        int conversationId = mySqlClient.createConversation();
+        int conversationId = mySqlClient.createConversation(packet.getConversation().getName());
 
         if(conversationId != -1){
             success = true;
-            packet.setConversationId(conversationId);
-            for(int userId : packet.getUserIds()) mySqlClient.addUserToConversation(conversationId, userId);
+            packet.getConversation().setId(conversationId);
+            for(User user : packet.getConversation().getUsers()) mySqlClient.addUserToConversation(conversationId, user.getId());
         }
 
         packet.setSuccessful(success);

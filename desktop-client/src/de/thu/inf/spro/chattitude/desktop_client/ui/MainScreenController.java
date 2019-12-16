@@ -92,10 +92,10 @@ public class MainScreenController implements Initializable {
     }
 
     public void newChat() {
-        CreateConversationPacket packet = new CreateConversationPacket(1);
-        client.send(packet);
+        //CreateConversationPacket packet = new CreateConversationPacket(1);
+        //client.send(packet);
         client.setOnConversationCreated(conversationId -> Platform.runLater(() -> {
-            Label cell = createConversationItem(new Conversation(conversationId, 0, null));
+            Label cell = createConversationItem(new Conversation(conversationId, "test", null));
             conversationsList.getItems().add(0, cell);
             conversationsList.getSelectionModel().select(cell);
             selectedConversation = conversationId;
