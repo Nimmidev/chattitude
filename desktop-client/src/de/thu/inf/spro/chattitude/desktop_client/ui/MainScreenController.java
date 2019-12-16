@@ -1,16 +1,13 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
-import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextArea;
+import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
-import de.thu.inf.spro.chattitude.packet.packets.CreateConversationPacket;
-import de.thu.inf.spro.chattitude.packet.packets.GetConversationsPacket;
-import de.thu.inf.spro.chattitude.packet.packets.MessageHistoryPacket;
-import de.thu.inf.spro.chattitude.packet.packets.MessagePacket;
+import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,12 +22,12 @@ public class MainScreenController implements Initializable {
 
     @FXML
     private JFXTextArea messageField;
-
     @FXML
     private JFXListView<Label> conversationsList;
-
     @FXML
     private JFXListView<Label> messageHistoryList;
+    @FXML
+    public JFXTextField txtNewPartner;
 
     private Client client;
     private int selectedConversation;
@@ -92,7 +89,30 @@ public class MainScreenController implements Initializable {
     }
 
     public void newChat() {
-        CreateConversationPacket packet = new CreateConversationPacket(1);
+        // TODO
+
+        /*
+        String newChatPartner = txtNewPartner.getText();
+        SearchUserPacket packet = new SearchUserPacket(newChatPartner);
+        User[] name = packet.getResults();
+        System.out.println(newChatPartner);
+        System.out.println(name.length);
+        System.out.println(name[0]);
+        System.out.println(name[1]);
+
+        for (int i = 0; i < name.length; i++) {
+            if (name[i].getName() == newChatPartner) {
+                System.out.println(name[i].getName());
+                System.out.println(name[i].getId());
+            } else {
+                System.out.println("Nix gefunden");
+            }
+        }
+        */
+
+
+
+        CreateConversationPacket packet = new CreateConversationPacket(1,2);
         client.send(packet);
         client.setOnConversationCreated(conversationId -> Platform.runLater(() -> {
             Label cell = createConversationItem(new Conversation(conversationId, 0, null));
@@ -101,6 +121,8 @@ public class MainScreenController implements Initializable {
             selectedConversation = conversationId;
             System.out.println("created " + conversationId);
         }));
+
+
     }
 
     public void sendMessage() {
@@ -108,6 +130,14 @@ public class MainScreenController implements Initializable {
         Message message = new Message(selectedConversation, messageField.getText(), null);
 
         client.send(new MessagePacket(message));
+    }
+
+    public void addToGroup() {
+
+    }
+
+    public void deleteFromGroup() {
+
     }
 
 }

@@ -4,6 +4,7 @@ import de.thu.inf.spro.chattitude.desktop_client.network.WebSocketClient;
 import de.thu.inf.spro.chattitude.desktop_client.util.Callback;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
+import javafx.scene.control.Alert;
 import org.java_websocket.WebSocket;
 
 import java.net.MalformedURLException;
@@ -38,10 +39,10 @@ public class Client implements PacketHandler {
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
         Message message = new Message(1, "Test data 123", user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
 
-        AuthenticationPacket authenticationPacket = new AuthenticationPacket(testCredientials);
-        send(authenticationPacket);
+        //AuthenticationPacket authenticationPacket = new AuthenticationPacket(testCredientials);
+        //send(authenticationPacket);
 
-        //RegisterPacket packet = new RegisterPacket(testCredientials);
+        RegisterPacket packet = new RegisterPacket(testCredientials);
         //CreateConversationPacket packet = new CreateConversationPacket(1);
         //MessagePacket packet = new MessagePacket(message);
         //MessageHistoryPacket packet = new MessageHistoryPacket(1, -1);
@@ -50,7 +51,7 @@ public class Client implements PacketHandler {
         //SearchUserPacket packet = new SearchUserPacket("Nimmi");
         //GetAttachmentPacket packet = new GetAttachmentPacket("7bff0eae-6dd9-444a-98a6-16a9b4161b66");
 
-        //send(packet);
+        send(packet);
     }
 
     @Override
@@ -74,7 +75,6 @@ public class Client implements PacketHandler {
             System.out.println("Authenticated");
             if (onLoginSuccessful != null) onLoginSuccessful.run();
         } else {
-            System.out.println("Authentication failed");
             if (onLoginSuccessful != null) onLoginFailed.run();
         }
     }
