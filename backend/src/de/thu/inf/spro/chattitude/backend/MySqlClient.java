@@ -297,7 +297,7 @@ public class MySqlClient {
             int userId = resultSet.getInt("userId");
             int messageId = resultSet.getInt("messageId");
 
-            if(resultSet.wasNull()){
+            if(!resultSet.wasNull()){
                 long timestamp = resultSet.getTimestamp("timestamp").getTime();
 
                 conversationName = resultSet.getString("name");

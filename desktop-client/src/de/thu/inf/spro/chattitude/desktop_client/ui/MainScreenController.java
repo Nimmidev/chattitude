@@ -135,27 +135,13 @@ public class MainScreenController implements Initializable {
         Platform.exit();
     }
 
+    public void createDialog() {
+        SearchUserPopUp popUp = new SearchUserPopUp(client);
+    }
+
     public void newChat() {
         // TODO
 
-        /*
-        String newChatPartner = txtNewPartner.getText();
-        SearchUserPacket packet = new SearchUserPacket(newChatPartner);
-        User[] name = packet.getResults();
-        System.out.println(newChatPartner);
-        System.out.println(name.length);
-        System.out.println(name[0]);
-        System.out.println(name[1]);
-
-        for (int i = 0; i < name.length; i++) {
-            if (name[i].getName() == newChatPartner) {
-                System.out.println(name[i].getName());
-                System.out.println(name[i].getId());
-            } else {
-                System.out.println("Nix gefunden");
-            }
-        }
-        */
         User[] userArray = new User[]{new User(1,"testUser1"), new User(2, "testUser2")};
 
         Conversation dummyConversation = new Conversation(userArray); // Users have to exist

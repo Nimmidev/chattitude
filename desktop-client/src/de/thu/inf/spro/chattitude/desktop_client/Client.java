@@ -97,7 +97,8 @@ public class Client implements PacketHandler {
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
         for(Conversation conversation : packet.getConversations()){
-            System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
+            //System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
+            // Outcomment hat Nullpointer.Exception behoben
         }
 
         if (onConversations != null) onConversations.call(packet.getConversations());
