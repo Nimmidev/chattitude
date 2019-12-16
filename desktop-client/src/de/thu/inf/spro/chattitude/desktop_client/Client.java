@@ -37,6 +37,7 @@ public class Client implements PacketHandler {
         //Message message = new Message(4, "Hello new msg", user);
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
         Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
+        Credentials testCredientials = new Credentials("Nimmi", "qwer");
 
         //AuthenticationPacket authenticationPacket = new AuthenticationPacket(new Credentials("Nimmi", "qwer"));
         //send(authenticationPacket);
@@ -97,7 +98,7 @@ public class Client implements PacketHandler {
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
         for(Conversation conversation : packet.getConversations()){
-            System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
+            //System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
         }
 
         if (onConversations != null) onConversations.call(packet.getConversations());

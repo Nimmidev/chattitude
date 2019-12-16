@@ -11,7 +11,7 @@ import java.util.*;
 public class MySqlClient {
     private Connection mySqlConnection;
 
-    public MySqlClient() {
+    MySqlClient() {
         try {
             connect();
         } catch (SQLException e) {
@@ -126,11 +126,7 @@ public class MySqlClient {
         }
     }
 
-    public Connection getMySqlConnection() {
-        return mySqlConnection;
-    }
-
-    public void close() {
+    void close() {
         try {
             mySqlConnection.close();
         } catch (SQLException e) {
@@ -138,7 +134,7 @@ public class MySqlClient {
         }
     }
 
-    public int getUserId(String username){
+    int getUserId(String username){
         String query = "SELECT userId FROM User WHERE username=?;";
         int userId = -1;
 
@@ -155,7 +151,7 @@ public class MySqlClient {
         return userId;
     }
 
-    public int createConversation(String name){
+    int createConversation(String name){
         String insertQuery = "INSERT INTO Conversation (name) VALUES (?);";
         String selectQuery = "SELECT LAST_INSERT_ID();";
         int conversationId = -1;
@@ -188,7 +184,63 @@ public class MySqlClient {
         return conversationId;
     }
 
-    public void addUserToConversation(int conversationId, int userId){
+    public Conversation getConversation(int conversationId){
+        Conversation conversation = null;
+        String conversationQuery = "SELECT Conversation.conversationId, Conversation.name, User.userId, " +
+                "User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
+                "INNER JOIN Conversation ON Conversation.conversationId = ? " +
+                "LEFT JOIN ChatMessage ON ChatMessage.messageId = Conversation.lastMessageId " +
+                "LEFT JOIN User ON User.userId = ChatMessage.sender;";
+        String usersQuery = "SELECT ConversationMember.conversationId, User.userId, User.username FROM `ConversationMember` " +
+                "INNER JOIN Conversation ON Conversation.conversationId = ConversationMember.conversationId " +
+                "INNER JOIN User ON User.userId = ConversationMember.userId " +
+                "WHERE ConversationMember.conversationId = ?;";
+
+        try {
+            getConnection().setAutoCommit(false);
+
+            try {
+                PreparedStatement pstmtConversation = getConnection().prepareStatement(conversationQuery);
+                pstmtConversation.setInt(1,  conversationId);
+                pstmtConversation.execute();
+
+                PreparedStatement pstmtUsers = getConnection().prepareStatement(usersQuery);
+                pstmtUsers.setInt(1,  conversationId);
+                pstmtUsers.execute();
+
+                ResultSet conversationResults = pstmtConversation.getResultSet();
+                ResultSet usersResults = pstmtUsers.getResultSet();
+
+                if(conversationResults.next()) conversation = _getConversationResult(conversationResults);
+                conversation.setUsers(_getUsersResult(usersResults));
+
+                getConnection().commit();
+            } catch (SQLException e){
+                getConnection().rollback();
+                e.printStackTrace();
+            } finally {
+                getConnection().setAutoCommit(true);
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return conversation;
+    }
+
+    private List<User> _getUsersResult(ResultSet resultSet) throws SQLException {
+        List<User> users = new ArrayList<>();
+
+        while(resultSet.next()){
+            int userId = resultSet.getInt("userId");
+            String username = resultSet.getString("username");
+            users.add(new User(userId, username));
+        }
+
+        return users;
+    }
+
+    void addUserToConversation(int conversationId, int userId){
         String query = "INSERT INTO ConversationMember (conversationId, userId) VALUES (?, ?);";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -200,7 +252,7 @@ public class MySqlClient {
         }
     }
 
-    public void removeUserFromConversation(int userId, int conversationId){
+    void removeUserFromConversation(int userId, int conversationId){
         String query = "DELETE FROM ConversationMember WHERE conversationId=? AND userId=?;";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -212,7 +264,7 @@ public class MySqlClient {
         }
     }
 
-    public void updateConversationAdmin(int conversationId, int userId, boolean admin){
+    void updateConversationAdmin(int conversationId, int userId, boolean admin){
         String query = "UPDATE ConversationMember SET isAdmin = ? WHERE userId = ? AND conversationId = ?;";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -225,7 +277,7 @@ public class MySqlClient {
         }
     }
 
-    public List<User> getConversationUsers(int conversationId){
+    List<User> getConversationUsers(int conversationId){
         List<User> users = new ArrayList<>();
         String query = "SELECT User.userId, User.username FROM ConversationMember " +
                 "INNER JOIN User ON ConversationMember.userId = User.userId " +
@@ -248,7 +300,7 @@ public class MySqlClient {
         return users;
     }
 
-    public List<Conversation> getUserConversations(int userId){
+    List<Conversation> getUserConversations(int userId){
         try {
             getConnection().setAutoCommit(false);
 
@@ -272,6 +324,7 @@ public class MySqlClient {
     }
 
     private Map<Integer, Conversation> _getUserConversations(int userId) throws SQLException {
+        Map<Integer, Conversation> conversations = new HashMap<>();
         String query = "SELECT Conversation.conversationId, Conversation.name, User.userId, " +
                 "User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
                 "INNER JOIN Conversation ON Conversation.conversationId = ConversationMember.conversationId " +
@@ -282,36 +335,40 @@ public class MySqlClient {
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  userId);
             pstmt.execute();
-            return _getUserConversationsResult(pstmt.getResultSet());
-        }
-    }
 
-    private Map<Integer, Conversation> _getUserConversationsResult(ResultSet resultSet) throws SQLException {
-        Map<Integer, Conversation> conversations = new HashMap<>();
-
-        while(resultSet.next()){
-            Message message = null;
-            String conversationName = "";
-
-            int conversationId = resultSet.getInt("conversationId");
-            int userId = resultSet.getInt("userId");
-            int messageId = resultSet.getInt("messageId");
-
-            if(resultSet.wasNull()){
-                long timestamp = resultSet.getTimestamp("timestamp").getTime();
-
-                conversationName = resultSet.getString("name");
-                String fileId = new String(resultSet.getBytes("fileId"));
-                String content = resultSet.getString("content");
-                String username = resultSet.getString("username");
-                User user = new User(userId, username);
-                message = new Message(messageId, conversationId, fileId, content, timestamp, user);
+            ResultSet resultSet = pstmt.getResultSet();
+            while(resultSet.next()){
+                Conversation conversation = _getConversationResult(resultSet);
+                conversations.put(conversation.getId(), conversation);
             }
-
-            conversations.put(conversationId, new Conversation(conversationId, conversationName, message));
         }
 
         return conversations;
+    }
+
+    private Conversation _getConversationResult(ResultSet resultSet) throws SQLException {
+        Message message = null;
+        String conversationName = "";
+        Conversation conversation = null;
+
+        int conversationId = resultSet.getInt("conversationId");
+        int userId = resultSet.getInt("userId");
+        int messageId = resultSet.getInt("messageId");
+
+        if(!resultSet.wasNull()){
+            long timestamp = resultSet.getTimestamp("timestamp").getTime();
+
+            conversationName = resultSet.getString("name");
+            String fileId = new String(resultSet.getBytes("fileId"));
+            String content = resultSet.getString("content");
+            String username = resultSet.getString("username");
+            User user = new User(userId, username);
+            message = new Message(messageId, conversationId, fileId, content, timestamp, user);
+        }
+
+        conversation = new Conversation(conversationId, conversationName, message);
+
+        return conversation;
     }
 
     private void _addUsersToConversations(int userId, Map<Integer, Conversation> conversations) throws SQLException {
@@ -336,12 +393,8 @@ public class MySqlClient {
             int userId = resultSet.getInt("userId");
             String username = resultSet.getString("username");
             User user = new User(userId, username);
-            List currentUserList = userMap.get(conversationId);
+            List<User> currentUserList = userMap.computeIfAbsent(conversationId, k -> new ArrayList<>());
 
-            if(currentUserList == null){
-                currentUserList = new ArrayList();
-                userMap.put(conversationId, currentUserList);
-            }
             currentUserList.add(user);
         }
 
@@ -359,7 +412,7 @@ public class MySqlClient {
         }
     }
 
-    public boolean saveMessage(Message message){
+    void saveMessage(Message message){
         try {
             getConnection().setAutoCommit(false);
 
@@ -377,15 +430,12 @@ public class MySqlClient {
             } catch (SQLException e){
                 getConnection().rollback();
                 e.printStackTrace();
-                return false;
             } finally {
                 getConnection().setAutoCommit(true);
             }
         } catch(SQLException e){
             e.printStackTrace();
         }
-
-        return true;
     }
 
     private String saveMessageData(byte[] data) throws SQLException {
@@ -427,17 +477,17 @@ public class MySqlClient {
         return -1;
     }
 
-    private void updateConversationLastMessage(int conversationid, int messageId) throws SQLException {
+    private void updateConversationLastMessage(int conversationId, int messageId) throws SQLException {
         String query = "UPDATE Conversation SET lastMessageId = ? WHERE conversationId = ?";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1, messageId);
-            pstmt.setInt(2, conversationid);
+            pstmt.setInt(2, conversationId);
             pstmt.executeUpdate();
         }
     }
 
-    public List<User> searchUsers(String searchQuery){
+    List<User> searchUsers(String searchQuery){
         String query = "SELECT userId, username FROM User WHERE username LIKE ?";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -464,7 +514,7 @@ public class MySqlClient {
         return users;
     }
 
-    public boolean checkUserInConversation(int userId, int conversationId){
+    boolean checkUserInConversation(int userId, int conversationId){
         String query = "SELECT userId FROM ConversationMember WHERE userId = ? AND conversationId = ?";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -482,7 +532,7 @@ public class MySqlClient {
         return false;
     }
 
-    public boolean checkUserIsAdmin(int userId, int conversationId){
+    boolean checkUserIsAdmin(int userId, int conversationId){
         String query = "SELECT userId FROM ConversationMember WHERE userId = ? AND conversationId = ? AND isAdmin = true";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -500,7 +550,7 @@ public class MySqlClient {
         return false;
     }
 
-    public List<Message> getMessageHistory(int conversationId, int lastMessageId, int limit){
+    List<Message> getMessageHistory(int conversationId, int lastMessageId){
         String query = "SELECT User.userId, User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.conversationId, " +
                 "ChatMessage.fileId, ChatMessage.timestamp FROM ChatMessage INNER JOIN User ON User.userId = ChatMessage.sender " +
                 "WHERE ChatMessage.conversationId = ? AND ChatMessage.messageId < ? ORDER BY messageId DESC LIMIT ?;";
@@ -508,7 +558,7 @@ public class MySqlClient {
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
             pstmt.setInt(1,  conversationId);
             pstmt.setInt(2,  lastMessageId);
-            pstmt.setInt(3,  limit);
+            pstmt.setInt(3,  Server.MESSAGE_HISTORY_FETCH_LIMIT);
             pstmt.execute();
             return getMessageHistoryResult(pstmt.getResultSet());
         } catch (SQLException e){
@@ -536,7 +586,7 @@ public class MySqlClient {
         return messages;
     }
 
-    public byte[] getAttachment(String fieldId){
+    byte[] getAttachment(String fieldId){
         String query = "SELECT data FROM FileUpload WHERE fileId = ?";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -553,7 +603,7 @@ public class MySqlClient {
         return new byte[]{};
     }
 
-    public void addUser(String username, String password){
+    void addUser(String username, String password){
         String query = "INSERT INTO User (username, password) VALUES (?,?);";
 
         try (PreparedStatement pstmt = getConnection().prepareStatement(query)){
@@ -565,7 +615,7 @@ public class MySqlClient {
         }
     }
 
-    public boolean checkUserExistence(String username){
+    boolean checkUserExistence(String username){
         String query = "Select username FROM User WHERE username = ?;";
         boolean result = false;
 
@@ -583,7 +633,7 @@ public class MySqlClient {
         return result;
     }
 
-    public boolean checkUserCredentials(String username, String password){
+    boolean checkUserCredentials(String username, String password){
         String query = "Select username FROM User WHERE username=? AND password=?;";
         boolean result = false;
 

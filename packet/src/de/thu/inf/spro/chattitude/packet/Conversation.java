@@ -33,17 +33,18 @@ public class Conversation {
     }
 
     public Conversation(User[] users){
-        this.id = -1;
-        this.name = "";
-        this.message = null;
-        this.users = users;
+        this(-1, "", null, users);
     }
 
     public Conversation(int id, String name, Message message){
+        this(id, name, message, new User[]{});
+    }
+
+    public Conversation(int id, String name, Message message, User[] users){
         this.id = id;
         this.name = name;
         this.message = message;
-        this.users = new User[]{};
+        this.users = users;
     }
 
     public int getId(){

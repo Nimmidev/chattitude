@@ -42,4 +42,8 @@ public class Credentials {
         return authenticated;
     }
 
+    public User asUser(){
+        return new User(userId, username);
+    }
+
 }
