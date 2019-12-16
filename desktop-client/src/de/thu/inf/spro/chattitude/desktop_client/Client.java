@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import org.java_websocket.WebSocket;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
@@ -25,8 +26,15 @@ public class Client implements PacketHandler {
     private Callback<Credentials> onRegister;
     private Callback<User[]> onSearchUser;
 
-    public Client() throws MalformedURLException, URISyntaxException {
-        webSocketClient = new WebSocketClient(this, 8080);
+    public Client() throws URISyntaxException {
+        URI uri;
+        String uriStr = System.getenv("SERVER_URL");
+        if (uriStr == null) {
+            uri = new URI("wss://chattitude.brk.st");
+        } else {
+            uri = new URI(uriStr);
+        }
+        webSocketClient = new WebSocketClient(this, uri);
         webSocketClient.connect();
     }
 
