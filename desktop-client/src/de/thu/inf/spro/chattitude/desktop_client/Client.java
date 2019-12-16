@@ -14,14 +14,13 @@ public class Client implements PacketHandler {
 
     private WebSocketClient webSocketClient;
 
-    private Credentials testCredientials = new Credentials("Nimmi", "qwer");
-
     private Runnable onLoginSuccessful;
     private Runnable onLoginFailed;
     private Callback<Message> onMessage;
     private Callback<Conversation[]> onConversations;
     private Callback<Integer> onConversationCreated;
     private Callback<MessageHistoryPacket> onMessageHistory;
+    private Callback<Conversation> onConversationUpdated;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -37,8 +36,8 @@ public class Client implements PacketHandler {
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
         Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
 
-        AuthenticationPacket authenticationPacket = new AuthenticationPacket(testCredientials);
-        send(authenticationPacket);
+        //AuthenticationPacket authenticationPacket = new AuthenticationPacket(new Credentials("Nimmi", "qwer"));
+        //send(authenticationPacket);
 
         //RegisterPacket packet = new RegisterPacket(testCredientials);
         //CreateConversationPacket packet = new CreateConversationPacket(1);
@@ -104,6 +103,7 @@ public class Client implements PacketHandler {
     @Override
     public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
         System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
+        if (onConversationUpdated != null) onConversationUpdated.call(packet.getConversation());
     }
 
     @Override
@@ -144,6 +144,10 @@ public class Client implements PacketHandler {
 
     public void setOnMessageHistory(Callback<MessageHistoryPacket> onMessageHistory) {
         this.onMessageHistory = onMessageHistory;
+    }
+
+    public void setOnConversationUpdated(Callback<Conversation> onConversationUpdated) {
+        this.onConversationUpdated = onConversationUpdated;
     }
 
     public void send(Packet packet){

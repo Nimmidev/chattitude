@@ -1,5 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Credentials;
 import de.thu.inf.spro.chattitude.packet.packets.AuthenticationPacket;
@@ -26,6 +28,12 @@ public class LoginScreenController {
     @FXML
     private AnchorPane loginScreen;
 
+    @FXML
+    private JFXTextField txtUsername;
+
+    @FXML
+    private JFXPasswordField txtPassword;
+
     public LoginScreenController() {
         System.out.println("LoginScreenController");
         client = App.getClient();
@@ -46,7 +54,7 @@ public class LoginScreenController {
     public void login() {
         // Methode schon mit Button "verlinkt"
         // Todo
-        Credentials credentials = new Credentials("Nimmi", "qwer");
+        Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
         client.send(new AuthenticationPacket(credentials));
     }
 
@@ -79,7 +87,7 @@ public class LoginScreenController {
     public void signUp() {
         // Methode schon mit Button "verlinkt"
         // Todo
-        Credentials credentials = new Credentials("Nimmi", "qwer");
+        Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
         client.send(new RegisterPacket(credentials));
     }
 

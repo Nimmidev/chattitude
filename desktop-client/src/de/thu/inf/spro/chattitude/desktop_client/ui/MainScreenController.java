@@ -1,12 +1,10 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
-import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextArea;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
-import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.CreateConversationPacket;
 import de.thu.inf.spro.chattitude.packet.packets.GetConversationsPacket;
 import de.thu.inf.spro.chattitude.packet.packets.MessageHistoryPacket;
@@ -40,7 +38,7 @@ public class MainScreenController implements Initializable {
         client = App.getClient();
         client.setOnMessage(message -> Platform.runLater(() -> {
             int conversationId = message.getConversationId();
-            if (conversationId == selectedConversation.getId()) {
+            if (selectedConversation != null && conversationId == selectedConversation.getId()) {
                 messageHistoryList.getItems().add(createMessageItem(message));
             }
             for (Label cell : conversationsList.getItems()) {
@@ -53,6 +51,19 @@ public class MainScreenController implements Initializable {
             }
             System.out.println("Warning: Message for unknown conversation " + conversationId);
         }));
+        client.setOnConversationUpdated(newConversation -> {
+            for (Label cell : conversationsList.getItems()) {
+                Conversation oldConversation = (Conversation) cell.getProperties().get(CONVERSATION_PROPERTY);
+                if (newConversation.getId() == oldConversation.getId()) {
+                    cell.getProperties().put(CONVERSATION_PROPERTY, newConversation);
+                    updateConversationItem(newConversation, cell);
+                    return;
+                }
+            }
+
+            Label cell = createConversationItem(newConversation);
+            conversationsList.getItems().add(0, cell);
+        });
     }
 
     @Override
@@ -72,7 +83,7 @@ public class MainScreenController implements Initializable {
     private Label createConversationItem(Conversation conversation) {
         Label cell = new Label();
         cell.getProperties().put(CONVERSATION_PROPERTY, conversation);
-       updateConversationItem(conversation, cell);
+        updateConversationItem(conversation, cell);
         return cell;
     }
 

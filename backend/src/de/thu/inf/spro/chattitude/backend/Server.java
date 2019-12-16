@@ -115,13 +115,20 @@ public class Server implements PacketHandler {
 
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
+        Credentials credentials = webSocket.getAttachment();
         boolean success = false;
         int conversationId = mySqlClient.createConversation();
 
         if(conversationId != -1){
             success = true;
             packet.setConversationId(conversationId);
-            for(int userId : packet.getUserIds()) mySqlClient.addUserToConversation(conversationId, userId);
+            mySqlClient.addUserToConversation(conversationId, credentials.getUserId());
+            for(int userId : packet.getUserIds()) {
+                if (userId == credentials.getUserId())
+                    continue;
+                mySqlClient.addUserToConversation(conversationId, userId);
+                // TODO ConversationUpdate Packet an alle Teilnehmer senden
+            }
         }
 
         packet.setSuccessful(success);
