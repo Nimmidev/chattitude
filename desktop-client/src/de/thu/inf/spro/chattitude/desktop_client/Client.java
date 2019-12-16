@@ -23,6 +23,7 @@ public class Client implements PacketHandler {
     private Callback<MessageHistoryPacket> onMessageHistory;
     private Callback<Conversation> onConversationUpdated;
     private Callback<Credentials> onRegister;
+    private Callback<User[]> onSearchUser;
 
     public Client() throws MalformedURLException, URISyntaxException {
         webSocketClient = new WebSocketClient(this, 8080);
@@ -96,11 +97,6 @@ public class Client implements PacketHandler {
 
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
-        for(Conversation conversation : packet.getConversations()){
-            //System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), conversation.getMessage().getUser().getName(), conversation.getMessage().getContent(), conversation.getMessage().getTimestamp(), conversation.getUsers().length));
-            // Outcomment hat Nullpointer.Exception behoben
-        }
-
         if (onConversations != null) onConversations.call(packet.getConversations());
     }
 
@@ -130,6 +126,8 @@ public class Client implements PacketHandler {
     public void onSearchUser(SearchUserPacket packet, WebSocket webSocket) {
         if(packet.getResults().length == 0) System.out.println("No Users found.");
         else for(User user : packet.getResults()) System.out.println(user.getName());
+        if (onSearchUser != null)
+            onSearchUser.call(packet.getResults());
     }
 
     public void setOnConversationCreated(Callback<Conversation> onConversationCreated) {
@@ -162,6 +160,10 @@ public class Client implements PacketHandler {
 
     public void setOnRegister(Callback<Credentials> onRegister) {
         this.onRegister = onRegister;
+    }
+
+    public void setOnSearchUser(Callback<User[]> onSearchUser) {
+        this.onSearchUser = onSearchUser;
     }
 
     public void send(Packet packet){
