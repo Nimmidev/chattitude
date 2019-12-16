@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import org.java_websocket.WebSocket;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
@@ -25,8 +26,15 @@ public class Client implements PacketHandler {
     private Callback<Credentials> onRegister;
     private Callback<User[]> onSearchUser;
 
-    public Client() throws MalformedURLException, URISyntaxException {
-        webSocketClient = new WebSocketClient(this, 8080);
+    public Client() throws URISyntaxException {
+        URI uri;
+        String uriStr = System.getenv("SERVER_URL");
+        if (uriStr == null) {
+            uri = new URI("wss://chattitude.brk.st");
+        } else {
+            uri = new URI(uriStr);
+        }
+        webSocketClient = new WebSocketClient(this, uri);
         webSocketClient.connect();
     }
 
@@ -38,6 +46,7 @@ public class Client implements PacketHandler {
         //Message message = new Message(4, "Hello new msg", user);
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
         Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
+        Credentials testCredientials = new Credentials("Nimmi", "qwer");
 
         //AuthenticationPacket authenticationPacket = new AuthenticationPacket(new Credentials("Nimmi", "qwer"));
         //send(authenticationPacket);
@@ -97,6 +106,15 @@ public class Client implements PacketHandler {
 
     @Override
     public void onGetConversations(GetConversationsPacket packet, WebSocket webSocket) {
+        for(Conversation conversation : packet.getConversations()){
+            Message message = conversation.getMessage();
+            String messageText = message != null ? message.getContent() : "";
+            long timestamp = message != null ? message.getTimestamp() : -1;
+            User user = message != null ? message.getUser() : null;
+            String username = user != null ? user.getName() : "";
+            System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), username, messageText, timestamp, conversation.getUsers().length));
+        }
+
         if (onConversations != null) onConversations.call(packet.getConversations());
     }
 

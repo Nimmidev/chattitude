@@ -8,6 +8,7 @@ import de.thu.inf.spro.chattitude.packet.packets.Packet;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -15,8 +16,8 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
     private Communicator communicator;
 
-    public WebSocketClient(PacketHandler handler, int port) throws MalformedURLException, URISyntaxException {
-        super(new URL("https://localhost:" + port).toURI());
+    public WebSocketClient(PacketHandler handler, URI uri) throws URISyntaxException {
+        super(uri);
 
         communicator = new Communicator(handler);
     }

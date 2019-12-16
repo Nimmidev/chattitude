@@ -25,7 +25,7 @@ public class App extends Application {
         INSTANCE = this;
         try {
             client = new Client();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
 
