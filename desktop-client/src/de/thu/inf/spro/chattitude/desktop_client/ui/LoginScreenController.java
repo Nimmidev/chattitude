@@ -95,6 +95,8 @@ public class LoginScreenController {
             secondaryStage.setWidth(primaryScreenBounds.getWidth());
             secondaryStage.setHeight(primaryScreenBounds.getHeight());
             secondaryStage.setResizable(true);
+            // TODO hab das nur testweise auskommentiert gemacht damit ich das Fenster resizen kann:
+            //secondaryStage.initStyle(StageStyle.UNDECORATED);
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
             secondaryStage.show();
