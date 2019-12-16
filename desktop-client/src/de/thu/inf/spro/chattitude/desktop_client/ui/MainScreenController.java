@@ -14,6 +14,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollToEvent;
+import javafx.scene.control.skin.ListViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
 
 import javax.swing.*;
 import java.net.URL;
@@ -158,13 +161,13 @@ public class MainScreenController implements Initializable {
         Conversation dummyConversation = new Conversation(userArray); // Users have to exist
         CreateConversationPacket packet = new CreateConversationPacket(dummyConversation);
         client.send(packet);
-        client.setOnConversationCreated(conversationId -> Platform.runLater(() -> {
+        client.setOnConversationCreated(conversation -> Platform.runLater(() -> {
 
-            Label cell = createConversationItem(dummyConversation);
+            Label cell = createConversationItem(conversation);
             conversationsList.getItems().add(0, cell);
             conversationsList.getSelectionModel().select(cell);
-            selectedConversation = dummyConversation;
-            System.out.println("created " + conversationId);
+            selectedConversation = conversation;
+            System.out.println("created " + conversation.getId());
         }));
 
     }

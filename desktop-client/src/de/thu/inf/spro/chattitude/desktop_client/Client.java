@@ -19,7 +19,7 @@ public class Client implements PacketHandler {
     private Runnable onLoginFailed;
     private Callback<Message> onMessage;
     private Callback<Conversation[]> onConversations;
-    private Callback<Integer> onConversationCreated;
+    private Callback<Conversation> onConversationCreated;
     private Callback<MessageHistoryPacket> onMessageHistory;
     private Callback<Conversation> onConversationUpdated;
     private Callback<Credentials> onRegister;
@@ -106,7 +106,7 @@ public class Client implements PacketHandler {
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
         System.out.println("CreateConversation: " + packet.getConversation().getId());
-        if (onConversationCreated != null) onConversationCreated.call(packet.getConversation().getId());
+        if (onConversationCreated != null) onConversationCreated.call(packet.getConversation());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class Client implements PacketHandler {
         else for(User user : packet.getResults()) System.out.println(user.getName());
     }
 
-    public void setOnConversationCreated(Callback<Integer> onConversationCreated) {
+    public void setOnConversationCreated(Callback<Conversation> onConversationCreated) {
         this.onConversationCreated = onConversationCreated;
     }
 
