@@ -89,13 +89,16 @@ public class MainScreenController implements Initializable {
                 return;
             }
 
+            ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
+            VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
+            Message topMost = messagesOfSelectedConversation.get(vf.getFirstVisibleCell().getIndex() + 1);
 
             for (Message message : packet.getMessages()) {
                 if (!messagesOfSelectedConversation.contains(message)) {
                     messagesOfSelectedConversation.add(0, message);
                 }
             }
-            messageHistoryList.scrollTo(messagesOfSelectedConversation.size() - 1);
+            messageHistoryList.scrollTo(topMost);
             checkToLoadHistory();
         }));
     }
@@ -124,11 +127,7 @@ public class MainScreenController implements Initializable {
 
                 ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
                 VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-                vf.positionProperty().addListener((observable2, oldValue2, newValue) -> {
-                    int first = vf.getFirstVisibleCell().getIndex();
-                    System.out.println("First: " + first);
-                    checkToLoadHistory();
-                });
+                vf.positionProperty().addListener((observable2, oldValue2, newValue) -> checkToLoadHistory());
 
                 loadMoreMessages();
             } else {
@@ -210,7 +209,6 @@ public class MainScreenController implements Initializable {
         ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
         VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
         int first = vf.getFirstVisibleCell().getIndex();
-        System.out.println("Hier: " + first);
         if (first == 0) {
             if (!allMessagesOfCurrentConversationLoaded && !loadingHistory) {
                 loadMoreMessages();
