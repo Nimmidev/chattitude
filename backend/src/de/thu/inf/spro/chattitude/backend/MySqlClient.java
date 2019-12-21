@@ -8,7 +8,7 @@ import org.mariadb.jdbc.MariaDbDataSource;
 import java.sql.*;
 import java.util.*;
 
-public class MySqlClient {
+class MySqlClient {
     private Connection mySqlConnection;
 
     MySqlClient() {
@@ -61,7 +61,7 @@ public class MySqlClient {
                 ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS Conversation (" +
                     "`conversationId` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY," +
-                    "`name` VARCHAR(64) NOT NULL DEFAULT ''" +
+                    "`name` VARCHAR(64) NULL DEFAULT ''" +
                     ",`lastMessageId` INT UNSIGNED" +
                 ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS ChatMessage (" +
@@ -89,6 +89,7 @@ public class MySqlClient {
                     "`conversationId` INT UNSIGNED NOT NULL," +
                     "`userId` INT UNSIGNED NOT NULL," +
                     "`isAdmin` BOOLEAN NOT NULL DEFAULT false," +
+                    "PRIMARY KEY (conversationId, userId), " +
                     "INDEX `constr_conversationId_idx` (`conversationId` ASC)," +
                     "INDEX `constr_userId_idx` (`userId` ASC)," +
                     "CONSTRAINT `CMember_conversationId_constr` " +
@@ -184,7 +185,7 @@ public class MySqlClient {
         return conversationId;
     }
 
-    public Conversation getConversation(int conversationId){
+    Conversation getConversation(int conversationId){
         Conversation conversation = null;
         String conversationQuery = "SELECT Conversation.conversationId, Conversation.name, User.userId, " +
                 "User.username, ChatMessage.messageId, ChatMessage.content, ChatMessage.fileId, ChatMessage.timestamp FROM ConversationMember " +
@@ -212,7 +213,8 @@ public class MySqlClient {
                 ResultSet usersResults = pstmtUsers.getResultSet();
 
                 if(conversationResults.next()) conversation = _getConversationResult(conversationResults);
-                conversation.setUsers(_getUsersResult(usersResults));
+                if(conversation != null) conversation.setUsers(_getUsersResult(usersResults));
+                else throw new SQLException("Conversation can't be null");
 
                 getConnection().commit();
             } catch (SQLException e){
@@ -349,7 +351,7 @@ public class MySqlClient {
     private Conversation _getConversationResult(ResultSet resultSet) throws SQLException {
         Message message = null;
         String conversationName = "";
-        Conversation conversation = null;
+        Conversation conversation;
 
         int conversationId = resultSet.getInt("conversationId");
         int userId = resultSet.getInt("userId");

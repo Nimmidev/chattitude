@@ -18,6 +18,8 @@ import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {
@@ -228,9 +230,11 @@ public class MainScreenController implements Initializable {
     public void newChat() {
         // TODO
 
+        String groupName = "Group " + new SimpleDateFormat("HH:mm:ss").format(new Date());
         User[] userArray = new User[]{new User(1,"testUser1"), new User(2, "testUser2")};
 
-        Conversation dummyConversation = new Conversation(userArray); // Users have to exist
+        //Conversation dummyConversation = new Conversation(groupName, userArray);
+        Conversation dummyConversation = new Conversation(userArray[1]);
         CreateConversationPacket packet = new CreateConversationPacket(dummyConversation);
         client.send(packet);
         client.setOnConversationCreated(conversation -> Platform.runLater(() -> {

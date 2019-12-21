@@ -21,7 +21,9 @@ public class Conversation {
 
     public Conversation(JsonObject json){
         id = json.get(FIELD_ID).asInt();
-        name = json.get(FIELD_NAME).asString();
+
+        if(json.get(FIELD_NAME) != null) name = json.get(FIELD_NAME).asString();
+        else name = null;
 
         if(json.get(FIELD_MESSAGE) != null) message = new Message(json.get(FIELD_MESSAGE).asObject());
         else message = null;
@@ -32,15 +34,19 @@ public class Conversation {
         users = userList.toArray(users);
     }
 
-    public Conversation(User[] users){
-        this(-1, "", null, users);
+    public Conversation(String name, User[] users){
+        this(-1, name, null, users);
+    }
+
+    public Conversation(User user){
+        this(-1, null, null, new User[]{user});
     }
 
     public Conversation(int id, String name, Message message){
         this(id, name, message, new User[]{});
     }
 
-    public Conversation(int id, String name, Message message, User[] users){
+    private Conversation(int id, String name, Message message, User[] users){
         this.id = id;
         this.name = name;
         this.message = message;
@@ -83,7 +89,7 @@ public class Conversation {
         JsonObject json = new JsonObject();
 
         json.add(FIELD_ID, id);
-        json.add(FIELD_NAME, name);
+        if(name != null) json.add(FIELD_NAME, name);
         if(message != null) json.add(FIELD_MESSAGE, message.asJson());
         JsonArray usersArray = new JsonArray();
         Arrays.stream(users).map(User::asJson).forEach(usersArray::add);
