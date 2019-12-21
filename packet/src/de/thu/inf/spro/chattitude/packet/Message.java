@@ -10,7 +10,7 @@ public class Message {
     private static final String FIELD_ID = "id";
     private static final String FIELD_CONVERSATION_ID = "conversationId";
     private static final String FIELD_USER = "user";
-    private static final String FIELD_DATA_UUID = "dataUUID";
+    private static final String FIELD_FILE_ID = "fileId";
     private static final String FIELD_TEXT = "text";
     private static final String FIELD_TIMESTAMP = "timestamp";
     private static final String FIELD_DATA = "data";
@@ -26,16 +26,17 @@ public class Message {
     public Message(JsonObject json){
         id = json.get(FIELD_ID).asInt();
         conversationId = json.get(FIELD_CONVERSATION_ID).asInt();
-        if (json.get(FIELD_USER) != null)
-            user = new User(json.get(FIELD_USER).asObject());
-        fileId = json.get(FIELD_DATA_UUID).asString();
+        
+        if(json.get(FIELD_USER) != null) user = new User(json.get(FIELD_USER).asObject());
+        if(json.get(FIELD_FILE_ID) != null) fileId = json.get(FIELD_FILE_ID).asString();
+        
         content = json.get(FIELD_TEXT).asString();
         timestamp = json.get(FIELD_TIMESTAMP).asLong();
         data = Base64.getDecoder().decode(json.get(FIELD_DATA).asString());
     }
 
     public Message(int conversationId, String content, User user){
-        this(conversationId, "", content, user);
+        this(conversationId, null, content, user);
     }
 
     public Message(int conversationId, String fileId, String content, User user){
@@ -47,7 +48,7 @@ public class Message {
     }
 
     public Message(int conversationId, String content, User user, byte[] data){
-        this(-1, conversationId, "", content, new Date().getTime(), user, data);
+        this(-1, conversationId, null, content, new Date().getTime(), user, data);
     }
 
     public Message(int id, int conversationId, String fileId, String content, long timestamp, User user, byte[] data){
@@ -64,8 +65,8 @@ public class Message {
         this.id = id;
     }
 
-    public void setFieldId(String fieldId){
-        this.fileId = fieldId;
+    public void setFileId(String fileId){
+        this.fileId = fileId;
     }
 
     public int getId(){
@@ -105,9 +106,10 @@ public class Message {
 
         json.add(FIELD_ID, id);
         json.add(FIELD_CONVERSATION_ID, conversationId);
-        if (user != null)
-            json.add(FIELD_USER, user.asJson());
-        json.add(FIELD_DATA_UUID, fileId);
+        
+        if(user != null) json.add(FIELD_USER, user.asJson());
+        if(fileId != null) json.add(FIELD_FILE_ID, fileId);
+        
         json.add(FIELD_TEXT, content);
         json.add(FIELD_TIMESTAMP, timestamp);
         json.add(FIELD_DATA, Base64.getEncoder().encodeToString(data));

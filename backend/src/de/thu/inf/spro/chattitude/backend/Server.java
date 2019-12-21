@@ -1,5 +1,6 @@
 package de.thu.inf.spro.chattitude.backend;
 
+import de.thu.inf.spro.chattitude.backend.database.MySqlClient;
 import de.thu.inf.spro.chattitude.backend.network.WebSocketServer;
 import de.thu.inf.spro.chattitude.packet.*;
 import de.thu.inf.spro.chattitude.packet.packets.*;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 public class Server implements PacketHandler {
 
-    static final int MESSAGE_HISTORY_FETCH_LIMIT = 10;
+    public static final int MESSAGE_HISTORY_FETCH_LIMIT = 10;
     private static final int MAX_FILE_UPLOAD_SIZE = 10 * 1000 * 1000;
 
     private WebSocketServer webSocketServer;
@@ -126,6 +127,7 @@ public class Server implements PacketHandler {
 
             for(User user : conversation.getUsers()) {
                 if (user.getId() == credentials.getUserId()) continue;
+                System.out.println(user.getId());
                 mySqlClient.addUserToConversation(conversationId, user.getId());
             }
 
@@ -151,24 +153,25 @@ public class Server implements PacketHandler {
     @Override
     public void onModifyConversationUser(ModifyConversationUserPacket packet, WebSocket webSocket) {
         Credentials credentials = webSocket.getAttachment();
-        boolean isAdmin = mySqlClient.checkUserIsAdmin(credentials.getUserId(), packet.getConversationId());
+        boolean isAdmin = mySqlClient.checkConversationUserIsAdmin(credentials.getUserId(), packet.getConversationId());
+        boolean success = false;
 
         if(isAdmin){
             if(packet.getAction() == ModifyConversationUserPacket.Action.REMOVE){
-                mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
+                success = mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.ADD){
-                mySqlClient.addUserToConversation(packet.getConversationId(), packet.getUserId());
+                success = mySqlClient.addUserToConversation(packet.getConversationId(), packet.getUserId());
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.PROMOTE_ADMIN){
-                mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), true);
+                success = mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), true);
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.DEMOTE_ADMIN){
-                mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), false);
+                success = mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), false);
             }
         }
 
-        packet.setSuccessful(isAdmin);
+        packet.setSuccessful(success);
         send(webSocket, packet);
 
-        if(isAdmin){
+        if(success){
             Conversation conversation = mySqlClient.getConversation(packet.getConversationId());
             broadcastPacket(conversation.getUsers(), new ConversationUpdatedPacket(conversation));
         }

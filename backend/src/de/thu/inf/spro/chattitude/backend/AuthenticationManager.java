@@ -1,5 +1,6 @@
 package de.thu.inf.spro.chattitude.backend;
 
+import de.thu.inf.spro.chattitude.backend.database.MySqlClient;
 import de.thu.inf.spro.chattitude.packet.Credentials;
 import org.java_websocket.WebSocket;
 
