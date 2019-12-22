@@ -25,8 +25,8 @@ public class MySqlClient {
             userSQL = new UserSQL(connection);
             conversationSQL = new ConversationSQL(connection);
             conversationMemberSQL = new ConversationMemberSQL(connection);
-            messageSQL = new MessageSQL(connection);
             fileUploadSQL = new FileUploadSQL(connection);
+            messageSQL = new MessageSQL(connection, conversationSQL, fileUploadSQL);
             createTables();
         } catch (SQLException e) {
             throw new RuntimeException("Error connecting to mysql server", e);
@@ -91,8 +91,23 @@ public class MySqlClient {
 
     // --- Conversation ---
 
-    public int createConversation(String conversationName){
-        return conversationSQL.add(conversationName);
+    public int createConversation(String conversationName, int sessionUserId, User[] users){
+        int conversationId = conversationSQL.add(conversationName);
+        
+        if(conversationId != -1){
+            addUserToConversation(sessionUserId, conversationId);
+            
+            for(User user : users) {
+                if (user.getId() == sessionUserId) continue;
+                addUserToConversation(user.getId(), conversationId);
+            }
+    
+            if(conversationName == null){
+                updateConversationAdmin(sessionUserId, conversationId, true);
+            }
+        }
+        
+        return conversationId;
     }
 
     public Conversation getConversation(int conversationId){
@@ -109,16 +124,16 @@ public class MySqlClient {
 
     // --- ConversationMember
 
-    public boolean addUserToConversation(int conversationId, int userId){
-        return conversationMemberSQL.addToConversation(conversationId, userId);
+    public boolean addUserToConversation(int userId, int conversationId){
+        return conversationMemberSQL.addToConversation(userId, conversationId);
     }
 
     public boolean removeUserFromConversation(int userId, int conversationId){
         return conversationMemberSQL.removeFromConversation(userId, conversationId);
     }
 
-    public boolean updateConversationAdmin(int conversationId, int userId, boolean admin){
-        return conversationMemberSQL.updateConversationAdmin(conversationId, userId, admin);
+    public boolean updateConversationAdmin(int userId, int conversationId, boolean isAdmin){
+        return conversationMemberSQL.updateIsAdmin(userId, conversationId, isAdmin);
     }
 
     public boolean checkUserInConversation(int userId, int conversationId){
@@ -132,7 +147,7 @@ public class MySqlClient {
     // --- Message ---
 
     public void saveMessage(Message message) {
-        messageSQL.add(message, conversationSQL, fileUploadSQL);
+        messageSQL.add(message);
     }
 
     public List<Message> getMessageHistory(int conversationId, int lastMessageId){

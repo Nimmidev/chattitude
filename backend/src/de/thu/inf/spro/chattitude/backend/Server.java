@@ -118,24 +118,11 @@ public class Server implements PacketHandler {
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
         Credentials credentials = webSocket.getAttachment();
         Conversation conversation = packet.getConversation();
-        int conversationId = mySqlClient.createConversation("asdf");//conversation.getName());
+        
+        int conversationId = mySqlClient.createConversation(conversation.getName(), credentials.getUserId(), conversation.getUsers());
         boolean success = conversationId != -1;
 
-        if(success){
-            conversation.setId(conversationId);
-            mySqlClient.addUserToConversation(conversationId, credentials.getUserId());
-
-            for(User user : conversation.getUsers()) {
-                if (user.getId() == credentials.getUserId()) continue;
-                System.out.println(user.getId());
-                mySqlClient.addUserToConversation(conversationId, user.getId());
-            }
-
-            if(conversation.getName() == null){
-                mySqlClient.updateConversationAdmin(conversationId, credentials.getUserId(), true);
-            }
-        }
-
+        conversation.setId(conversationId);
         packet.setSuccessful(success);
         send(webSocket, packet);
 
@@ -160,11 +147,11 @@ public class Server implements PacketHandler {
             if(packet.getAction() == ModifyConversationUserPacket.Action.REMOVE){
                 success = mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.ADD){
-                success = mySqlClient.addUserToConversation(packet.getConversationId(), packet.getUserId());
+                success = mySqlClient.addUserToConversation(packet.getUserId(), packet.getConversationId());
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.PROMOTE_ADMIN){
-                success = mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), true);
+                success = mySqlClient.updateConversationAdmin(packet.getUserId(), packet.getConversationId(), true);
             } else if(packet.getAction() == ModifyConversationUserPacket.Action.DEMOTE_ADMIN){
-                success = mySqlClient.updateConversationAdmin(packet.getConversationId(), packet.getUserId(), false);
+                success = mySqlClient.updateConversationAdmin(packet.getUserId(), packet.getConversationId(), false);
             }
         }
 

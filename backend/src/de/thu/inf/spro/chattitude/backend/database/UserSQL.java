@@ -89,14 +89,29 @@ final class UserSQL extends BaseSQL {
         return users;
     }
 
-    void add(String username, String password){
-        try (PreparedStatement pstmt = connection.get().prepareStatement(ADD)){
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            pstmt.executeUpdate();
-        } catch (SQLException e){
+    int add(String username, String password){
+        int userId = -1;
+
+        try {
+            connection.get().setAutoCommit(false);
+
+            try (PreparedStatement pstmt = connection.get().prepareStatement(ADD)){
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                pstmt.execute();
+
+                userId = getLastInsertId();
+            } catch (SQLException e){
+                connection.get().rollback();
+                e.printStackTrace();
+            } finally {
+                connection.get().setAutoCommit(true);
+            }
+        } catch(SQLException e){
             e.printStackTrace();
         }
+
+        return userId;
     }
 
     boolean checkExistence(String username){

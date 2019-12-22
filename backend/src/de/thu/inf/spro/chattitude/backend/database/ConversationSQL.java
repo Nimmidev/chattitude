@@ -70,30 +70,29 @@ final class ConversationSQL extends BaseSQL {
         String convMembUId = convMemb + ConversationMemberSQL._USER_ID;
         String convMembConvId = convMemb + ConversationMemberSQL._CONVERSATION_ID;
         
-        String tmp = String.join(", ", convId, convName, userId, username, messageId, content, fileId, timestamp);
-        String getCorePartBeginning =  String.format("SELECT %s FROM %s INNER JOIN %s ON %s", tmp, 
-                ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId);
+        String corePartKeys = String.join(", ", convId, convName, userId, username, messageId, content, fileId, timestamp);
         
         GET_CONVERSATION_USERS = String.format("SELECT %s, %s FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?", userId, username, 
                 ConversationMemberSQL.TABLE_NAME, UserSQL.TABLE_NAME, convMembUId, userId, convMembConvId);
         
-        GET_CONVERSATION__CORE_PART = getCorePartBeginning + 
-                String.format(" = ? LEFT JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s;", MessageSQL.TABLE_NAME, messageId, 
-                        lastMsgId, UserSQL.TABLE_NAME, userId, msgUserId);
+        GET_CONVERSATION__CORE_PART =  
+                String.format("SELECT %s FROM %s LEFT JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s WHERE %s = ?;", corePartKeys, 
+                        ConversationSQL.TABLE_NAME, MessageSQL.TABLE_NAME, messageId, lastMsgId, UserSQL.TABLE_NAME, userId, msgUserId, convId);
 
-        tmp = String.join(", ", convMembConvId, userId, username);
+        String usersPartKeys = String.join(", ", convMembConvId, userId, username);
         GET_CONVERSATION__USERS_PART = String.format("SELECT %s FROM %s INNER JOIN %s ON %s = %s INNER JOIN %s ON %s = %s WHERE %s = ?;",
-                tmp, ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId, convMembConvId, UserSQL.TABLE_NAME, 
+                usersPartKeys, ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId, convMembConvId, UserSQL.TABLE_NAME, 
                 userId, convMembUId, convMembConvId);
 
-        GET_CONVERSATIONS__CORE_PART = getCorePartBeginning + 
-                String.format(" = %s LEFT JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s WHERE %s = ?;", convMembConvId, 
-                        MessageSQL.TABLE_NAME, messageId, lastMsgId, UserSQL.TABLE_NAME, userId, msgUserId, convMembUId);
+        GET_CONVERSATIONS__CORE_PART = 
+                String.format("SELECT %s FROM %s INNER JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s WHERE %s = ?;",
+                        corePartKeys, ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId, convMembConvId, MessageSQL.TABLE_NAME, 
+                        messageId, lastMsgId, UserSQL.TABLE_NAME, userId, msgUserId, convMembUId);
 
-        GET_CONVERSATIONS__USERS_PART = String.format("SELECT cm2.%s, %s, %s FROM %s cm1 INNER JOIN %s ON " + 
+        GET_CONVERSATIONS__USERS_PART = String.format("SELECT cm2.%s, %s, %s, cm2.%s FROM %s cm1 INNER JOIN %s ON " + 
                 "%s = cm1.%s INNER JOIN %s cm2 ON cm2.%s = %s INNER JOIN %s ON cm2.%s = %s WHERE cm1.%s = ?;", 
-                _ID, userId, username, ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId, _ID, 
-                ConversationMemberSQL.TABLE_NAME, _ID, convId, UserSQL.TABLE_NAME, UserSQL._ID, userId, UserSQL._ID);
+                _ID, userId, username,  ConversationMemberSQL._IS_ADMIN,  ConversationMemberSQL.TABLE_NAME, TABLE_NAME, 
+                convId, _ID, ConversationMemberSQL.TABLE_NAME, _ID, convId, UserSQL.TABLE_NAME, UserSQL._ID, userId, UserSQL._ID);
     }
 
     ConversationSQL(ValidConnection connection){
@@ -115,7 +114,6 @@ final class ConversationSQL extends BaseSQL {
 
     int add(String conversationName){
         int conversationId = -1;
-        String SELECT_LAST_INSERT_ID = "SELECT LAST_INSERT_ID();";
 
         try {
             connection.get().setAutoCommit(false);
@@ -124,14 +122,7 @@ final class ConversationSQL extends BaseSQL {
                 insertPstmt.setString(1, conversationName);
                 insertPstmt.execute();
 
-                try (PreparedStatement selectPstmt = connection.get().prepareStatement(SELECT_LAST_INSERT_ID)){
-                    selectPstmt.execute();
-                    connection.get().commit();
-
-                    if(selectPstmt.getResultSet() != null && selectPstmt.getResultSet().next()){
-                        conversationId = selectPstmt.getResultSet().getInt("LAST_INSERT_ID()");
-                    }
-                }
+                conversationId = getLastInsertId();
             } catch (SQLException e){
                 connection.get().rollback();
                 e.printStackTrace();
@@ -183,17 +174,16 @@ final class ConversationSQL extends BaseSQL {
 
     private Conversation getResult(ResultSet resultSet) throws SQLException {
         Message message = null;
-        String conversationName = "";
         Conversation conversation;
 
         int conversationId = resultSet.getInt(MessageSQL._CONVERSATION_ID);
         int userId = resultSet.getInt(UserSQL._ID);
+        String conversationName = resultSet.getString(ConversationSQL._NAME);
         int messageId = resultSet.getInt(MessageSQL._ID);
 
         if(!resultSet.wasNull()){
             long timestamp = resultSet.getTimestamp(MessageSQL._TIMESTAMP).getTime();
 
-            conversationName = resultSet.getString(ConversationSQL._NAME);
             byte[] bytes = resultSet.getBytes(FileUploadSQL._ID);
             String fileId = bytes != null ? new String(bytes) : null;
             String content = resultSet.getString(MessageSQL._CONTENT);
@@ -245,7 +235,7 @@ final class ConversationSQL extends BaseSQL {
 
             try {
                 Map<Integer, Conversation> conversations = getUserConversationsWithoutUsers(userId);
-                addUsersToConversations(userId, conversations);
+                addUsersResultToConversations(userId, conversations);
                 connection.get().commit();
 
                 return new ArrayList<>(conversations.values());
@@ -279,7 +269,7 @@ final class ConversationSQL extends BaseSQL {
         return conversations;
     }
 
-    private void addUsersToConversations(int userId, Map<Integer, Conversation> conversations) throws SQLException {
+    private void addUsersResultToConversations(int userId, Map<Integer, Conversation> conversations) throws SQLException {
         try (PreparedStatement pstmt = connection.get().prepareStatement(GET_CONVERSATIONS__USERS_PART)){
             pstmt.setInt(1,  userId);
             pstmt.execute();
@@ -313,9 +303,8 @@ final class ConversationSQL extends BaseSQL {
             }
         }
     }
-
     
-    void updateLastMessage(int conversationId, int messageId){
+    void updateLastMessageId(int conversationId, int messageId){
         try (PreparedStatement pstmt = connection.get().prepareStatement(UPDATE_LAST_MESSAGE)){
             pstmt.setInt(1, messageId);
             pstmt.setInt(2, conversationId);

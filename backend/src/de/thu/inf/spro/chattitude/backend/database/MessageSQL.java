@@ -71,15 +71,20 @@ final class MessageSQL extends BaseSQL {
                 " DESC LIMIT ?;";
     }
     
-    MessageSQL(ValidConnection connection){
+    private ConversationSQL conversationSQL;
+    private FileUploadSQL fileUploadSQL;
+    
+    MessageSQL(ValidConnection connection, ConversationSQL conversationSQL, FileUploadSQL fileUploadSQL){
         super(connection);
+        this.conversationSQL = conversationSQL;
+        this.fileUploadSQL = fileUploadSQL;
     }
 
     void createTable(){
         super.createTable(CREATE_TABLE);
     }
 
-    void add(Message message, ConversationSQL conversationSQL, FileUploadSQL fileUploadSQL){
+    void add(Message message){
         try {
             connection.get().setAutoCommit(false);
 
@@ -90,8 +95,8 @@ final class MessageSQL extends BaseSQL {
                 }
 
                 insertMessage(message);
-                message.setId(getMessageId());
-                conversationSQL.updateLastMessage(message.getConversationId(), message.getId());
+                message.setId(getLastInsertId());
+                conversationSQL.updateLastMessageId(message.getConversationId(), message.getId());
 
                 connection.get().commit();
             } catch (SQLException e){
@@ -113,20 +118,6 @@ final class MessageSQL extends BaseSQL {
             pstmt.setInt(4, message.getUser().getId());
             pstmt.executeUpdate();
         }
-    }
-
-    private int getMessageId() throws SQLException {
-        String query = "SELECT LAST_INSERT_ID();";
-
-        try (PreparedStatement pstmt = connection.get().prepareStatement(query)){
-            pstmt.execute();
-
-            if(pstmt.getResultSet() != null && pstmt.getResultSet().next()){
-                return pstmt.getResultSet().getInt("LAST_INSERT_ID()");
-            }
-        }
-
-        return -1;
     }
 
     List<Message> getHistory(int conversationId, int lastMessageId){

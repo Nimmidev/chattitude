@@ -54,9 +54,9 @@ final class ConversationMemberSQL extends BaseSQL {
         super.createTable(CREATE_TABLE);
     }
 
-    boolean addToConversation(int conversationId, int userId){
+    boolean addToConversation(int userId, int conversationId){
         try (PreparedStatement pstmt = connection.get().prepareStatement(ADD)){
-            pstmt.setInt(1,  conversationId);
+            pstmt.setInt(1, conversationId);
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
         } catch (SQLException e){
@@ -80,9 +80,9 @@ final class ConversationMemberSQL extends BaseSQL {
         return true;
     }
 
-    boolean updateConversationAdmin(int conversationId, int userId, boolean admin){
+    boolean updateIsAdmin(int userId, int conversationId, boolean isAdmin){
         try (PreparedStatement pstmt = connection.get().prepareStatement(UPDATE)){
-            pstmt.setBoolean(1,  admin);
+            pstmt.setBoolean(1,  isAdmin);
             pstmt.setInt(2, userId);
             pstmt.setInt(3,  conversationId);
             pstmt.executeUpdate();
