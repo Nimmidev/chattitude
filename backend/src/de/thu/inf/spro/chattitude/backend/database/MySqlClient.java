@@ -3,6 +3,7 @@ package de.thu.inf.spro.chattitude.backend.database;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
+import de.thu.inf.spro.chattitude.packet.packets.ModifyConversationUserPacket;
 import org.mariadb.jdbc.MariaDbDataSource;
 
 import java.sql.*;
@@ -21,29 +22,24 @@ public class MySqlClient {
     public MySqlClient() {
         try {
             Connection mysqlConnection = connect();
-            connection = new ValidConnection(mysqlConnection, this::connect);
+            connection = new ValidConnection(mysqlConnection, MySqlClient::connect);
+            
             userSQL = new UserSQL(connection);
             conversationSQL = new ConversationSQL(connection);
             conversationMemberSQL = new ConversationMemberSQL(connection);
             fileUploadSQL = new FileUploadSQL(connection);
             messageSQL = new MessageSQL(connection, conversationSQL, fileUploadSQL);
-            createTables();
+            
+            createTables(connection, userSQL, conversationSQL, conversationMemberSQL, fileUploadSQL, messageSQL);
         } catch (SQLException e) {
             throw new RuntimeException("Error connecting to mysql server", e);
         }
     }
 
-    private Connection connect() throws SQLException {
-        MariaDbDataSource dataSource = new MariaDbDataSource();
-        dataSource.setUser(System.getenv("MYSQL_USER"));
-        dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
-        dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
-        dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
-
-        return dataSource.getConnection();
-    }
-
-    private void createTables() throws SQLException {
+    static void createTables(ValidConnection connection, UserSQL userSQL, ConversationSQL conversationSQL,
+                             ConversationMemberSQL conversationMemberSQL, FileUploadSQL fileUploadSQL,
+                             MessageSQL messageSQL) throws SQLException {
+        
         var metaData = connection.get().getMetaData();
         ResultSet res = metaData.getTables(null, null, "Conversation", new String[] {"TABLE"});
         boolean conversationExists = res.next();
@@ -59,6 +55,30 @@ public class MySqlClient {
         }
     }
 
+    static Connection connect() throws SQLException {
+        MariaDbDataSource dataSource = new MariaDbDataSource();
+        dataSource.setUser(System.getenv("MYSQL_USER"));
+        dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
+        dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
+        dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
+
+        return dataSource.getConnection();
+    }
+
+    static void dropTables(ValidConnection connection){
+        String tableStrings = String.join(", ", UserSQL.TABLE_NAME, ConversationSQL.TABLE_NAME, ConversationMemberSQL.TABLE_NAME,
+                FileUploadSQL.TABLE_NAME, MessageSQL.TABLE_NAME);
+
+        try(Statement statement = connection.get().createStatement()){
+            statement.addBatch("SET FOREIGN_KEY_CHECKS = 0;");
+            statement.addBatch(String.format("DROP TABLE IF EXISTS %s;", tableStrings));
+            statement.addBatch("SET FOREIGN_KEY_CHECKS = 1;");
+            statement.executeBatch();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    
     public void close() {
         try {
             connection.get().close();
@@ -92,18 +112,22 @@ public class MySqlClient {
     // --- Conversation ---
 
     public int createConversation(String conversationName, int sessionUserId, User[] users){
+        if(conversationName == null && users.length != 1){
+            throw new IllegalStateException("A Single Chat can only be created with exactly two users.");
+        }
+        
         int conversationId = conversationSQL.add(conversationName);
         
         if(conversationId != -1){
-            addUserToConversation(sessionUserId, conversationId);
+            conversationMemberSQL.addToConversation(sessionUserId, conversationId);
             
             for(User user : users) {
                 if (user.getId() == sessionUserId) continue;
-                addUserToConversation(user.getId(), conversationId);
+                conversationMemberSQL.addToConversation(user.getId(), conversationId);
             }
     
             if(conversationName == null){
-                updateConversationAdmin(sessionUserId, conversationId, true);
+                conversationMemberSQL.updateIsAdmin(sessionUserId, conversationId, true);
             }
         }
         
@@ -124,24 +148,27 @@ public class MySqlClient {
 
     // --- ConversationMember
 
-    public boolean addUserToConversation(int userId, int conversationId){
-        return conversationMemberSQL.addToConversation(userId, conversationId);
-    }
+    public boolean modifyConversationUser(ModifyConversationUserPacket.Action action, int sessionUserId, int userId, int conversationId){
+        boolean isAdmin = conversationMemberSQL.checkIsAdmin(sessionUserId, conversationId);
+        boolean success = false;
 
-    public boolean removeUserFromConversation(int userId, int conversationId){
-        return conversationMemberSQL.removeFromConversation(userId, conversationId);
-    }
-
-    public boolean updateConversationAdmin(int userId, int conversationId, boolean isAdmin){
-        return conversationMemberSQL.updateIsAdmin(userId, conversationId, isAdmin);
+        if(isAdmin){
+            if(action == ModifyConversationUserPacket.Action.REMOVE){
+                success = conversationMemberSQL.removeFromConversation(userId, conversationId);
+            } else if(action == ModifyConversationUserPacket.Action.ADD){
+                success = conversationMemberSQL.addToConversation(userId, conversationId);
+            } else if(action == ModifyConversationUserPacket.Action.PROMOTE_ADMIN){
+                success = conversationMemberSQL.updateIsAdmin(userId, conversationId, true);
+            } else if(action == ModifyConversationUserPacket.Action.DEMOTE_ADMIN){
+                success = conversationMemberSQL.updateIsAdmin(userId, conversationId, false);
+            }
+        }
+        
+        return success;
     }
 
     public boolean checkUserInConversation(int userId, int conversationId){
         return conversationMemberSQL.checkIfInConversation(userId, conversationId);
-    }
-
-    public boolean checkConversationUserIsAdmin(int userId, int conversationId){
-        return conversationMemberSQL.checkIsAdmin(userId, conversationId);
     }
 
     // --- Message ---

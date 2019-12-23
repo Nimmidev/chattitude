@@ -69,20 +69,20 @@ public class Server implements PacketHandler {
     public void onMessage(MessagePacket packet, WebSocket webSocket) {
         Message message = packet.getMessage();
         Credentials credentials = webSocket.getAttachment();
+        boolean success = false;
+        
         message.setUser(credentials.asUser());
 
         if(mySqlClient.checkUserInConversation(credentials.getUserId(), message.getConversationId())){
             if(message.getData().length < MAX_FILE_UPLOAD_SIZE){
                 mySqlClient.saveMessage(message);
-                packet.setSuccessful(true);
+                success = true;
             }
-        } else {
-            packet.setSuccessful(false);
         }
 
-        //send(webSocket, packet);
+        packet.setSuccessful(success);
 
-        if(packet.wasSuccessful()){
+        if(success){
             List<User> users = mySqlClient.getConversationUsers(message.getConversationId());
             broadcastPacket(users.toArray(new User[0]), packet);
         }
@@ -91,17 +91,15 @@ public class Server implements PacketHandler {
     @Override
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
         Credentials credentials = webSocket.getAttachment();
+        boolean success = false;
 
         if(mySqlClient.checkUserInConversation(credentials.getUserId(), packet.getConversationId())){
             List<Message> messages =  mySqlClient.getMessageHistory(packet.getConversationId(), packet.getLastMessageId());
             packet.setMessages(messages.toArray(new Message[]{}));
-            packet.setSuccessful(true);
-            System.out.println("success");
-        } else {
-            packet.setSuccessful(false);
-            System.out.println("failure");
+            success = true;
         }
-
+        
+        packet.setSuccessful(success);
         send(webSocket, packet);
     }
 
@@ -140,20 +138,7 @@ public class Server implements PacketHandler {
     @Override
     public void onModifyConversationUser(ModifyConversationUserPacket packet, WebSocket webSocket) {
         Credentials credentials = webSocket.getAttachment();
-        boolean isAdmin = mySqlClient.checkConversationUserIsAdmin(credentials.getUserId(), packet.getConversationId());
-        boolean success = false;
-
-        if(isAdmin){
-            if(packet.getAction() == ModifyConversationUserPacket.Action.REMOVE){
-                success = mySqlClient.removeUserFromConversation(packet.getConversationId(), packet.getUserId());
-            } else if(packet.getAction() == ModifyConversationUserPacket.Action.ADD){
-                success = mySqlClient.addUserToConversation(packet.getUserId(), packet.getConversationId());
-            } else if(packet.getAction() == ModifyConversationUserPacket.Action.PROMOTE_ADMIN){
-                success = mySqlClient.updateConversationAdmin(packet.getUserId(), packet.getConversationId(), true);
-            } else if(packet.getAction() == ModifyConversationUserPacket.Action.DEMOTE_ADMIN){
-                success = mySqlClient.updateConversationAdmin(packet.getUserId(), packet.getConversationId(), false);
-            }
-        }
+        boolean success = mySqlClient.modifyConversationUser(packet.getAction(), credentials.getUserId(), packet.getUserId(), packet.getConversationId());
 
         packet.setSuccessful(success);
         send(webSocket, packet);

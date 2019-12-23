@@ -11,11 +11,11 @@ class AuthenticationManager {
 
     private MySqlClient mysqlClient;
 
-    public AuthenticationManager(MySqlClient mySqlClient) {
+    AuthenticationManager(MySqlClient mySqlClient) {
         this.mysqlClient = mySqlClient;
     }
 
-    public boolean register(Credentials credentials, WebSocket webSocket){
+    boolean register(Credentials credentials, WebSocket webSocket){
         if(!mysqlClient.checkUserExistence(credentials.getUsername())){
             mysqlClient.addUser(credentials.getUsername(), sha256(credentials.getPassword()));
             updateCredentials(credentials, webSocket, true);
@@ -26,7 +26,7 @@ class AuthenticationManager {
     }
 
 
-    public boolean authenticate(Credentials credentials, WebSocket webSocket){
+    boolean authenticate(Credentials credentials, WebSocket webSocket){
         boolean authenticated = mysqlClient.checkUserCredentials(credentials.getUsername(), sha256(credentials.getPassword()));
         updateCredentials(credentials, webSocket, authenticated);
 

@@ -17,12 +17,13 @@ public class UserSQLTest extends SQLTest {
     public void userExistenceTest(){
         String username = "userExistenceTest";
 
-        userSQL.add(username, "qwer");
-        boolean exists = userSQL.checkExistence(username);
-        Assert.assertTrue(exists);
 
-        exists = userSQL.checkExistence("----------");
+        boolean exists = userSQL.checkExistence(username);
         Assert.assertFalse(exists);
+        
+        userSQL.add(username, "qwer");
+        exists = userSQL.checkExistence(username);
+        Assert.assertTrue(exists);
     }
     
     @Test
@@ -49,15 +50,21 @@ public class UserSQLTest extends SQLTest {
         List<User> users = userSQL.search("searchUserTest");
         Assert.assertEquals(users.size(), USERNAME_COUNT);
     }
-    
+
     @Test
-    public void getUserByIdTest(){
+    public void getUserIdByNameTest(){
         String username = "getUserByIdTest";
-        
+
         int id = userSQL.add(username, "qwer");
         int userId = userSQL.getId(username);
-        
+
         Assert.assertEquals(id, userId);
+    }
+
+    @Test
+    public void getUserIdByNameNotFoundTest(){
+        int userId = userSQL.getId("getUserByIdNotFoundTest");
+        Assert.assertEquals(-1, userId);
     }
     
 }

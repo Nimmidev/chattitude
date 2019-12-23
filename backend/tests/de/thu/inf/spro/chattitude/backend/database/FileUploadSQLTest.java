@@ -9,29 +9,27 @@ import java.security.SecureRandom;
 public class FileUploadSQLTest extends SQLTest {
 
     @Test
-    public void addFileTest(){
+    public void addFileTest() throws NoSuchAlgorithmException {
         byte[] bytes = new byte[10];
 
-        try {
-            SecureRandom.getInstanceStrong().nextBytes(bytes);
-            fileUploadSQL.add(bytes);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        SecureRandom.getInstanceStrong().nextBytes(bytes);
+        fileUploadSQL.add(bytes);
     }
 
     @Test
-    public void getFileTest(){
+    public void getFileTest() throws NoSuchAlgorithmException {
         byte[] insertBytes = new byte[10];
 
-        try {
-            SecureRandom.getInstanceStrong().nextBytes(insertBytes);
-            String id = fileUploadSQL.add(insertBytes);
-            byte[] bytes = fileUploadSQL.get(id);
-            Assert.assertArrayEquals(insertBytes, bytes);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        SecureRandom.getInstanceStrong().nextBytes(insertBytes);
+        String id = fileUploadSQL.add(insertBytes);
+        byte[] bytes = fileUploadSQL.get(id);
+        Assert.assertArrayEquals(insertBytes, bytes);
+    }
+
+    @Test
+    public void getFileNonExistentTest(){
+        byte[] bytes = fileUploadSQL.get("");
+        Assert.assertEquals(0, bytes.length);
     }
     
 }

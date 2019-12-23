@@ -14,28 +14,19 @@ abstract class SQLTest {
     static MessageSQL messageSQL;
 
     @BeforeClass
-    public static void createDBConnection(){
-        try {
-            Connection mysqlConnection = DBUtils.connect();
-            ValidConnection connection = new ValidConnection(mysqlConnection, DBUtils::connect);
+    public static void createDBConnection() throws SQLException {
+        Connection mysqlConnection = MySqlClient.connect();
+        ValidConnection connection = new ValidConnection(mysqlConnection, MySqlClient::connect);
 
-            userSQL = new UserSQL(connection);
-            conversationSQL = new ConversationSQL(connection);
-            conversationMemberSQL = new ConversationMemberSQL(connection);
-            fileUploadSQL = new FileUploadSQL(connection);
-            messageSQL = new MessageSQL(connection, conversationSQL, fileUploadSQL);
+        userSQL = new UserSQL(connection);
+        conversationSQL = new ConversationSQL(connection);
+        conversationMemberSQL = new ConversationMemberSQL(connection);
+        fileUploadSQL = new FileUploadSQL(connection);
+        messageSQL = new MessageSQL(connection, conversationSQL, fileUploadSQL);
 
-            //Reset database
-            DBUtils.dropTables(connection);
-
-            userSQL.createTable();
-            conversationSQL.createTable();
-            conversationMemberSQL.createTable();
-            fileUploadSQL.createTable();
-            messageSQL.createTable();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        //Reset database
+        MySqlClient.dropTables(connection);
+        MySqlClient.createTables(connection, userSQL, conversationSQL, conversationMemberSQL, fileUploadSQL, messageSQL);
     }
     
 }

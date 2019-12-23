@@ -296,22 +296,30 @@ final class ConversationSQL extends BaseSQL {
             if(conversation != null){
                 List<User> userList = userMap.get(conversationId);
                 conversation.setUsers(userList);
-                if(userList.size() == 2){
-                    User other = userList.get(0).getId() == ogUserId ? userList.get(1) : userList.get(0);
-                    conversation.setName(other.getName());
+                
+                if(conversation.getName() == null){
+                    if(userList.size() == 2){
+                        User other = userList.get(0).getId() == ogUserId ? userList.get(1) : userList.get(0);
+                        conversation.setName(other.getName());
+                    } else {
+                        conversation.setName("Invalid State Chat");
+                    }
                 }
             }
         }
     }
     
-    void updateLastMessageId(int conversationId, int messageId){
+    boolean updateLastMessageId(int conversationId, int messageId){
         try (PreparedStatement pstmt = connection.get().prepareStatement(UPDATE_LAST_MESSAGE)){
             pstmt.setInt(1, messageId);
             pstmt.setInt(2, conversationId);
             pstmt.executeUpdate();
         } catch (SQLException e){
             e.printStackTrace();
+            return false;
         }
+        
+        return true;
     }
 
 }

@@ -86,10 +86,9 @@ final class ConversationMemberSQL extends BaseSQL {
             pstmt.setInt(2, userId);
             pstmt.setInt(3,  conversationId);
             pstmt.executeUpdate();
-            
-            return false;
         } catch (SQLException e){
             e.printStackTrace();
+            return false;
         }
         
         return true;
