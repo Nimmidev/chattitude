@@ -3,7 +3,7 @@ package de.thu.inf.spro.chattitude.backend.database;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.ModifyConversationUserPacket;
-import javafx.util.Pair;
+import de.thu.inf.spro.chattitude.packet.util.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
