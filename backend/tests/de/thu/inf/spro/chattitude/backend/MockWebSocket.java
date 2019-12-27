@@ -1,5 +1,8 @@
 package de.thu.inf.spro.chattitude.backend;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import de.thu.inf.spro.chattitude.packet.packets.Packet;
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.enums.Opcode;
@@ -9,10 +12,12 @@ import org.java_websocket.framing.Framedata;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.function.Function;
 
 public class MockWebSocket implements WebSocket {
     
     private Object attachment;
+    private Function<Packet, Void> onMessageCallback;
     
     @Override
     public void close(int i, String s) {
@@ -36,7 +41,13 @@ public class MockWebSocket implements WebSocket {
 
     @Override
     public void send(String s) {
+        JsonObject packetData = Json.parse(s).asObject();
+        Packet packet = Packet.of(packetData);
+        if(onMessageCallback != null) onMessageCallback.apply(packet);
+    }
 
+    void setOnMessageCallback(Function<Packet, Void> onMessageCallback){
+        this.onMessageCallback = onMessageCallback;
     }
 
     @Override

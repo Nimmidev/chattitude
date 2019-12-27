@@ -156,7 +156,6 @@ final class ConversationSQL extends BaseSQL {
 
                 if(conversationResults.next()) conversation = getResult(conversationResults);
                 if(conversation != null) conversation.setUsers(getUsersResult(usersResults));
-                else throw new SQLException("Conversation can't be null");
 
                 connection.get().commit();
             } catch (SQLException e){

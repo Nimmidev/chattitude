@@ -6,6 +6,7 @@ import de.thu.inf.spro.chattitude.packet.User;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ConversationSQLTest extends SQLTest {
@@ -97,6 +98,7 @@ public class ConversationSQLTest extends SQLTest {
     }
 
     @Test
+    // should throw SQLIntegrityConstraintViolationException: foreign key constraint fails
     public void updateLastMessageIdNonExistentTest(){
         int conversationId = conversationSQL.add("updateLastMessageIdNonExistentTest");
         boolean success = conversationSQL.updateLastMessageId(conversationId, Integer.MAX_VALUE);

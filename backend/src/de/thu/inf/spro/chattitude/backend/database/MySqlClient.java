@@ -1,5 +1,6 @@
 package de.thu.inf.spro.chattitude.backend.database;
 
+import de.thu.inf.spro.chattitude.backend.Server;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
@@ -89,8 +90,8 @@ public class MySqlClient {
 
     // --- User ---
 
-    public void addUser(String username, String password){
-        userSQL.add(username, password);
+    public int addUser(String username, String password){
+        return userSQL.add(username, password);
     }
 
     public int getUserId(String username){
@@ -173,12 +174,22 @@ public class MySqlClient {
 
     // --- Message ---
 
-    public void saveMessage(Message message) {
-        messageSQL.add(message);
+    public int saveMessage(int sessionUserId, Message message) {
+        if(checkUserInConversation(sessionUserId, message.getConversationId())){
+            if(message.getData().length < Server.MAX_FILE_UPLOAD_SIZE){
+                return messageSQL.add(message);
+            }
+        }
+
+        return -1;
     }
 
-    public List<Message> getMessageHistory(int conversationId, int lastMessageId){
-        return messageSQL.getHistory(conversationId, lastMessageId);
+    public List<Message> getMessageHistory(int sessionUserId, int conversationId, int lastMessageId){
+        if(checkUserInConversation(sessionUserId, conversationId)){
+            return messageSQL.getHistory(conversationId, lastMessageId);
+        }
+
+        return null;
     }
 
     // --- FileUpload ---

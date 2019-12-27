@@ -3,6 +3,7 @@ package de.thu.inf.spro.chattitude.backend;
 import de.thu.inf.spro.chattitude.backend.database.MySqlClient;
 import de.thu.inf.spro.chattitude.packet.Credentials;
 import org.java_websocket.WebSocket;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,6 +17,11 @@ public class AuthenticationManagerTest {
     public static void setup(){
         mySqlClient = new MySqlClient();
         authenticationManager = new AuthenticationManager(mySqlClient);
+    }
+
+    @AfterClass
+    public static void cleanUp(){
+        mySqlClient.close();
     }
 
     @Test

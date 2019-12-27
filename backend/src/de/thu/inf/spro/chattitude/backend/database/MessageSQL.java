@@ -84,7 +84,7 @@ final class MessageSQL extends BaseSQL {
         super.createTable(CREATE_TABLE);
     }
 
-    void add(Message message){
+    int add(Message message){
         try {
             connection.get().setAutoCommit(false);
 
@@ -95,10 +95,12 @@ final class MessageSQL extends BaseSQL {
                 }
 
                 insertMessage(message);
-                message.setId(getLastInsertId());
+                int messageId = getLastInsertId();
+                message.setId(messageId);
                 conversationSQL.updateLastMessageId(message.getConversationId(), message.getId());
 
                 connection.get().commit();
+                return messageId;
             } catch (SQLException e){
                 connection.get().rollback();
                 e.printStackTrace();
@@ -108,6 +110,8 @@ final class MessageSQL extends BaseSQL {
         } catch(SQLException e){
             e.printStackTrace();
         }
+
+        return -1;
     }
 
     private void insertMessage(Message message) throws SQLException {

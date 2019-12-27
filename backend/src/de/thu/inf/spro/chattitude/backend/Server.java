@@ -15,7 +15,7 @@ import java.util.Map;
 public class Server implements PacketHandler {
 
     public static final int MESSAGE_HISTORY_FETCH_LIMIT = 10;
-    private static final int MAX_FILE_UPLOAD_SIZE = 10 * 1000 * 1000;
+    public static final int MAX_FILE_UPLOAD_SIZE = 10 * 1000 * 1000;
 
     private WebSocketServer webSocketServer;
     private MySqlClient mySqlClient;
@@ -47,7 +47,10 @@ public class Server implements PacketHandler {
     @Override
     public void onRegister(RegisterPacket packet, WebSocket webSocket) {
         boolean success = authenticationManager.register(packet.getCredentials(), webSocket);
+
+        if(success) addConnectedUser(packet.getCredentials(), webSocket);
         packet.setSuccessful(success);
+
         send(webSocket, packet);
     }
 
@@ -55,13 +58,9 @@ public class Server implements PacketHandler {
     public void onAuthenticate(AuthenticationPacket packet, WebSocket webSocket) {
         boolean success = authenticationManager.authenticate(packet.getCredentials(), webSocket);
 
-        if(success){
-            int userId = packet.getCredentials().getUserId();
-            List<WebSocket> webSockets = connections.computeIfAbsent(userId, integer -> new ArrayList<>());
-            webSockets.add(webSocket);
-        }
-
+        if(success) addConnectedUser(packet.getCredentials(), webSocket);
         packet.setSuccessful(success);
+
         send(webSocket, packet);
     }
 
@@ -69,17 +68,9 @@ public class Server implements PacketHandler {
     public void onMessage(MessagePacket packet, WebSocket webSocket) {
         Message message = packet.getMessage();
         Credentials credentials = webSocket.getAttachment();
-        boolean success = false;
-        
+
         message.setUser(credentials.asUser());
-
-        if(mySqlClient.checkUserInConversation(credentials.getUserId(), message.getConversationId())){
-            if(message.getData().length < MAX_FILE_UPLOAD_SIZE){
-                mySqlClient.saveMessage(message);
-                success = true;
-            }
-        }
-
+        boolean success = mySqlClient.saveMessage(credentials.getUserId(), message) != -1;
         packet.setSuccessful(success);
 
         if(success){
@@ -91,15 +82,13 @@ public class Server implements PacketHandler {
     @Override
     public void onMessageHistory(MessageHistoryPacket packet, WebSocket webSocket) {
         Credentials credentials = webSocket.getAttachment();
-        boolean success = false;
+        List<Message> messages = mySqlClient.getMessageHistory(credentials.getUserId(), packet.getConversationId(), packet.getLastMessageId());
 
-        if(mySqlClient.checkUserInConversation(credentials.getUserId(), packet.getConversationId())){
-            List<Message> messages =  mySqlClient.getMessageHistory(packet.getConversationId(), packet.getLastMessageId());
+        if(messages != null){
             packet.setMessages(messages.toArray(new Message[]{}));
-            success = true;
+            packet.setSuccessful(true);
         }
-        
-        packet.setSuccessful(success);
+
         send(webSocket, packet);
     }
 
@@ -167,7 +156,7 @@ public class Server implements PacketHandler {
         send(webSocket, packet);
     }
 
-    private void broadcastPacket(User[] users, Packet packet){
+    void broadcastPacket(User[] users, Packet packet){
         for(User user : users){
             if(connections.containsKey(user.getId())){
                 List<WebSocket> webSockets = connections.get(user.getId());
@@ -186,6 +175,12 @@ public class Server implements PacketHandler {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addConnectedUser(Credentials credentials, WebSocket webSocket){
+        int userId = credentials.getUserId();
+        List<WebSocket> webSockets = connections.computeIfAbsent(userId, integer -> new ArrayList<>());
+        webSockets.add(webSocket);
     }
 
     private void send(WebSocket webSocket, Packet packet){

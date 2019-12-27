@@ -15,7 +15,8 @@ public class MessageSQLTest extends SQLTest {
         int userId = userSQL.add("addMessageTest", "qwer");
         User user = new User(userId, "addMessageTest");
         Message message = new Message(conversationId, "test", user);
-        messageSQL.add(message);
+        int messageId = messageSQL.add(message);
+        Assert.assertNotEquals(-1, messageId);
     }
     
     @Test

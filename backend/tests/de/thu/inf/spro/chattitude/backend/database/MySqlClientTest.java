@@ -1,6 +1,7 @@
 package de.thu.inf.spro.chattitude.backend.database;
 
 import de.thu.inf.spro.chattitude.packet.Conversation;
+import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.ModifyConversationUserPacket;
 import de.thu.inf.spro.chattitude.packet.util.Pair;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public class MySqlClientTest extends SQLTest {
 
@@ -193,7 +195,64 @@ public class MySqlClientTest extends SQLTest {
         isAdmin = conversationMemberSQL.checkIsAdmin(sessionUserId, conversationId);
         Assert.assertFalse(isAdmin);
     }
-    
+
+    @Test
+    public void saveMessageTest(){
+        int sessionUserId = mySqlClient.addUser("saveMessageTest1", "qwer");
+        int userId = mySqlClient.addUser("saveMessageTest2", "qwer");
+        User user = new User(userId, "saveMessageTest2");
+        int conversationId = mySqlClient.createConversation(null, sessionUserId, new User[]{user});
+        Message message = new Message(conversationId, "test", user);
+        int messageId = mySqlClient.saveMessage(sessionUserId, message);
+        Assert.assertNotEquals(-1, messageId);
+    }
+
+    @Test
+    public void saveMessageFailTest(){
+        int sessionUserId = mySqlClient.addUser("saveMessageFailTest1", "qwer");
+        int userId = mySqlClient.addUser("saveMessageFailTest2", "qwer");
+        User user = new User(userId, "saveMessageFailTest2");
+        int conversationId = mySqlClient.createConversation("saveMessageFailTest", sessionUserId, new User[]{});
+        Message message = new Message(conversationId, "test", user);
+        int messageId = mySqlClient.saveMessage(userId, message);
+        Assert.assertEquals(-1, messageId);
+    }
+
+    @Test
+    public void getMessageHistoryTest(){
+        int sessionUserId = mySqlClient.addUser("getMessHisTest", "qwer");
+        User user = new User(sessionUserId, "getMessHisTest2");
+        int conversationId = mySqlClient.createConversation("test", sessionUserId, new User[]{});
+        int lastMessageId = -1;
+        final int MESSAGE_COUNT = 4;
+
+        for(int i = 0; i < MESSAGE_COUNT; i++){
+            Message message = new Message(conversationId, "test", user);
+            lastMessageId = mySqlClient.saveMessage(sessionUserId, message);
+        }
+
+        List<Message> messages = mySqlClient.getMessageHistory(sessionUserId, conversationId, lastMessageId);
+        Assert.assertEquals(MESSAGE_COUNT - 1, messages.size());
+    }
+
+    @Test
+    public void getMessageHistoryFailTest(){
+        int sessionUserId = mySqlClient.addUser("getMessHisFailTest1", "qwer");
+        int userId = mySqlClient.addUser("getMessHisFailTest2", "qwer");
+        User user = new User(userId, "getMessHisFailTest2");
+        int conversationId = mySqlClient.createConversation("getMessHisFailTest", userId, new User[]{});
+        int lastMessageId = -1;
+        final int MESSAGE_COUNT = 4;
+
+        for(int i = 0; i < MESSAGE_COUNT; i++){
+            Message message = new Message(conversationId, "test", user);
+            lastMessageId = mySqlClient.saveMessage(sessionUserId, message);
+        }
+
+        List<Message> messages = mySqlClient.getMessageHistory(sessionUserId, conversationId, lastMessageId);
+        Assert.assertNull(messages);
+    }
+
     private Pair<Integer, Integer> createConversationWithSessionUser(String name){
         int userId = userSQL.add(name, "qwer");
         int conversationId = conversationSQL.add(name);

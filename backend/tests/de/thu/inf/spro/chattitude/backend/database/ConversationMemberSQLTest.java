@@ -23,6 +23,7 @@ public class ConversationMemberSQLTest extends SQLTest {
     }
 
     @Test
+    // should throw SQLIntegrityConstraintViolationException: Duplicate entry for key PRIMARY
     public void addToConversationAlreadyExistsTest(){
         int userId = userSQL.add("addToConvAlExTe", "qwer");
         int conversationId = conversationSQL.add("addToConvAlExTe");

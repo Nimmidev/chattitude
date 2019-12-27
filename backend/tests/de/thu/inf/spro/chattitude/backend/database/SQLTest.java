@@ -1,11 +1,12 @@
 package de.thu.inf.spro.chattitude.backend.database;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-abstract class SQLTest {
+public abstract class SQLTest {
     
     static UserSQL userSQL;
     static ConversationSQL conversationSQL;
@@ -13,18 +14,22 @@ abstract class SQLTest {
     static FileUploadSQL fileUploadSQL;
     static MessageSQL messageSQL;
 
+    private static ValidConnection connection;
+
     @BeforeClass
-    public static void createDBConnection() throws SQLException {
+    public static void setupSQLObjects() throws SQLException {
         Connection mysqlConnection = MySqlClient.connect();
-        ValidConnection connection = new ValidConnection(mysqlConnection, MySqlClient::connect);
+        connection = new ValidConnection(mysqlConnection, MySqlClient::connect);
 
         userSQL = new UserSQL(connection);
         conversationSQL = new ConversationSQL(connection);
         conversationMemberSQL = new ConversationMemberSQL(connection);
         fileUploadSQL = new FileUploadSQL(connection);
         messageSQL = new MessageSQL(connection, conversationSQL, fileUploadSQL);
+    }
 
-        //Reset database
+    public static void resetDatabase() throws SQLException {
+        if(connection == null) setupSQLObjects();
         MySqlClient.dropTables(connection);
         MySqlClient.createTables(connection, userSQL, conversationSQL, conversationMemberSQL, fileUploadSQL, messageSQL);
     }
