@@ -31,7 +31,8 @@ public class App extends Application {
 
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/jfx/LoginScreen.fxml"));
-            primaryStage.initStyle(StageStyle.UNDECORATED);
+            // TODO: Auskommentiert für den klassisches Fensterstyle
+            //primaryStage.initStyle(StageStyle.UNDECORATED);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
