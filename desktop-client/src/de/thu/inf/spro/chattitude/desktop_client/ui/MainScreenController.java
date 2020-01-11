@@ -8,6 +8,7 @@ import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,12 +25,10 @@ import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {
 
-    private static final String CONVERSATION_PROPERTY = "conversation";
-
     @FXML
     private JFXTextArea messageField;
     @FXML
-    private JFXListView<Label> conversationsList;
+    private JFXListView<Conversation> conversationsList;
     @FXML
     private JFXListView<Message> messageHistoryList;
     @FXML
@@ -37,6 +36,7 @@ public class MainScreenController implements Initializable {
 
     private Client client;
     private Conversation selectedConversation;
+    private ObservableList<Conversation> conversations;
     private ObservableList<Message> messagesOfSelectedConversation;
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;
@@ -45,36 +45,31 @@ public class MainScreenController implements Initializable {
         System.out.println("LoginScreenController");
         client = App.getClient();
         messagesOfSelectedConversation = FXCollections.observableArrayList();
+        conversations = FXCollections.observableArrayList();
 
         client.setOnMessage(message -> Platform.runLater(() -> {
             int conversationId = message.getConversationId();
             if (selectedConversation != null && conversationId == selectedConversation.getId()) {
                 messagesOfSelectedConversation.add(message);
             }
-            for (Label cell : conversationsList.getItems()) {
-                Conversation conversation = (Conversation) cell.getProperties().get(CONVERSATION_PROPERTY);
-                if (conversation.getId() == conversationId) {
-                    conversation.setMessage(message);
-                    updateConversationItem(conversation, cell);
-                    return;
-                }
+            Conversation conversation = getConversation(conversationId);
+            if (conversation == null) {
+                System.out.println("Warning: Received message for unknown conversation " + conversationId);
+                return;
             }
-            System.out.println("Warning: Message for unknown conversation " + conversationId);
+            conversation.setMessage(message); // TODO irgendwie ein Update triggern?
+
         }));
 
-        client.setOnConversationUpdated(newConversation -> {
-            for (Label cell : conversationsList.getItems()) {
-                Conversation oldConversation = (Conversation) cell.getProperties().get(CONVERSATION_PROPERTY);
-                if (newConversation.getId() == oldConversation.getId()) {
-                    cell.getProperties().put(CONVERSATION_PROPERTY, newConversation);
-                    updateConversationItem(newConversation, cell);
-                    return;
-                }
+        client.setOnConversationUpdated(newConversation -> Platform.runLater(() -> {
+            Conversation oldConversation = getConversation(newConversation.getId());
+            if (oldConversation == null) { // new conversation
+                conversations.add(newConversation);
+            } else {
+                int index = conversations.indexOf(oldConversation);
+                conversations.set(index, newConversation); // Replace with new conversation object
             }
-
-            Label cell = createConversationItem(newConversation);
-            conversationsList.getItems().add(0, cell);
-        });
+        }));
 
         client.setOnMessageHistory(packet -> Platform.runLater(() -> {
             loadingHistory = false;
@@ -93,7 +88,7 @@ public class MainScreenController implements Initializable {
 
             ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
             VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-            Message topMost = messagesOfSelectedConversation.get(vf.getFirstVisibleCell().getIndex() + 1);
+            Message topMost = messagesOfSelectedConversation.get(vf.getFirstVisibleCell().getIndex());
 
             for (Message message : packet.getMessages()) {
                 if (!messagesOfSelectedConversation.contains(message)) {
@@ -107,19 +102,16 @@ public class MainScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        client.setOnConversations(conversations -> Platform.runLater(() -> {
-            for (Conversation conversation : conversations) {
-                Label cell = createConversationItem(conversation);
-                cell.visibleProperty().addListener((observable, oldValue, newValue) -> {
-                    System.out.println(newValue);
-                });
-                conversationsList.getItems().add(cell);
-
-            }
+        client.setOnConversations(newConversations -> Platform.runLater(() -> {
+            conversations.clear();
+            conversations.addAll(newConversations);
         }));
         client.send(new GetConversationsPacket());
-        conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedCell) -> {
-            selectedConversation = ((Conversation) selectedCell.getProperties().get(CONVERSATION_PROPERTY));
+
+        conversationsList.setCellFactory(param -> new ConversationCell());
+        conversationsList.setItems(conversations);
+        conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSelectedConversation) -> {
+            selectedConversation = newSelectedConversation;
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
@@ -139,61 +131,6 @@ public class MainScreenController implements Initializable {
 
         messageHistoryList.setCellFactory(param -> new MessageCell());
         messageHistoryList.setItems(messagesOfSelectedConversation);
-
-        /*messageHistoryList.onScrollProperty().set(event -> {
-            System.out.println("Scroll Prop " + event.getTotalDeltaX());
-        });
-        messageHistoryList.setOnScroll(event -> {
-            System.out.println("On Scrollt " + event.getTotalDeltaX());
-            ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
-            VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-            int first = vf.getFirstVisibleCell().getIndex();
-            System.out.println("First: " + first);
-        });
-
-        messageHistoryList.setOnScrollTo(event -> {
-            System.out.println("On ScrollTo " + event.getScrollTarget());
-        });*/
-
-        /*javafx.scene.control.ScrollBar timelineBar = getScrollbarComponent(messageHistoryList, javafx.geometry.Orientation.HORIZONTAL);
-        timelineBar.addEventFilter(ScrollToEvent.ANY, event -> {
-            ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
-            VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-            int first = vf.getFirstVisibleCell().getIndex();
-            System.out.println("First: " + first);
-        });*/
-
-        /*ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
-        VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-        int first = vf.getFirstVisibleCell().getIndex();*/
-        // TODO hm
-
-    }
-
-    public static javafx.scene.control.ScrollBar getScrollbarComponent(javafx.scene.control.Control control, javafx.geometry.Orientation orientation) {
-        javafx.scene.Node n = control.lookup(".scroll-bar");
-        if (n instanceof javafx.scene.control.ScrollBar) {
-            final javafx.scene.control.ScrollBar bar = (javafx.scene.control.ScrollBar) n;
-            if (bar.getOrientation().equals(orientation)) {
-                return bar;
-            }
-        }
-        return null;
-    }
-
-    private Label createConversationItem(Conversation conversation) {
-        Label cell = new Label();
-        cell.getProperties().put(CONVERSATION_PROPERTY, conversation);
-        updateConversationItem(conversation, cell);
-        return cell;
-    }
-
-    private void updateConversationItem(Conversation conversation, Label cell) {
-        String text = "Id: " + conversation.getId();
-        if (conversation.getMessage() != null) {
-            text += "\n" + conversation.getMessage().getUser().getName() + ": " + conversation.getMessage().getContent();
-        }
-        cell.setText(text);
     }
 
     private void loadMoreMessages() {
@@ -210,7 +147,10 @@ public class MainScreenController implements Initializable {
     private void checkToLoadHistory() {
         ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
         VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-        int first = vf.getFirstVisibleCell().getIndex();
+        var firstVisible = vf.getFirstVisibleCell();
+        if (firstVisible == null)
+            return;
+        int first = firstVisible.getIndex();
         if (first == 0) {
             if (!allMessagesOfCurrentConversationLoaded && !loadingHistory) {
                 loadMoreMessages();
@@ -233,17 +173,12 @@ public class MainScreenController implements Initializable {
         String groupName = "Group " + new SimpleDateFormat("HH:mm:ss").format(new Date());
         User[] userArray = new User[]{new User(1,"testUser1"), new User(2, "testUser2")};
 
-        //Conversation dummyConversation = new Conversation(groupName, userArray);
         Conversation dummyConversation = new Conversation(userArray[1]);
         CreateConversationPacket packet = new CreateConversationPacket(dummyConversation);
         client.send(packet);
         client.setOnConversationCreated(conversation -> Platform.runLater(() -> {
-
-            Label cell = createConversationItem(conversation);
-            conversationsList.getItems().add(0, cell);
-            conversationsList.getSelectionModel().select(cell);
-            selectedConversation = conversation;
-            System.out.println("created " + conversation.getId());
+            conversations.add(conversation);
+            conversationsList.getSelectionModel().select(conversation);
         }));
 
     }
@@ -253,6 +188,14 @@ public class MainScreenController implements Initializable {
         Message message = new Message(selectedConversation.getId(), messageField.getText(), null);
 
         client.send(new MessagePacket(message));
+    }
+
+    private Conversation getConversation(int id) {
+        for (Conversation conversation : conversations) {
+            if (conversation.getId() == id)
+                return conversation;
+        }
+        return null;
     }
 
     public void addToGroup() {

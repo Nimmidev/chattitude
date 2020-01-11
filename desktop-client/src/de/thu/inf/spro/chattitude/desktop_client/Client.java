@@ -120,13 +120,11 @@ public class Client implements PacketHandler {
 
     @Override
     public void onCreateConversation(CreateConversationPacket packet, WebSocket webSocket) {
-        System.out.println("CreateConversation: " + packet.getConversation().getId());
         if (onConversationCreated != null) onConversationCreated.call(packet.getConversation());
     }
 
     @Override
     public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
-        System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
         if (onConversationUpdated != null) onConversationUpdated.call(packet.getConversation());
     }
 

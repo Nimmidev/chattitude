@@ -115,7 +115,7 @@ public class Server implements PacketHandler {
 
         if(success){
             Conversation conversationData = mySqlClient.getConversation(conversationId);
-            broadcastPacket(conversationData.getUsers(), new ConversationUpdatedPacket(conversationData));
+            broadcastPacket(conversationData.getUsers(), new ConversationUpdatedPacket(conversationData)); // TODO Diese Conversation enthält keinen Namen
         }
     }
 
