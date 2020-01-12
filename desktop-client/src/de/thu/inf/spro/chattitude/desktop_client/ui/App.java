@@ -14,7 +14,6 @@ import java.net.URISyntaxException;
 
 public class App extends Application {
     private static Client client;
-    private static Application INSTANCE;
 
     public App() {
 
@@ -22,7 +21,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        INSTANCE = this;
         try {
             client = new Client();
         } catch (URISyntaxException e) {
@@ -31,8 +29,6 @@ public class App extends Application {
 
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/jfx/LoginScreen.fxml"));
-            // TODO: Auskommentiert für den klassisches Fensterstyle
-            //primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.setResizable(false);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);

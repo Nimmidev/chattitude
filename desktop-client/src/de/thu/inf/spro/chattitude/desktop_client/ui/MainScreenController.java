@@ -2,21 +2,21 @@ package de.thu.inf.spro.chattitude.desktop_client.ui;
 
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextArea;
+import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -26,13 +26,11 @@ import java.util.ResourceBundle;
 public class MainScreenController implements Initializable {
 
     @FXML
-    private JFXTextArea messageField;
+    private JFXTextField messageField;
     @FXML
     private JFXListView<Conversation> conversationsList;
     @FXML
     private JFXListView<Message> messageHistoryList;
-    @FXML
-    public ComboBox comboBox;
 
     private Client client;
     private Conversation selectedConversation;
@@ -57,7 +55,8 @@ public class MainScreenController implements Initializable {
                 System.out.println("Warning: Received message for unknown conversation " + conversationId);
                 return;
             }
-            conversation.setMessage(message); // TODO irgendwie ein Update triggern?
+            conversation.setMessage(message);
+            replaceConversation(conversation, conversation); // Update triggern
 
         }));
 
@@ -66,8 +65,7 @@ public class MainScreenController implements Initializable {
             if (oldConversation == null) { // new conversation
                 conversations.add(newConversation);
             } else {
-                int index = conversations.indexOf(oldConversation);
-                conversations.set(index, newConversation); // Replace with new conversation object
+                replaceConversation(oldConversation, newConversation);
             }
         }));
 
@@ -88,7 +86,10 @@ public class MainScreenController implements Initializable {
 
             ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
             VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-            Message topMost = messagesOfSelectedConversation.get(vf.getFirstVisibleCell().getIndex());
+            int index = vf.getFirstVisibleCell().getIndex() + 1;
+            if (index >= messagesOfSelectedConversation.size())
+                index--;
+            Message topMost = messagesOfSelectedConversation.get(index);
 
             for (Message message : packet.getMessages()) {
                 if (!messagesOfSelectedConversation.contains(message)) {
@@ -108,13 +109,18 @@ public class MainScreenController implements Initializable {
         }));
         client.send(new GetConversationsPacket());
 
-        conversationsList.setCellFactory(param -> new ConversationCell());
+        conversationsList.setCellFactory(param -> {
+            var cell = new ConversationCell();
+            cell.setOnMouseClicked(event -> messageField.requestFocus());
+            return cell;
+        });
         conversationsList.setItems(conversations);
         conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSelectedConversation) -> {
             selectedConversation = newSelectedConversation;
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
+            messageField.setText("");
 
             if (selectedConversation.getMessage() != null) {
                 messagesOfSelectedConversation.add(selectedConversation.getMessage());
@@ -131,6 +137,13 @@ public class MainScreenController implements Initializable {
 
         messageHistoryList.setCellFactory(param -> new MessageCell());
         messageHistoryList.setItems(messagesOfSelectedConversation);
+    }
+
+    @FXML
+    private void messageFieldKeyPress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER)  {
+            sendMessage();
+        }
     }
 
     private void loadMoreMessages() {
@@ -184,10 +197,13 @@ public class MainScreenController implements Initializable {
     }
 
     public void sendMessage() {
+        if (messageField.getText().equals(""))
+            return;
         System.out.println("Send");
         Message message = new Message(selectedConversation.getId(), messageField.getText(), null);
-
         client.send(new MessagePacket(message));
+
+        messageField.setText("");
     }
 
     private Conversation getConversation(int id) {
@@ -196,6 +212,11 @@ public class MainScreenController implements Initializable {
                 return conversation;
         }
         return null;
+    }
+
+    private void replaceConversation(Conversation oldConversation, Conversation newConversation) {
+        int index = conversations.indexOf(oldConversation);
+        conversations.set(index, newConversation); // Replace with new conversation object
     }
 
     public void addToGroup() {
