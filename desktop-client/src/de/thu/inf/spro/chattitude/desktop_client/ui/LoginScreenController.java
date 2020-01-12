@@ -14,13 +14,13 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -44,7 +44,7 @@ public class LoginScreenController implements Initializable {
     @FXML
     private JFXButton btnSignIn;
     @FXML
-    private JFXTextArea txtError;
+    private Label errorLabel;
 
 
     public LoginScreenController() {
@@ -60,37 +60,43 @@ public class LoginScreenController implements Initializable {
     }
 
     public void signIn() {
-        if (toggleStatus == true) {
+        errorLabel.setText("");
+        if (toggleStatus) {
             // Registration
             String userName = txtUsername.getText();
             String userPassword = txtPassword.getText();
             String userPassword2 = txtPassword2.getText();
 
             if (!userPassword.equals(userPassword2)) {
-                txtError.setText("Sorry, passwords don't match!");
-            } else if (userPassword == userPassword2) {
+                errorLabel.setText("Sorry, passwords don't match!");
+            } else {
                 if (userName.length() < minimalLength || userPassword.length() < minimalLength) {
-                    // Wird später ersetzt durch TextLabel
-                    txtError.setText("Username or password too short!");
+                    errorLabel.setText("Username or password too short!");
                 } else {
-                   txtError.setText("Registration successful!");
-                    client.setOnRegister(credentials -> Platform.runLater(() ->{
+                    client.setOnRegister(credentials -> Platform.runLater(() -> {
                         if (credentials.isAuthenticated()) {
                             showMainScreen();
                         } else {
-                            txtError.setText("Username already taken!");
+                            errorLabel.setText("Username already taken!");
                         }
                     }));
                     Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
                     client.send(new RegisterPacket(credentials));
                 }
             }
-        } else if (toggleStatus == false) {
+        } else {
             // Login
             Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
             client.send(new AuthenticationPacket(credentials));
         }
 
+    }
+
+    @FXML
+    private void FieldsKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER)  {
+            signIn();
+        }
     }
 
     /* BackUp-Kommentar bitte nicht löschen -- JAN
@@ -155,6 +161,7 @@ public class LoginScreenController implements Initializable {
 
     private void onLoginFailed() {
         System.out.println("Login failed.");
+        Platform.runLater(() -> errorLabel.setText("Wrong username or password"));
     }
 
     @Override
