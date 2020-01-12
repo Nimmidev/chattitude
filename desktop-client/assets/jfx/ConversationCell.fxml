@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="conversationCell" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="150.0" prefWidth="150.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane>
+         <center>
+            <Label fx:id="titleLabel" text="Nice Groupname" BorderPane.alignment="CENTER_LEFT">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <BorderPane.margin>
+                  <Insets right="10.0" />
+               </BorderPane.margin>
+            </Label>
+         </center>
+         <right>
+            <Label fx:id="timeLabel" text="12:34" textFill="#727272" BorderPane.alignment="CENTER_RIGHT">
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Label>
+         </right>
+      </BorderPane>
+      <Label fx:id="messageLabel" text="Tom: Yo guys! Whats going on here?" />
+   </children>
+</VBox>
