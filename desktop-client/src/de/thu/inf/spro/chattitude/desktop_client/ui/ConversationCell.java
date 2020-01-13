@@ -1,6 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
 import com.jfoenix.controls.JFXListCell;
+import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import javafx.fxml.FXML;
@@ -37,13 +38,6 @@ public class ConversationCell extends JFXListCell<Conversation> {
         }
     }
 
-    private void setToStartOfDay(Calendar calendar) {
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-    }
-
     @Override
     protected void updateItem(Conversation conversation, boolean empty) {
         super.updateItem(conversation, empty);
@@ -59,17 +53,7 @@ public class ConversationCell extends JFXListCell<Conversation> {
             if (message != null) {
                 messageLabel.setText(message.getUser().getName() + ": " + conversation.getMessage().getContent());
 
-                Date date = new Date(message.getTimestamp());
-
-                Calendar today = Calendar.getInstance();
-                setToStartOfDay(today);
-
-                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-                if (!date.before(today.getTime())) {
-                    format = DateFormat.getTimeInstance(DateFormat.SHORT);
-                }
-
-                timeLabel.setText(format.format(date));
+                timeLabel.setText(Util.getRelativeDateTime(new Date(message.getTimestamp())));
             }
         }
 
