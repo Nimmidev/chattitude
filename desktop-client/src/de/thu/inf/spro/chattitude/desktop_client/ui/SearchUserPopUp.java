@@ -27,7 +27,7 @@ public class SearchUserPopUp implements Callback <User[]>{
 
 
     public SearchUserPopUp(Client client, int id) {
-        client.setOnSearchUser(this);
+        //client.setOnSearchUser(this);
         this.conversationID = id;
 
         final Stage dialog = new Stage();

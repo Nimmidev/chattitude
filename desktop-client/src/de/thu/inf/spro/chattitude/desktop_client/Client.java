@@ -24,7 +24,7 @@ public class Client implements PacketHandler {
     private Callback<MessageHistoryPacket> onMessageHistory;
     private Callback<Conversation> onConversationUpdated;
     private Callback<Credentials> onRegister;
-    private Callback<User[]> onSearchUser;
+    private Callback<SearchUserPacket> onSearchUser;
 
     public Client() throws URISyntaxException {
         URI uri;
@@ -143,7 +143,7 @@ public class Client implements PacketHandler {
         if(packet.getResults().length == 0) System.out.println("No Users found.");
         else for(User user : packet.getResults()) System.out.println(user.getName());
         if (onSearchUser != null)
-            onSearchUser.call(packet.getResults());
+            onSearchUser.call(packet);
     }
 
     public void setOnConversationCreated(Callback<Conversation> onConversationCreated) {
@@ -178,7 +178,7 @@ public class Client implements PacketHandler {
         this.onRegister = onRegister;
     }
 
-    public void setOnSearchUser(Callback<User[]> onSearchUser) {
+    public void setOnSearchUser(Callback<SearchUserPacket> onSearchUser) {
         this.onSearchUser = onSearchUser;
     }
 

@@ -13,10 +13,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -31,6 +35,8 @@ public class MainScreenController implements Initializable {
     private JFXListView<Conversation> conversationsList;
     @FXML
     private JFXListView<Message> messageHistoryList;
+    @FXML
+    private StackPane stackPane;
 
     private Client client;
     private Conversation selectedConversation;
@@ -146,6 +152,12 @@ public class MainScreenController implements Initializable {
         }
     }
 
+    @FXML
+    private void editConversation() {
+        EditConversationPopUp popUp = new EditConversationPopUp(client, selectedConversation);
+        stackPane.getChildren().add(popUp);
+    }
+
     private void loadMoreMessages() {
         System.out.println("Load more messages for " + selectedConversation);
         if (selectedConversation.getMessage() == null)
@@ -169,15 +181,6 @@ public class MainScreenController implements Initializable {
                 loadMoreMessages();
             }
         }
-    }
-
-    public void exitWindow() {
-        Platform.exit();
-    }
-
-    public void createDialog() {
-        SearchUserPopUp popUp = new SearchUserPopUp(client, selectedConversation.getId());
-
     }
 
     public void newChat() {
@@ -217,14 +220,6 @@ public class MainScreenController implements Initializable {
     private void replaceConversation(Conversation oldConversation, Conversation newConversation) {
         int index = conversations.indexOf(oldConversation);
         conversations.set(index, newConversation); // Replace with new conversation object
-    }
-
-    public void addToGroup() {
-
-    }
-
-    public void deleteFromGroup() {
-
     }
 
 }
