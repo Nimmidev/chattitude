@@ -102,6 +102,14 @@ public class Conversation {
         this.admins = admins.stream().mapToInt(value -> value).toArray();
     }
 
+    public boolean isAdmin(int userId) {
+        for (int admin : getAdmins()) {
+            if (admin == userId)
+                return true;
+        }
+        return false;
+    }
+
     public JsonObject asJson(){
         JsonObject json = new JsonObject();
 

@@ -1,7 +1,8 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.cell;
 
 import com.jfoenix.controls.JFXListCell;
 import de.thu.inf.spro.chattitude.desktop_client.Util;
+import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import javafx.fxml.FXML;
@@ -51,7 +52,8 @@ public class ConversationCell extends JFXListCell<Conversation> {
             titleLabel.setText(conversation.getName());
             Message message = conversation.getMessage();
             if (message != null) {
-                messageLabel.setText(message.getUser().getName() + ": " + conversation.getMessage().getContent());
+                ChatMessage chatMessage = ChatMessage.of(message);
+                messageLabel.setText(message.getUser().getName() + ": " + chatMessage.getPreview());
 
                 timeLabel.setText(Util.getRelativeDateTime(new Date(message.getTimestamp())));
             }

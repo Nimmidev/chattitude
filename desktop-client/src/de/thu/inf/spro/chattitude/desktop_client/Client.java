@@ -1,5 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client;
 
+import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
+import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
 import de.thu.inf.spro.chattitude.desktop_client.network.WebSocketClient;
 import de.thu.inf.spro.chattitude.packet.util.Callback;
 import de.thu.inf.spro.chattitude.packet.*;
@@ -19,13 +21,14 @@ public class Client implements PacketHandler {
 
     private Runnable onLoginSuccessful;
     private Runnable onLoginFailed;
-    private Callback<Message> onMessage;
+    private Callback<ChatMessage> onMessage;
     private Callback<Conversation[]> onConversations;
     private Callback<Conversation> onConversationCreated;
     private Callback<MessageHistoryPacket> onMessageHistory;
     private Callback<Conversation> onConversationUpdated;
     private Callback<Credentials> onRegister;
     private Callback<SearchUserPacket> onSearchUser;
+    private Callback<GetAttachmentPacket> onGetAttachment;
 
     public Client() throws URISyntaxException {
         URI uri;
@@ -44,9 +47,8 @@ public class Client implements PacketHandler {
         
         System.out.println("ConnectedPacket");
         User user = new User(1, "Nimmi");
-        //Message message = new Message(4, "Hello new msg", user);
         String dataMessageTest = "This is a test data meüääöäüssage..!.1.!";
-        Message message = new Message(1, "Test data: " + System.currentTimeMillis(), user, dataMessageTest.getBytes(StandardCharsets.UTF_8));
+        TextMessage message = new TextMessage(1, "Test message");
         Credentials testCredientials = new Credentials("Nimmi", "qwer");
 
         //AuthenticationPacket authenticationPacket = new AuthenticationPacket(new Credentials("Nimmi", "qwer"));
@@ -98,7 +100,8 @@ public class Client implements PacketHandler {
     @Override
     public void onMessage(MessagePacket packet, WebSocket webSocket) {
         System.out.println("MessagePacket");
-        if (onMessage != null) onMessage.call(packet.getMessage());
+        Message message = packet.getMessage();
+        if (onMessage != null) onMessage.call(ChatMessage.of(message));
     }
 
     @Override
@@ -115,6 +118,12 @@ public class Client implements PacketHandler {
             long timestamp = message != null ? message.getTimestamp() : -1;
             User user = message != null ? message.getUser() : null;
             String username = user != null ? user.getName() : "";
+            
+            if(message != null){
+                ChatMessage chatMessage = ChatMessage.of(message);
+                messageText = chatMessage.getPreview();
+            }
+            
             System.out.println(String.format("|%d|%s: %s %d, Users: %d", conversation.getId(), username, messageText, timestamp, conversation.getUsers().length));
         }
 
@@ -139,6 +148,8 @@ public class Client implements PacketHandler {
     @Override
     public void onGetAttachment(GetAttachmentPacket packet, WebSocket webSocket) {
         System.out.println("AttachmentPacket: Size: " + packet.getData().length + ", Data: " + new String(packet.getData()));
+        
+        if(onGetAttachment != null) onGetAttachment.call(packet);
     }
 
     @Override
@@ -165,7 +176,7 @@ public class Client implements PacketHandler {
         this.onLoginFailed = onLoginFailed;
     }
 
-    public void setOnMessage(Callback<Message> onMessage) {
+    public void setOnMessage(Callback<ChatMessage> onMessage) {
         this.onMessage = onMessage;
     }
 
@@ -183,6 +194,10 @@ public class Client implements PacketHandler {
 
     public void setOnSearchUser(Callback<SearchUserPacket> onSearchUser) {
         this.onSearchUser = onSearchUser;
+    }
+    
+    public void setOnGetAttachment(Callback<GetAttachmentPacket> onGetAttachment){
+        this.onGetAttachment = onGetAttachment;
     }
 
     public void send(Packet packet){

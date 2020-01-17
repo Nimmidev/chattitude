@@ -1,4 +1,4 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.cell;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListCell;

@@ -146,8 +146,7 @@ final class MessageSQL extends BaseSQL {
             int userId = resultSet.getInt("userId");
             int messageId = resultSet.getInt("messageId");
             long timestamp = resultSet.getTimestamp("timestamp").getTime();
-            byte[] bytes = resultSet.getBytes("fileId");
-            String fileId = bytes != null ? new String(bytes) : null;
+            String fileId = resultSet.getString("fileId");
             String content = resultSet.getString("content");
             String username = resultSet.getString("username");
             User user = new User(userId, username);

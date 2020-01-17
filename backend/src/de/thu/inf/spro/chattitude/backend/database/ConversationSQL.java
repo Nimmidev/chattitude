@@ -69,7 +69,8 @@ final class ConversationSQL extends BaseSQL {
         String convName = conv + _NAME;
         String convMembUId = convMemb + ConversationMemberSQL._USER_ID;
         String convMembConvId = convMemb + ConversationMemberSQL._CONVERSATION_ID;
-        
+        String convMembIsAdmin = convMemb + ConversationMemberSQL._IS_ADMIN;
+
         String corePartKeys = String.join(", ", convId, convName, userId, username, messageId, content, fileId, timestamp);
         
         GET_CONVERSATION_USERS = String.format("SELECT %s, %s FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?", userId, username, 
@@ -79,7 +80,7 @@ final class ConversationSQL extends BaseSQL {
                 String.format("SELECT %s FROM %s LEFT JOIN %s ON %s = %s LEFT JOIN %s ON %s = %s WHERE %s = ?;", corePartKeys, 
                         ConversationSQL.TABLE_NAME, MessageSQL.TABLE_NAME, messageId, lastMsgId, UserSQL.TABLE_NAME, userId, msgUserId, convId);
 
-        String usersPartKeys = String.join(", ", convMembConvId, userId, username);
+        String usersPartKeys = String.join(", ", convMembConvId, convMembIsAdmin, userId, username);
         GET_CONVERSATION__USERS_PART = String.format("SELECT %s FROM %s INNER JOIN %s ON %s = %s INNER JOIN %s ON %s = %s WHERE %s = ?;",
                 usersPartKeys, ConversationMemberSQL.TABLE_NAME, TABLE_NAME, convId, convMembConvId, UserSQL.TABLE_NAME, 
                 userId, convMembUId, convMembConvId);
@@ -136,7 +137,7 @@ final class ConversationSQL extends BaseSQL {
         return conversationId;
     }
 
-    Conversation get(int conversationId){
+    Conversation get(int conversationId, int ogUserId){
         Conversation conversation = null;
 
         try {
@@ -155,7 +156,7 @@ final class ConversationSQL extends BaseSQL {
                 ResultSet usersResults = pstmtUsers.getResultSet();
 
                 if(conversationResults.next()) conversation = getResult(conversationResults);
-                if(conversation != null) conversation.setUsers(getUsersResult(usersResults));
+                if(conversation != null) applyUsersResult(usersResults, conversation, ogUserId);
 
                 connection.get().commit();
             } catch (SQLException e){
@@ -196,16 +197,31 @@ final class ConversationSQL extends BaseSQL {
         return conversation;
     }
 
-    private List<User> getUsersResult(ResultSet resultSet) throws SQLException {
+    private void applyUsersResult(ResultSet resultSet, Conversation conversation, int ogUserId) throws SQLException {
         List<User> users = new ArrayList<>();
+        List<Integer> admins = new ArrayList<>();
 
         while(resultSet.next()){
             int userId = resultSet.getInt("userId");
             String username = resultSet.getString("username");
             users.add(new User(userId, username));
+            if (resultSet.getBoolean("isAdmin")) {
+                admins.add(userId);
+            }
         }
 
-        return users;
+        conversation.setUsers(users);
+        conversation.setAdmins(admins);
+
+        if (conversation.getName() == null) {
+            if(users.size() == 2){
+                User other = users.get(0).getId() == ogUserId ? users.get(1) : users.get(0);
+                conversation.setName(other.getName());
+            } else {
+                conversation.setName("Invalid State Chat");
+            }
+        }
+
     }
 
     List<User> getUsers(int conversationId){

@@ -44,7 +44,7 @@ public class Message {
     }
 
     public Message(int id, int conversationId, String fileId, String content, long timestamp, User user){
-        this(id, conversationId, fileId, content, timestamp, user, new byte[]{});
+        this(id, conversationId, fileId, content, timestamp, user, null);
     }
 
     public Message(int conversationId, String content, User user, byte[] data){
@@ -58,6 +58,8 @@ public class Message {
         this.fileId = fileId;
         this.content = content;
         this.timestamp = timestamp;
+        
+        if(data == null) data = new byte[]{};
         this.data = data;
     }
 

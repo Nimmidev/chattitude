@@ -3,13 +3,13 @@ package de.thu.inf.spro.chattitude.desktop_client.ui;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.SearchResultCell;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.SearchUserPacket;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -58,7 +58,7 @@ public class EditConversationPopUp extends StackPane implements Initializable {
 
         client.setOnSearchUser(packet -> Platform.runLater(() -> {
             if (packet.getQuery().equals(searchField.getText())) {
-                searchResultList.getItems().setAll(packet.getResults()); // TODO User die shcon Member sind markieren
+                searchResultList.getItems().setAll(packet.getResults());
             } else {
                 searchResultList.getItems().clear();
             }
