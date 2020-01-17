@@ -17,13 +17,22 @@
          <left>
             <VBox maxHeight="1.7976931348623157E308" minHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="55.0" style="-fx-background-color: #4363A4;">
+                  <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="55.0" style="-fx-background-color: #4363A4;">
                      <children>
-                        <JFXButton fx:id="btnNewChat" buttonType="RAISED" onAction="#newChat" prefHeight="25.0" prefWidth="48.0" text="+" textFill="#24ab36">
-                           <font>
-                              <Font name="Arial Rounded MT Bold" size="17.0" />
-                           </font>
-                        </JFXButton>
+                        <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain;">
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin></JFXButton>
+                        <JFXButton fx:id="btnUserChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#startUserChat" prefHeight="55.0" prefWidth="54.0" style="-fx-background-image: url(&quot;icons/UserChat.png&quot;); -fx-background-size: contain;">
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin></JFXButton>
                      </children>
                   </HBox>
                   <JFXListView fx:id="conversationsList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-focus-color: transparent; -fx-selection-bar-non-focused: -fx-selection-bar; -fx-faint-focus-color: transparent;" VBox.vgrow="ALWAYS" />

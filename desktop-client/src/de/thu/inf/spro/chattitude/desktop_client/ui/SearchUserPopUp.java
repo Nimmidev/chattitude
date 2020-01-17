@@ -5,10 +5,12 @@ import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.ModifyConversationUserPacket;
 import de.thu.inf.spro.chattitude.packet.packets.SearchUserPacket;
 import de.thu.inf.spro.chattitude.packet.util.Callback;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -16,7 +18,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
-public class SearchUserPopUp implements Callback <User[]>{
+public class SearchUserPopUp {
     private SearchUserPacket packet;
     private ListView<String> list = new ListView();
     private ObservableList<String> oList = FXCollections.observableArrayList();
@@ -27,13 +29,19 @@ public class SearchUserPopUp implements Callback <User[]>{
 
 
     public SearchUserPopUp(Client client, int id) {
-        //client.setOnSearchUser(this);
         this.conversationID = id;
+       /* client.setOnSearchUser(packet -> Platform.runLater(() ->
+                oList.clear();
+                for(User user : users) oList.add(user.getName());
+                tmpArray = users;
+                ));
+
+        */
 
         final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         VBox dialogVbox = new VBox(20);
-        dialog.setTitle("Find Chattitude-Users");
+        dialog.setTitle("Create Group Chat");
         Text txtText = new Text("Search for other Chattitude-Users here");
         TextField txtField = new TextField();
         Label txtLabel = new Label();
@@ -43,6 +51,10 @@ public class SearchUserPopUp implements Callback <User[]>{
                 System.out.println("ENTER RELEASED");
                 packet = new SearchUserPacket(txtField.getText());
                 client.send(packet);
+                for (User user : packet.getResults()) oList.add(user.getName());
+                // for(User user : packet.getResults()) System.out.println(user.getName());
+                System.out.println(oList.size());
+
             }
         });
 
@@ -64,13 +76,14 @@ public class SearchUserPopUp implements Callback <User[]>{
         dialogVbox.getChildren().addAll(txtText, txtField, txtLabel, list);
         Scene dialogScene = new Scene(dialogVbox, 400, 300);
         dialog.setScene(dialogScene);
+        dialog.getIcons().add(new Image("/LogoPicRound.png"));
         dialog.show();
         dialog.setOnCloseRequest(windowEvent -> {
             client.setOnSearchUser(null);
         });
     }
 
-    @Override
+    //@Override
     public void call(User[] users) {
         oList.clear();
         for(User user : users) oList.add(user.getName());

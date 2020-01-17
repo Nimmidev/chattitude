@@ -1,7 +1,6 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.packet.Conversation;
@@ -13,14 +12,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -199,6 +195,19 @@ public class MainScreenController implements Initializable {
         }));
 
     }
+    public void startUserChat() {
+        CreateSingleChatPopUp popUp = new CreateSingleChatPopUp(client);
+        // TODO - JAN
+        stackPane.getChildren().add(popUp);
+    }
+
+    public void startGroupChat() {
+        // TODO - JAN
+        CreateGroupChatPopUp popUp = new CreateGroupChatPopUp(client);
+        stackPane.getChildren().add(popUp);
+    }
+
+
 
     public void sendMessage() {
         if (messageField.getText().equals(""))
