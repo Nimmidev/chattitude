@@ -1,5 +1,6 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
@@ -37,6 +38,8 @@ public class MainScreenController implements Initializable {
     private JFXListView<Message> messageHistoryList;
     @FXML
     private StackPane stackPane;
+    @FXML
+    private JFXButton editConversationButton;
 
     private Client client;
     private Conversation selectedConversation;
@@ -127,7 +130,8 @@ public class MainScreenController implements Initializable {
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
             messageField.setText("");
-            // TODO Edit Conversation nur anzeigen wenn Admin
+
+            editConversationButton.setVisible(selectedConversation.isAdmin(client.getCredentials().getUserId()));
 
             if (selectedConversation.getMessage() != null) {
                 messagesOfSelectedConversation.add(selectedConversation.getMessage());
