@@ -127,6 +127,7 @@ public class MainScreenController implements Initializable {
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
             messageField.setText("");
+            // TODO Edit Conversation nur anzeigen wenn Admin
 
             if (selectedConversation.getMessage() != null) {
                 messagesOfSelectedConversation.add(selectedConversation.getMessage());

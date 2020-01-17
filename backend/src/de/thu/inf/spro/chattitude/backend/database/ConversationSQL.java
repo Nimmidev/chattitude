@@ -278,6 +278,7 @@ final class ConversationSQL extends BaseSQL {
 
     private void addUsersToConversationsResult(int ogUserId, ResultSet resultSet, Map<Integer, Conversation> conversations) throws SQLException {
         Map<Integer, List<User>> userMap = new HashMap<>();
+        Map<Integer, List<Integer>> adminMap = new HashMap<>();
 
         while(resultSet.next()){
             int conversationId = resultSet.getInt("conversationId");
@@ -285,8 +286,13 @@ final class ConversationSQL extends BaseSQL {
             String username = resultSet.getString("username");
             User user = new User(userId, username);
             List<User> currentUserList = userMap.computeIfAbsent(conversationId, k -> new ArrayList<>());
-
             currentUserList.add(user);
+
+            if (resultSet.getBoolean("isAdmin")) {
+                List<Integer> currentAdminList = adminMap.computeIfAbsent(conversationId, k -> new ArrayList<>());
+                currentAdminList.add(userId);
+            }
+
         }
 
         Set<Integer> keys = userMap.keySet();
@@ -295,6 +301,7 @@ final class ConversationSQL extends BaseSQL {
             if(conversation != null){
                 List<User> userList = userMap.get(conversationId);
                 conversation.setUsers(userList);
+                conversation.setAdmins(adminMap.getOrDefault(conversationId, Collections.emptyList()));
                 
                 if(conversation.getName() == null){
                     if(userList.size() == 2){

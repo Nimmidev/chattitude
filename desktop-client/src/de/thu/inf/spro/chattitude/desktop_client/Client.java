@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 public class Client implements PacketHandler {
 
     private WebSocketClient webSocketClient;
+    private Credentials credentials;
 
     private Runnable onLoginSuccessful;
     private Runnable onLoginFailed;
@@ -71,6 +72,7 @@ public class Client implements PacketHandler {
     @Override
     public void onRegister(RegisterPacket packet, WebSocket webSocket) {
         if (packet.getCredentials().isAuthenticated()){
+            credentials = packet.getCredentials();
             System.out.println("Registration successful");
             System.out.println("Authenticated");
         } else {
@@ -86,6 +88,7 @@ public class Client implements PacketHandler {
     public void onAuthenticate(AuthenticationPacket packet, WebSocket webSocket) {
         if(packet.getCredentials().isAuthenticated()){
             System.out.println("Authenticated");
+            credentials = packet.getCredentials();
             if (onLoginSuccessful != null) onLoginSuccessful.run();
         } else {
             if (onLoginSuccessful != null) onLoginFailed.run();
@@ -194,4 +197,7 @@ public class Client implements PacketHandler {
         }
     }
 
+    public Credentials getCredentials() {
+        return credentials;
+    }
 }

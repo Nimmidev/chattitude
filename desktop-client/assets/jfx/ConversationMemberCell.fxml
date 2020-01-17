@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-
-<HBox fx:id="conversationMemberCell" prefHeight="45.0" prefWidth="287.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:id="conversationMemberCell" prefHeight="45.0" prefWidth="287.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="usernameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Tom Frank" HBox.hgrow="ALWAYS">
          <font>
@@ -19,7 +18,7 @@
             <Insets left="10.0" right="10.0" />
          </HBox.margin>
       </Label>
-      <JFXButton onAction="#removeClick" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/remove.png&quot;); -fx-background-size: contain;" textAlignment="CENTER" HBox.hgrow="NEVER" />
+      <JFXButton fx:id="removeButton" onAction="#removeClick" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/remove.png&quot;); -fx-background-size: contain;" textAlignment="CENTER" HBox.hgrow="NEVER" />
    </children>
    <padding>
       <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
