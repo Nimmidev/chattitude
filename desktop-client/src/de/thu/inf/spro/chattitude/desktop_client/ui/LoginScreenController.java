@@ -15,6 +15,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -147,6 +148,7 @@ public class LoginScreenController implements Initializable {
             secondaryStage.setResizable(true);
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
+            secondaryStage.getIcons().add(new Image("/LogoPicRound.png"));
             secondaryStage.show();
 
         } catch (IOException e) {

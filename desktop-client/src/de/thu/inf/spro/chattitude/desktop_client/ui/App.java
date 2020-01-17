@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -32,6 +33,7 @@ public class App extends Application {
             primaryStage.setResizable(false);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.getIcons().add(new Image("/LogoPicRound.png"));
             primaryStage.show();
         } catch (IOException e) {
             throw new Error(e);
