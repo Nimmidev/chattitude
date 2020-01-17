@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class Server implements PacketHandler {
 
@@ -30,7 +32,15 @@ public class Server implements PacketHandler {
         authenticationManager = new AuthenticationManager(mySqlClient);
 
         webSocketServer = new WebSocketServer(this,8080);
-        webSocketServer.setOnDisconnectCallback(integer -> connections.remove(integer));
+        webSocketServer.setOnDisconnectCallback(webSocket -> {
+            for (Map.Entry<Integer, List<WebSocket>> entry : connections.entrySet()) {
+                if (entry.getValue().remove(webSocket)) {
+                    if (entry.getValue().isEmpty())
+                        connections.remove(entry.getKey());
+                    return;
+                }
+            }
+        });
         webSocketServer.start();
     }
 
@@ -114,8 +124,8 @@ public class Server implements PacketHandler {
         send(webSocket, packet);
 
         if(success){
-            Conversation conversationData = mySqlClient.getConversation(conversationId);
-            broadcastPacket(conversationData.getUsers(), new ConversationUpdatedPacket(conversationData)); // TODO Diese Conversation enthält keinen Namen
+            Conversation conversationData = mySqlClient.getConversation(conversationId, -1);
+            broadcastPacket(conversationData.getUsers(), user -> new ConversationUpdatedPacket(mySqlClient.getConversation(conversationId, user.getId())));
         }
     }
 
@@ -133,8 +143,8 @@ public class Server implements PacketHandler {
         send(webSocket, packet);
 
         if(success){
-            Conversation conversation = mySqlClient.getConversation(packet.getConversationId());
-            broadcastPacket(conversation.getUsers(), new ConversationUpdatedPacket(conversation));
+            Conversation conversation = mySqlClient.getConversation(packet.getConversationId(), -1);
+            broadcastPacket(conversation.getUsers(), user -> new ConversationUpdatedPacket(mySqlClient.getConversation(packet.getConversationId(), user.getId())));
         }
     }
 
@@ -162,6 +172,17 @@ public class Server implements PacketHandler {
                 List<WebSocket> webSockets = connections.get(user.getId());
                 for(WebSocket webSocket : webSockets){
                     if(!webSocket.isClosing() && !webSocket.isClosed()) send(webSocket, packet);
+                }
+            }
+        }
+    }
+
+    void broadcastPacket(User[] users, Function<User, Packet> fn){
+        for(User user : users){
+            if(connections.containsKey(user.getId())){
+                List<WebSocket> webSockets = connections.get(user.getId());
+                for(WebSocket webSocket : webSockets){
+                    if(!webSocket.isClosing() && !webSocket.isClosed()) send(webSocket, fn.apply(user));
                 }
             }
         }

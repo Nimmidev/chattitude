@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
 
     private Communicator communicator;
-    private Callback<Integer> onDisconnectCallback;
+    private Callback<WebSocket> onDisconnectCallback;
 
     public WebSocketServer(PacketHandler handler, int port) {
         super(new InetSocketAddress(port));
@@ -36,7 +36,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
 
         if(onDisconnectCallback != null && attachment != null){
             Credentials credentials = (Credentials) attachment;
-            onDisconnectCallback.call(credentials.getUserId());
+            onDisconnectCallback.call(webSocket);
         }
 
         System.out.println("Connection closed");
@@ -59,7 +59,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         System.out.println("WebSocketServer started");
     }
 
-    public void setOnDisconnectCallback(Callback<Integer> callback){
+    public void setOnDisconnectCallback(Callback<WebSocket> callback){
         onDisconnectCallback = callback;
     }
 

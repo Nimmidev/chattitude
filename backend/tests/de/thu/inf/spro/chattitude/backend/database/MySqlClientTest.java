@@ -69,7 +69,7 @@ public class MySqlClientTest extends SQLTest {
         int conversationId = mySqlClient.createConversation(conversationName, sessionUserId, users);
         Assert.assertTrue(conversationId != -1);
 
-        Conversation conversation = conversationSQL.get(conversationId);
+        Conversation conversation = conversationSQL.get(conversationId, -1);
         Assert.assertNotNull(conversation);
         Assert.assertEquals(conversationId, conversation.getId());
         Assert.assertEquals(conversationName, conversation.getName());
@@ -83,7 +83,7 @@ public class MySqlClientTest extends SQLTest {
         int conversationId = mySqlClient.createConversation(conversationName, sessionUserId, new User[]{});
         Assert.assertTrue(conversationId != -1);
 
-        Conversation conversation = conversationSQL.get(conversationId);
+        Conversation conversation = conversationSQL.get(conversationId, -1);
         Assert.assertNotNull(conversation);
         Assert.assertEquals(conversationId, conversation.getId());
         Assert.assertEquals(conversationName, conversation.getName());
@@ -110,7 +110,7 @@ public class MySqlClientTest extends SQLTest {
         int conversationId = mySqlClient.createConversation(null, sessionUserId, new User[]{user2});
         Assert.assertTrue(conversationId != -1);
 
-        Conversation conversation = conversationSQL.get(conversationId);
+        Conversation conversation = conversationSQL.get(conversationId, -1);
         Assert.assertNotNull(conversation);
         Assert.assertEquals(conversationId, conversation.getId());
         Assert.assertNull(conversation.getName());
