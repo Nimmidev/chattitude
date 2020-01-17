@@ -1,9 +1,14 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
+import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
+import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
+import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ChatMessageCell;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ConversationCell;
+import de.thu.inf.spro.chattitude.desktop_client.ui.controller.TextMessageController;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
@@ -13,14 +18,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -34,25 +36,27 @@ public class MainScreenController implements Initializable {
     @FXML
     private JFXListView<Conversation> conversationsList;
     @FXML
-    private JFXListView<Message> messageHistoryList;
+    private JFXListView<ChatMessage> messageHistoryList;
     @FXML
     private StackPane stackPane;
 
     private Client client;
+    private DownloadManager downloadManager;
     private Conversation selectedConversation;
     private ObservableList<Conversation> conversations; // TODO automaatisch sortieren nach Datum
-    private ObservableList<Message> messagesOfSelectedConversation;
+    private ObservableList<ChatMessage> messagesOfSelectedConversation;
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;
 
     public MainScreenController() {
         System.out.println("LoginScreenController");
         client = App.getClient();
+        downloadManager = new DownloadManager(client);
         messagesOfSelectedConversation = FXCollections.observableArrayList();
         conversations = FXCollections.observableArrayList();
 
         client.setOnMessage(message -> Platform.runLater(() -> {
-            int conversationId = message.getConversationId();
+            int conversationId = message.asMessage().getConversationId();
             if (selectedConversation != null && conversationId == selectedConversation.getId()) {
                 messagesOfSelectedConversation.add(message);
             }
@@ -61,7 +65,7 @@ public class MainScreenController implements Initializable {
                 System.out.println("Warning: Received message for unknown conversation " + conversationId);
                 return;
             }
-            conversation.setMessage(message);
+            conversation.setMessage(message.asMessage());
             replaceConversation(conversation, conversation); // Update triggern
 
         }));
@@ -80,7 +84,7 @@ public class MainScreenController implements Initializable {
             if (selectedConversation.getId() != packet.getConversationId())
                 return;
 
-            if (packet.getLastMessageId() != messagesOfSelectedConversation.get(0).getId()) {
+            if (packet.getLastMessageId() != messagesOfSelectedConversation.get(0).asMessage().getId()) {
                 System.out.println("Warning hä das wollt ich doch gar nicht");
                 return;
             }
@@ -95,9 +99,10 @@ public class MainScreenController implements Initializable {
             int index = vf.getFirstVisibleCell().getIndex() + 1;
             if (index >= messagesOfSelectedConversation.size())
                 index--;
-            Message topMost = messagesOfSelectedConversation.get(index);
+            ChatMessage topMost = messagesOfSelectedConversation.get(index);
 
-            for (Message message : packet.getMessages()) {
+            for (Message rawMessage : packet.getMessages()) {
+                ChatMessage message = ChatMessage.of(rawMessage);
                 if (!messagesOfSelectedConversation.contains(message)) {
                     messagesOfSelectedConversation.add(0, message);
                 }
@@ -109,6 +114,7 @@ public class MainScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        client.setOnGetAttachment(downloadManager);
         client.setOnConversations(newConversations -> Platform.runLater(() -> {
             conversations.clear();
             conversations.addAll(newConversations);
@@ -129,8 +135,9 @@ public class MainScreenController implements Initializable {
             messageField.setText("");
             // TODO Edit Conversation nur anzeigen wenn Admin
 
-            if (selectedConversation.getMessage() != null) {
-                messagesOfSelectedConversation.add(selectedConversation.getMessage());
+            if (selectedConversation != null && selectedConversation.getMessage() != null) {
+                Message rawMessage = selectedConversation.getMessage();
+                messagesOfSelectedConversation.add(ChatMessage.of(rawMessage));
 
                 ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
                 VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
@@ -142,7 +149,7 @@ public class MainScreenController implements Initializable {
             }
         });
 
-        messageHistoryList.setCellFactory(param -> new MessageCell());
+        messageHistoryList.setCellFactory(param -> new ChatMessageCell(downloadManager));
         messageHistoryList.setItems(messagesOfSelectedConversation);
     }
 
@@ -165,7 +172,7 @@ public class MainScreenController implements Initializable {
             return;
 
         loadingHistory = true;
-        int lastMessageId = messagesOfSelectedConversation.get(0).getId();
+        int lastMessageId = messagesOfSelectedConversation.get(0).asMessage().getId();
 
         client.send(new MessageHistoryPacket(selectedConversation.getId(), lastMessageId));
     }
@@ -204,8 +211,8 @@ public class MainScreenController implements Initializable {
         if (messageField.getText().equals(""))
             return;
         System.out.println("Send");
-        Message message = new Message(selectedConversation.getId(), messageField.getText(), null);
-        client.send(new MessagePacket(message));
+        TextMessage message = new TextMessage(selectedConversation.getId(), messageField.getText());
+        client.send(new MessagePacket(message.asMessage()));
 
         messageField.setText("");
     }

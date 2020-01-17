@@ -8,20 +8,24 @@ import java.util.Base64;
 
 public class GetAttachmentPacket extends Packet {
 
-    private static final String FIELD_UUID = "uuid";
+    private static final String FIELD_FILE_ID = "fileId";
     private static final String FIELD_DATA = "data";
+    private static final String FIELD_REQUEST_IDENTIFIER = "requestIdentifier";
 
-    private String fieldId;
+    private String fileId;
+    private String requestIdentifier;
     private byte[] data;
 
     public GetAttachmentPacket(JsonObject packetData) {
         super(packetData);
     }
 
-    public GetAttachmentPacket(String uuid){
+    public GetAttachmentPacket(String fileId, String requestIdentifier){
         super(PacketType.GET_ATTACHMENT);
 
-        this.fieldId = uuid;
+        this.fileId = fileId;
+        this.requestIdentifier = requestIdentifier;
+        
         data = new byte[]{};
     }
 
@@ -29,15 +33,17 @@ public class GetAttachmentPacket extends Packet {
     protected void pack() {
         super.pack();
 
-        packetData.add(FIELD_UUID, fieldId);
+        packetData.add(FIELD_FILE_ID, fileId);
         packetData.add(FIELD_DATA, Base64.getEncoder().encodeToString(data));
+        packetData.add(FIELD_REQUEST_IDENTIFIER, requestIdentifier);
     }
 
     @Override
     protected void unpack() {
         super.unpack();
 
-        fieldId = packetData.get(FIELD_UUID).asString();
+        fileId = packetData.get(FIELD_FILE_ID).asString();
+        requestIdentifier = packetData.get(FIELD_REQUEST_IDENTIFIER).asString();
         data = Base64.getDecoder().decode(packetData.get(FIELD_DATA).asString());
     }
 
@@ -46,9 +52,13 @@ public class GetAttachmentPacket extends Packet {
     }
 
     public String getFieldId(){
-        return fieldId;
+        return fileId;
     }
 
+    public String getRequestIdentifier(){
+        return requestIdentifier;
+    }
+    
     public byte[] getData(){
         return data;
     }

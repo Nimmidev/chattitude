@@ -34,8 +34,11 @@ final class UserSQL extends BaseSQL {
     private static final String GET_BY_NAME = "" + 
             "SELECT " + _ID + ", " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _USERNAME + " LIKE ?";
 
-    private static final String CHECK_EXISTENCE = "" + 
+    private static final String CHECK_EXISTENCE_BY_USERNAME = "" +
             "Select " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _USERNAME + " = ?;";
+    
+    private static final String CHECK_EXISTENCE_BY_USER_ID = "" +
+            "Select " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _ID + " = ?;";
 
     private static final String CHECK_CREDENTIALS = "" + 
             "Select " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _USERNAME + "=? AND " + _PASSWORD + "=?;";
@@ -117,8 +120,25 @@ final class UserSQL extends BaseSQL {
     boolean checkExistence(String username){
         boolean result = false;
 
-        try (PreparedStatement pstmt = connection.get().prepareStatement(CHECK_EXISTENCE)){
+        try (PreparedStatement pstmt = connection.get().prepareStatement(CHECK_EXISTENCE_BY_USERNAME)){
             pstmt.setString(1, username);
+            pstmt.execute();
+
+            if(pstmt.getResultSet() != null){
+                result = pstmt.getResultSet().next();
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    boolean checkExistence(int userId){
+        boolean result = false;
+
+        try (PreparedStatement pstmt = connection.get().prepareStatement(CHECK_EXISTENCE_BY_USER_ID)){
+            pstmt.setInt(1, userId);
             pstmt.execute();
 
             if(pstmt.getResultSet() != null){

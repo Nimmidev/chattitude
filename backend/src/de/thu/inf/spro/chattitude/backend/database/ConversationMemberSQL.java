@@ -39,7 +39,7 @@ final class ConversationMemberSQL extends BaseSQL {
     private static final String UPDATE = "" +
             "UPDATE " + TABLE_NAME + " SET " + _IS_ADMIN + " = ? WHERE " + _USER_ID + " = ? AND " + _CONVERSATION_ID + " = ?;";
 
-    private static final String CHECK_IF_IN_CONVERSATION = "" + 
+    private static final String CHECK_IF_IN_CONVERSATION = "" +
             "SELECT " + _USER_ID + " FROM " + TABLE_NAME + " WHERE " + _USER_ID + " = ? AND " + _CONVERSATION_ID + " = ?";
     
     private static final String CHECK_IS_ADMIN = "" + 
@@ -55,7 +55,15 @@ final class ConversationMemberSQL extends BaseSQL {
     }
 
     boolean addToConversation(int userId, int conversationId){
-        try (PreparedStatement pstmt = connection.get().prepareStatement(ADD)){
+        return execUserInConversationQuery(userId, conversationId, ADD);
+    }
+
+    boolean removeFromConversation(int userId, int conversationId){
+        return execUserInConversationQuery(userId, conversationId, REMOVE);
+    }
+    
+    private boolean execUserInConversationQuery(int userId, int conversationId, String query){
+        try (PreparedStatement pstmt = connection.get().prepareStatement(query)){
             pstmt.setInt(1, conversationId);
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
@@ -63,20 +71,7 @@ final class ConversationMemberSQL extends BaseSQL {
             e.printStackTrace();
             return false;
         }
-        
-        return true;
-    }
 
-    boolean removeFromConversation(int userId, int conversationId){
-        try (PreparedStatement pstmt = connection.get().prepareStatement(REMOVE)){
-            pstmt.setInt(1,  conversationId);
-            pstmt.setInt(2, userId);
-            pstmt.executeUpdate();
-        } catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-        
         return true;
     }
 

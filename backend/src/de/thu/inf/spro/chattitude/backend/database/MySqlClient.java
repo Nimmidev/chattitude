@@ -105,9 +105,20 @@ public class MySqlClient {
     public boolean checkUserExistence(String username){
         return userSQL.checkExistence(username);
     }
+    
+    public boolean checkUserExistence(int userId){
+        return userSQL.checkExistence(userId);
+    }
 
     public boolean checkUserCredentials(String username, String password){
         return userSQL.checkCredentials(username, password);
+    }
+    
+    private boolean checkUserExistences(User[] users){
+        for(User user : users){
+            if(!userSQL.checkExistence(user.getId())) return false;
+        }
+        return true;
     }
 
     // --- Conversation ---
@@ -115,6 +126,8 @@ public class MySqlClient {
     public int createConversation(String conversationName, int sessionUserId, User[] users){
         if(conversationName == null && users.length != 1){
             throw new IllegalStateException("A Single Chat can only be created with exactly two users.");
+        } else if(!checkUserExistences(users)){
+            throw new IllegalStateException("Can't create chat with invalid user ids.");
         }
         
         int conversationId = conversationSQL.add(conversationName);

@@ -14,15 +14,26 @@ public class UserSQLTest extends SQLTest {
     } 
     
     @Test
-    public void userExistenceTest(){
-        String username = "userExistenceTest";
-
-
+    public void userExistenceNameTest(){
+        String username = "userExistenceNameTest";
+        
         boolean exists = userSQL.checkExistence(username);
         Assert.assertFalse(exists);
         
         userSQL.add(username, "qwer");
         exists = userSQL.checkExistence(username);
+        Assert.assertTrue(exists);
+    }
+    
+    @Test
+    public void userExistenceIdTest(){
+        String username = "userExistenceIdTest";
+        
+        boolean exists = userSQL.checkExistence(-1);
+        Assert.assertFalse(exists);
+
+        int userId = userSQL.add(username, "qwer");
+        exists = userSQL.checkExistence(userId);
         Assert.assertTrue(exists);
     }
     
