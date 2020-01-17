@@ -20,7 +20,7 @@ public class ConversationSQLTest extends SQLTest {
     public void getConversationTest(){
         String name = "getConversationTest";
         int conversationId = conversationSQL.add(name);
-        Conversation conversation = conversationSQL.get(conversationId);
+        Conversation conversation = conversationSQL.get(conversationId, -1);
         
         Assert.assertNotNull(conversation);
         Assert.assertEquals(name, conversation.getName());
@@ -29,7 +29,7 @@ public class ConversationSQLTest extends SQLTest {
 
     @Test
     public void getConversationNonExistentTest(){
-        Conversation conversation = conversationSQL.get(Integer.MAX_VALUE);
+        Conversation conversation = conversationSQL.get(Integer.MAX_VALUE, -1);
         Assert.assertNull(conversation);
     }
 
@@ -92,7 +92,7 @@ public class ConversationSQLTest extends SQLTest {
         boolean success = conversationSQL.updateLastMessageId(conversationId, messageId);
         Assert.assertTrue(success);
         
-        Conversation conversation = conversationSQL.get(conversationId);
+        Conversation conversation = conversationSQL.get(conversationId, -1);
         Assert.assertNotNull(conversation);
         Assert.assertEquals(messageId, conversation.getMessage().getId());
     }

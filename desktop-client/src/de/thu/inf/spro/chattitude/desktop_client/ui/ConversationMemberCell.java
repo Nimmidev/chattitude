@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConversationMemberCell extends JFXListCell<User> {
     @FXML
@@ -26,6 +28,8 @@ public class ConversationMemberCell extends JFXListCell<User> {
     private Label adminLabel;
     @FXML
     private JFXButton removeButton;
+    @FXML
+    private JFXButton proDemoteButton;
 
     private FXMLLoader mLLoader;
     private Client client;
@@ -47,14 +51,6 @@ public class ConversationMemberCell extends JFXListCell<User> {
         }
     }
 
-    private boolean isAdmin() {
-        for (int admin : conversation.getAdmins()) {
-            if (admin == user.getId())
-                return true;
-        }
-        return false;
-    }
-
     @Override
     protected void updateItem(User user, boolean empty) {
         super.updateItem(user, empty);
@@ -68,13 +64,17 @@ public class ConversationMemberCell extends JFXListCell<User> {
         }
 
         usernameLabel.setText(user.getName());
-        adminLabel.setVisible(isAdmin());
+        adminLabel.setVisible(conversation.isAdmin(user.getId()));
+        proDemoteButton.setText(conversation.isAdmin(user.getId()) ? "Demote" : "Promote");
 
         if (user.getId() == client.getCredentials().getUserId()) {
             removeButton.setVisible(false);
+            proDemoteButton.setVisible(false);
         } else {
             removeButton.setVisible(true);
+            proDemoteButton.setVisible(true);
         }
+
 
 
         setGraphic(conversationMemberCell);
@@ -89,5 +89,29 @@ public class ConversationMemberCell extends JFXListCell<User> {
         conversation.setUsers(users);
 
         members.remove(user);
+    }
+
+    @FXML
+    private void proDemoteClick() {
+        if (conversation.isAdmin(user.getId())) {
+            client.send(new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.DEMOTE_ADMIN, user.getId(), conversation.getId()));
+            conversation.setAdmins(
+                    Arrays.stream(conversation.getAdmins())
+                    .filter(value -> value != user.getId())
+                    .boxed()
+                    .collect(Collectors.toList())
+            );
+        } else {
+            client.send(new ModifyConversationUserPacket(ModifyConversationUserPacket.Action.PROMOTE_ADMIN, user.getId(), conversation.getId()));
+            conversation.setAdmins(
+                    Stream.concat(
+                            Arrays.stream(conversation.getAdmins())
+                                .filter(value -> value != user.getId())
+                                .boxed(),
+                            Stream.of(user.getId())
+                    ).collect(Collectors.toList())
+            );
+        }
+        this.updateItem(user, false);
     }
 }

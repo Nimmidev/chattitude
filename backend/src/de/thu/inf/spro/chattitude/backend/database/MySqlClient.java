@@ -148,8 +148,8 @@ public class MySqlClient {
         return conversationId;
     }
 
-    public Conversation getConversation(int conversationId){
-        return conversationSQL.get(conversationId);
+    public Conversation getConversation(int conversationId, int ogUserId){
+        return conversationSQL.get(conversationId, ogUserId);
     }
 
     public List<User> getConversationUsers(int conversationId){
