@@ -62,6 +62,11 @@ public class SingleChatSearchResultCell extends JFXListCell<User>{
 
         @FXML
         private void addClick() {
+            client.send(new CreateConversationPacket(conversation = new Conversation(user)));
+            popUp.closePopUpClick();
+
+            // DAMIT MAN SICH NICHT SELBST AUSWÄHLEN KANN - brauche angemeldeten Nutzer :)
+            /*
             if (user != this.user) {
                 client.send(new CreateConversationPacket(conversation = new Conversation(user)));
                 popUp.closePopUpClick();
@@ -69,5 +74,6 @@ public class SingleChatSearchResultCell extends JFXListCell<User>{
                 System.out.println("You can´t start a chat with youself!");
                 popUp.displayError();
             }
+             */
         }
 }
