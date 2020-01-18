@@ -68,7 +68,7 @@
                 <JFXListView fx:id="searchResultList" prefHeight="150.0" prefWidth="219.0" VBox.vgrow="ALWAYS" />
             <JFXButton alignment="CENTER" onAction="#createGroupChatClick" text="Create Group" textAlignment="CENTER" textFill="#0090ff">
                <font>
-                  <Font name="Arial Rounded MT Bold" size="12.0" />
+                  <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
                <VBox.margin>
                   <Insets top="10.0" />
