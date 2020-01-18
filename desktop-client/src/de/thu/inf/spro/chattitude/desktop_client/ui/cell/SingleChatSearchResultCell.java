@@ -56,8 +56,13 @@ public class SingleChatSearchResultCell extends JFXListCell<User>{
                 return;
             }
 
+            if (user.getId() == client.getCredentials().getUserId()) {
+                addUserButton.setVisible(false);
+            } else {
+                addUserButton.setVisible(true);
+            }
             usernameLabel.setText(user.getName());
-            addUserButton.setVisible(true);
+
             setGraphic(conversationMemberCell);
         }
 
