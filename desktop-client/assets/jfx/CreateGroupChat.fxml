@@ -66,17 +66,29 @@
                     </VBox.margin>
                 </JFXTextField>
                 <JFXListView fx:id="searchResultList" prefHeight="150.0" prefWidth="219.0" VBox.vgrow="ALWAYS" />
-            <JFXButton alignment="CENTER" onAction="#createGroupChatClick" text="Create Group" textAlignment="CENTER" textFill="#0090ff">
-               <font>
-                  <Font name="Arial Rounded MT Bold" size="14.0" />
-               </font>
+            <HBox prefHeight="14.0" prefWidth="380.0">
+               <children>
+                  <JFXButton alignment="CENTER" onAction="#createGroupChatClick" text="Create Group" textAlignment="CENTER" textFill="#0090ff">
+                     <font>
+                        <Font name="Arial Rounded MT Bold" size="14.0" />
+                     </font>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </JFXButton>
+                  <Label fx:id="labelError" text="ErrorLabel" textFill="RED">
+                     <HBox.margin>
+                        <Insets left="10.0" top="7.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="Arial Rounded MT Bold" size="12.0" />
+                     </font>
+                  </Label>
+               </children>
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
-               <effect>
-                  <DropShadow />
-               </effect>
-            </JFXButton>
+            </HBox>
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" />

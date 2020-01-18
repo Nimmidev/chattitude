@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -36,6 +37,8 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
         private JFXTextField searchField;
         @FXML
         private JFXListView<User> searchResultList;
+        @FXML
+        private Label labelError;
 
         private FXMLLoader mLLoader;
         private ArrayList <User> userList;
@@ -80,6 +83,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
         public void initialize(URL location, ResourceBundle resources) {
 
             usersInConversationList.setCellFactory(param -> new GroupChatMemberCell(client, usersInConversation));
+            labelError.setVisible(false);
 
             searchField.textProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue.equals("")) {
@@ -114,8 +118,12 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
 
             if (userArray.length == 0) {
                 System.out.println("UserArray LEER");
+                labelError.setText("You need to choose atleast 1 user!");
+                labelError.setVisible(true);
             } else if (conversationNameField.getText().length() < 1) {
                 System.out.println("Gruppename LEER");
+                labelError.setText("You need to name your group!");
+                labelError.setVisible(true);
             } else {
                 client.send(new CreateConversationPacket(conversation = new Conversation(conversationNameField.getText(), userArray)));
                 closePopUpClick();
