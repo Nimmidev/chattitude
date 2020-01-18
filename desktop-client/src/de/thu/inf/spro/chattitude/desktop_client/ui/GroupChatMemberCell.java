@@ -43,7 +43,6 @@ public class GroupChatMemberCell extends JFXListCell<User> {
             }
         }
 
-
         @Override
         protected void updateItem(User user, boolean empty) {
             super.updateItem(user, empty);
