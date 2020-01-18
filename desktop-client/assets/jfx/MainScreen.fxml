@@ -52,6 +52,7 @@
                      <children>
                         <JFXButton fx:id="btnQuoteMessage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#quoteMessage" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/quote.png&quot;); -fx-background-size: contain;" />
                         <JFXButton fx:id="editConversationButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#editConversation" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/edit.png&quot;); -fx-background-size: contain;">
+                        <JFXButton fx:id="sendFileButton" onMouseClicked="#sendFileButtonClicked" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#editConversation" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/edit.png&quot;); -fx-background-size: contain;">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
