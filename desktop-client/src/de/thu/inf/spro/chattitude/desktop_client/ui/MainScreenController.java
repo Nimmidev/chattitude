@@ -212,17 +212,13 @@ public class MainScreenController implements Initializable {
     }
     public void startUserChat() {
         CreateSingleChatPopUp popUp = new CreateSingleChatPopUp(client);
-        // TODO - JAN
         stackPane.getChildren().add(popUp);
     }
 
     public void startGroupChat() {
-        // TODO - JAN
         CreateGroupChatPopUp popUp = new CreateGroupChatPopUp(client);
         stackPane.getChildren().add(popUp);
     }
-
-
 
     public void sendMessage() {
         if (messageField.getText().equals(""))
@@ -246,5 +242,4 @@ public class MainScreenController implements Initializable {
         int index = conversations.indexOf(oldConversation);
         conversations.set(index, newConversation); // Replace with new conversation object
     }
-
 }

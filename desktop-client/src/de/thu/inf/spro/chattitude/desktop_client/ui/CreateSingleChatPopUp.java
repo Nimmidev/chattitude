@@ -67,7 +67,7 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
             mLLoader.load();
             getChildren().add(parent);
         } catch (IOException e) {
-            throw new RuntimeException("Error loading EditConversationPopUp", e);
+            throw new RuntimeException("Error loading CreateSingleChatPopUp", e);
         }
     }
 
