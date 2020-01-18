@@ -140,7 +140,7 @@ public class MySqlClient {
                 conversationMemberSQL.addToConversation(user.getId(), conversationId);
             }
     
-            if(conversationName == null){
+            if(conversationName != null){
                 conversationMemberSQL.updateIsAdmin(sessionUserId, conversationId, true);
             }
         }
