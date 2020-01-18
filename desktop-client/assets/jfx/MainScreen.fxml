@@ -9,7 +9,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
 
 <StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.MainScreenController">
    <children>
@@ -51,8 +55,8 @@
                   <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="55.0" prefWidth="422.0" style="-fx-background-color: #4363A4;" BorderPane.alignment="CENTER">
                      <children>
                         <JFXButton fx:id="btnQuoteMessage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#quoteMessage" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/quote.png&quot;); -fx-background-size: contain;" />
+                        <JFXButton fx:id="sendFileButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#sendFileButtonClicked" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/attach.png&quot;); -fx-background-size: contain;" />
                         <JFXButton fx:id="editConversationButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#editConversation" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/edit.png&quot;); -fx-background-size: contain;">
-                        <JFXButton fx:id="sendFileButton" onMouseClicked="#sendFileButtonClicked" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#editConversation" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/edit.png&quot;); -fx-background-size: contain;">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -67,38 +71,48 @@
                   </HBox>
                </top>
                <bottom>
-                  <HBox prefHeight="35.0" prefWidth="416.0" style="-fx-background-color: #4363A4;" BorderPane.alignment="CENTER">
+                  <VBox style="-fx-background-color: #fff;" prefHeight="35.0" prefWidth="416.0" BorderPane.alignment="CENTER">
                      <children>
-                        <JFXTextField fx:id="messageField" focusColor="#93a3d300" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="100.0" onKeyPressed="#messageFieldKeyPress" promptText="Type message here" style="-fx-background-color: white;" unFocusColor="#4d4d4d00" HBox.hgrow="ALWAYS">
+                        <BorderPane fx:id="attachedFileClosePane">
+                           <right>
+                              <JFXButton fx:id="attachedFileClose" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#attachedFileCloseClicked" prefHeight="16.0" prefWidth="16.0" style="-fx-background-image: url(&quot;icons/close_black.png&quot;); -fx-background-size: contain;-fx-padding: 5 5 0 0;" />
+                           </right>
+                        </BorderPane>
+                        <Label style="-fx-padding: 0 0 10 10" fx:id="attachedFile" text="A File is attached" />
+                        <HBox prefHeight="35.0" prefWidth="416.0" style="-fx-background-color: #4363A4;" BorderPane.alignment="CENTER">
+                           <children>
+                              <JFXTextField fx:id="messageField" focusColor="#93a3d300" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="100.0" onKeyPressed="#messageFieldKeyPress" promptText="Type message here" style="-fx-background-color: white;" unFocusColor="#4d4d4d00" HBox.hgrow="ALWAYS">
+                                 <padding>
+                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                 </padding>
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="btnSendMessage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#sendMessage" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/send.png&quot;); -fx-background-size: contain;" textFill="#4363a4">
+                                 <font>
+                                    <Font name="Arial Rounded MT Bold" size="12.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
                            <padding>
-                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                           <HBox.margin>
+                           <BorderPane.margin>
                               <Insets />
-                           </HBox.margin>
-                        </JFXTextField>
-                        <JFXButton fx:id="btnSendMessage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#sendMessage" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/send.png&quot;); -fx-background-size: contain;" textFill="#4363a4">
-                           <font>
-                              <Font name="Arial Rounded MT Bold" size="12.0" />
-                           </font>
-                           <padding>
-                              <Insets right="5.0" />
-                           </padding>
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </JFXButton>
+                           </BorderPane.margin>
+                        </HBox>
                      </children>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                     <BorderPane.margin>
-                        <Insets />
-                     </BorderPane.margin>
-                  </HBox>
+                  </VBox>
                </bottom>
                <center>
                   <JFXListView fx:id="messageHistoryList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent;" BorderPane.alignment="CENTER">
