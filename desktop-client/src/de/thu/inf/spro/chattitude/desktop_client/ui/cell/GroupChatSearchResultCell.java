@@ -69,6 +69,7 @@ public class GroupChatSearchResultCell extends JFXListCell<User> {
 
         @FXML
         private void addClick() {
+            System.out.println(user.getName());
             members.add(user);
             this.updateItem(user, false);
             System.out.println(user.getName() + " added to group!");

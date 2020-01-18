@@ -16,7 +16,7 @@ import java.io.IOException;
 public class GroupChatMemberCell extends JFXListCell<User> {
 
         @FXML
-        private HBox conversationMemberCell;
+        private HBox GroupChatMemberCell;
         @FXML
         private Label usernameLabel;
         @FXML
@@ -52,7 +52,7 @@ public class GroupChatMemberCell extends JFXListCell<User> {
                 setGraphic(null);
                 return;
             }
-
+            
             usernameLabel.setText(user.getName());
 
             if (user.getId() == client.getCredentials().getUserId()) {
@@ -61,14 +61,7 @@ public class GroupChatMemberCell extends JFXListCell<User> {
                 removeButton.setVisible(true);
             }
 
-            setGraphic(conversationMemberCell);
-
-            /*
-            usernameLabel.setText(user.getName());
-            addUserButton.setVisible(true);
-            setGraphic(conversationMemberCell);
-             */
-
+            setGraphic(GroupChatMemberCell);
         }
 
         @FXML
