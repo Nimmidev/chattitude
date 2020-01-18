@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="loginScreen" prefHeight="433.0" prefWidth="263.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.LoginScreenController">
+<AnchorPane fx:id="loginScreen" prefHeight="434.0" prefWidth="215.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.LoginScreenController">
    <children>
-      <AnchorPane layoutX="14.0" layoutY="13.0" prefHeight="372.0" prefWidth="237.0" style="-fx-background-color: #4363A4;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="12.0">
+      <AnchorPane layoutX="3.0" layoutY="3.0" prefHeight="427.0" prefWidth="232.0" style="-fx-background-color: #4363A4;" AnchorPane.bottomAnchor="4.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="3.0">
          <children>
             <ImageView fitHeight="73.0" fitWidth="121.0" layoutX="64.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true">
                <image>
