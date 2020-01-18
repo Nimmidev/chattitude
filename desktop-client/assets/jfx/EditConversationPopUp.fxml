@@ -26,7 +26,7 @@
                <font>
                   <Font size="16.0" />
                </font></JFXTextField>
-            <JFXButton maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#saveConversationNameClick" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/save.png&quot;); -fx-background-size: contain;">
+            <JFXButton fx:id="saveConversationButton" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#saveConversationNameClick" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/save.png&quot;); -fx-background-size: contain;">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin></JFXButton>

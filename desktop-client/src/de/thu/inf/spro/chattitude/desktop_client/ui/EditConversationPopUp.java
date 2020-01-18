@@ -1,5 +1,6 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
@@ -33,6 +34,8 @@ public class EditConversationPopUp extends StackPane implements Initializable {
     private JFXTextField searchField;
     @FXML
     private JFXListView<User> searchResultList;
+    @FXML
+    private JFXButton saveConversationButton;
 
     private FXMLLoader mLLoader;
     private Conversation conversation;
@@ -76,6 +79,9 @@ public class EditConversationPopUp extends StackPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         conversationNameField.setText(conversation.getName());
+        conversationNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveConversationButton.setDisable(newValue.equals(conversation.getName()));
+        });
 
         usersInConversationList.setItems(usersInConversation);
         usersInConversationList.setCellFactory(param -> new ConversationMemberCell(client, conversation, usersInConversation));
@@ -111,5 +117,6 @@ public class EditConversationPopUp extends StackPane implements Initializable {
     private void saveConversationName() {
         conversation.setName(conversationNameField.getText());
         client.send(new ConversationUpdatedPacket(conversation));
+        saveConversationButton.setDisable(true);
     }
 }
