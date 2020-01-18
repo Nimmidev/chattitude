@@ -9,7 +9,7 @@ public class FileMessage extends ChatMessage {
     
     private String filename;
     
-    FileMessage(int conversationId, String text, String filename, byte[] data) {
+    public FileMessage(int conversationId, String text, String filename, byte[] data) {
         super(MessageType.FILE, conversationId, text, data);
         
         this.filename = filename;

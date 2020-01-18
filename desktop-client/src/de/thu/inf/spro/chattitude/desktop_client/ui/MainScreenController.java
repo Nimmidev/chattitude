@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
+import de.thu.inf.spro.chattitude.desktop_client.message.FileMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
 import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ChatMessageCell;
 import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ConversationCell;
@@ -19,13 +20,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -42,7 +49,11 @@ public class MainScreenController implements Initializable {
     private StackPane stackPane;
     @FXML
     private JFXButton editConversationButton;
-
+    @FXML
+    private BorderPane attachedFileClosePane;
+    @FXML
+    private Label attachedFile;
+    
     private Client client;
     private DownloadManager downloadManager;
     private Conversation selectedConversation;
@@ -50,6 +61,7 @@ public class MainScreenController implements Initializable {
     private ObservableList<ChatMessage> messagesOfSelectedConversation;
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;
+    private String currentlySelectedFile;
 
     public MainScreenController() {
         System.out.println("LoginScreenController");
@@ -70,7 +82,6 @@ public class MainScreenController implements Initializable {
             }
             conversation.setMessage(message.asMessage());
             replaceConversation(conversation, conversation); // Update triggern
-
         }));
 
         client.setOnConversationUpdated(newConversation -> Platform.runLater(() -> {
@@ -135,6 +146,8 @@ public class MainScreenController implements Initializable {
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
+            currentlySelectedFile = null;
+            setSelectedFileVisibility(false);
             messageField.setText("");
 
             editConversationButton.setVisible(selectedConversation.isAdmin(client.getCredentials().getUserId()));
@@ -155,6 +168,7 @@ public class MainScreenController implements Initializable {
 
         messageHistoryList.setCellFactory(param -> new ChatMessageCell(downloadManager));
         messageHistoryList.setItems(messagesOfSelectedConversation);
+        setSelectedFileVisibility(false);
     }
 
     @FXML
@@ -179,6 +193,28 @@ public class MainScreenController implements Initializable {
     private void editConversation() {
         EditConversationPopUp popUp = new EditConversationPopUp(client, selectedConversation);
         stackPane.getChildren().add(popUp);
+    }
+    
+    @FXML
+    private void sendFileButtonClicked(){
+        currentlySelectedFile = downloadManager.chooseFile(stackPane.getScene().getWindow());
+        attachedFile.setText(Paths.get(currentlySelectedFile).getFileName().toString());
+        setSelectedFileVisibility(true);
+    }
+    
+    @FXML
+    private void attachedFileCloseClicked(){
+        clearAttachedFile();
+    }
+    
+    private void setSelectedFileVisibility(boolean visibility){
+        attachedFileClosePane.setVisible(visibility);
+        attachedFile.setVisible(visibility);
+    }
+    
+    private void clearAttachedFile(){
+        setSelectedFileVisibility(false);
+        currentlySelectedFile = null;
     }
 
     private void loadMoreMessages() {
@@ -217,12 +253,21 @@ public class MainScreenController implements Initializable {
     }
 
     public void sendMessage() {
-        if (messageField.getText().equals(""))
+        if (messageField.getText().equals("") && currentlySelectedFile == null)
             return;
         System.out.println("Send");
-        TextMessage message = new TextMessage(selectedConversation.getId(), messageField.getText());
+        ChatMessage message;
+        
+        if(currentlySelectedFile != null){
+            String filename = Paths.get(currentlySelectedFile).getFileName().toString();
+            byte[] data = downloadManager.loadFrom(currentlySelectedFile);
+            message = new FileMessage(selectedConversation.getId(), messageField.getText(), filename, data);
+            clearAttachedFile();
+        } else {
+            message = new TextMessage(selectedConversation.getId(), messageField.getText());
+        }
+        
         client.send(new MessagePacket(message.asMessage()));
-
         messageField.setText("");
     }
 

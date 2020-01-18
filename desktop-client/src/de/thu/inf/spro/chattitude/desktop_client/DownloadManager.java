@@ -61,6 +61,12 @@ public class DownloadManager implements Callback<GetAttachmentPacket> {
         return file.getAbsolutePath();
     }
     
+    public String chooseFile(Window window){
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(window);
+        return file.getAbsolutePath();
+    }
+    
     public void saveTo(String path, String filename, byte[] data){
         File file = new File(path, filename);
         try {
@@ -68,6 +74,20 @@ public class DownloadManager implements Callback<GetAttachmentPacket> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    public byte[] loadFrom(String path){
+        File file = new File(path);
+        
+        if(file.exists()){
+            try {
+                return Files.readAllBytes(Paths.get(file.toURI()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return new byte[]{};
     }
     
 }
