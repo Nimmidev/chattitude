@@ -166,9 +166,13 @@ public class MainScreenController implements Initializable {
 
     @FXML
     private void quoteMessage() {
+        if (messageHistoryList.getSelectionModel().getSelectedItem() != null) {
         ChatMessage msg = messageHistoryList.getSelectionModel().getSelectedItem();
         String msgQuote = msg.getText();
         System.out.println(msgQuote);
+        } else {
+            System.out.println("No message selected!");
+        }
     }
 
     @FXML
