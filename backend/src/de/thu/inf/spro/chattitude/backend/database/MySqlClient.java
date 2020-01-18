@@ -160,6 +160,14 @@ public class MySqlClient {
         return conversationSQL.getUserConversations(userId);
     }
 
+    public boolean setConversationName(int ogUserId, int conversationId, String newName) {
+        if (conversationMemberSQL.checkIsAdmin(ogUserId, conversationId)) {
+            return conversationSQL.setConversationName(conversationId, newName);
+        } else {
+            throw new IllegalStateException("User " + ogUserId + " is not admin of conversation " + conversationId + ". THIS INCIDENT WILL BE REPORTED!!11!!");
+        }
+    }
+
     // --- ConversationMember
 
     public boolean modifyConversationUser(ModifyConversationUserPacket.Action action, int sessionUserId, int userId, int conversationId){

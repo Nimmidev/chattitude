@@ -6,6 +6,7 @@ import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.desktop_client.ui.cell.SearchResultCell;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
+import de.thu.inf.spro.chattitude.packet.packets.ConversationUpdatedPacket;
 import de.thu.inf.spro.chattitude.packet.packets.SearchUserPacket;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -108,6 +109,7 @@ public class EditConversationPopUp extends StackPane implements Initializable {
     }
 
     private void saveConversationName() {
-
+        conversation.setName(conversationNameField.getText());
+        client.send(new ConversationUpdatedPacket(conversation));
     }
 }

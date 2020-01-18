@@ -114,7 +114,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
 
             if (userArray.length == 0) {
                 System.out.println("UserArray LEER");
-            } if (conversationNameField.getText().length() < 1) {
+            } else if (conversationNameField.getText().length() < 1) {
                 System.out.println("Gruppename LEER");
             } else {
                 client.send(new CreateConversationPacket(conversation = new Conversation(conversationNameField.getText(), userArray)));
