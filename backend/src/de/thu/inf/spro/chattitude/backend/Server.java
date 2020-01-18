@@ -131,7 +131,13 @@ public class Server implements PacketHandler {
 
     @Override
     public void onConversationUpdated(ConversationUpdatedPacket packet, WebSocket webSocket) {
-        System.out.println("ConversationUpdatedPacket: " + packet.getConversation().getId());
+        Credentials credentials = webSocket.getAttachment();
+        boolean success = mySqlClient.setConversationName(credentials.getUserId(), packet.getConversation().getId(), packet.getConversation().getName());
+
+        if(success){
+            Conversation conversation = mySqlClient.getConversation(packet.getConversation().getId(), -1);
+            broadcastPacket(conversation.getUsers(), user -> new ConversationUpdatedPacket(mySqlClient.getConversation(packet.getConversation().getId(), user.getId())));
+        }
     }
 
     @Override

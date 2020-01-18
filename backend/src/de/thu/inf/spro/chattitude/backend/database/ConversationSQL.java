@@ -4,6 +4,7 @@ import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 
+import javax.print.attribute.standard.MediaSize;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +27,9 @@ final class ConversationSQL extends BaseSQL {
 
     private static final String INSERT_CONVERSATION = "" +
         "INSERT INTO " + TABLE_NAME + " (" + _NAME + ") VALUES (?);";
+
+    private static final String UPDATE_CONVERSATION_NAME = "" +
+            "UPDATE " + TABLE_NAME + " SET " + _NAME + " = ? WHERE " + _ID + " = ?";
 
     private static final String ADD_MESSAGE_ID_INDEX = "" +
             "ALTER TABLE " + TABLE_NAME + " ADD INDEX CM_lastMessageId_constr_idx (" + _LAST_MESSAGE_ID + " ASC);";
@@ -329,6 +333,19 @@ final class ConversationSQL extends BaseSQL {
                 }
             }
         }
+    }
+
+    boolean setConversationName(int conversationId, String newName) {
+        try (PreparedStatement pstmt = connection.get().prepareStatement(UPDATE_CONVERSATION_NAME)){
+            pstmt.setString(1, newName);
+            pstmt.setInt(2, conversationId);
+            pstmt.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
     
     boolean updateLastMessageId(int conversationId, int messageId){
