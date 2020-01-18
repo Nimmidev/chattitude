@@ -3,6 +3,7 @@ package de.thu.inf.spro.chattitude.desktop_client.ui;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.SingleChatSearchResultCell;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.SearchUserPacket;
 import javafx.application.Platform;

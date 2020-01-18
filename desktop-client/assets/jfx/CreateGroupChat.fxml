@@ -6,6 +6,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -22,14 +23,10 @@
         </HBox>
         <HBox>
             <children>
-                <JFXTextField fx:id="conversationNameField" labelFloat="true" onKeyPressed="#conversationNameFieldKeyPress" prefHeight="35.0" prefWidth="219.0" promptText="Your group name:" text="Nice Group" HBox.hgrow="ALWAYS">
+                <JFXTextField fx:id="conversationNameField" labelFloat="true" onKeyPressed="#conversationNameFieldKeyPress" prefHeight="35.0" prefWidth="219.0" promptText="Your group name:" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="16.0" />
                     </font></JFXTextField>
-                <JFXButton maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#saveConversationNameClick" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/save.png&quot;); -fx-background-size: contain;">
-                    <HBox.margin>
-                        <Insets left="10.0" />
-                    </HBox.margin></JFXButton>
             </children>
             <VBox.margin>
                 <Insets bottom="5.0" top="20.0" />
@@ -60,7 +57,7 @@
                         <Insets bottom="5.0" />
                     </padding>
                 </Label>
-                <JFXTextField fx:id="searchField" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" promptText="Search users" VBox.vgrow="NEVER">
+                <JFXTextField fx:id="searchField" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" promptText="Search for users:" VBox.vgrow="NEVER">
                     <font>
                         <Font size="16.0" />
                     </font>
@@ -69,6 +66,17 @@
                     </VBox.margin>
                 </JFXTextField>
                 <JFXListView fx:id="searchResultList" prefHeight="150.0" prefWidth="219.0" VBox.vgrow="ALWAYS" />
+            <JFXButton alignment="CENTER" onAction="#createGroupChatClick" text="Create Group" textAlignment="CENTER" textFill="#0090ff">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="12.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+               <effect>
+                  <DropShadow />
+               </effect>
+            </JFXButton>
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" />

@@ -3,6 +3,8 @@ package de.thu.inf.spro.chattitude.desktop_client.ui;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.GroupChatMemberCell;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.GroupChatSearchResultCell;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.CreateConversationPacket;
@@ -96,9 +98,8 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
         }
 
         @FXML
-        private void saveConversationNameClick() {
-            saveConversationName();
-
+        private void createGroupChatClick() {
+            createGroupChat();
         }
 
         @FXML
@@ -108,9 +109,16 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
             }
         }
 
-        private void saveConversationName() {
+        private void createGroupChat() {
             User[] userArray = usersInConversation.toArray(new User[0]);
-            client.send(new CreateConversationPacket(conversation = new Conversation(conversationNameField.getText(), userArray)));
-            closePopUpClick();
+
+            if (userArray.length == 0) {
+                System.out.println("UserArray LEER");
+            } if (conversationNameField.getText().length() < 1) {
+                System.out.println("Gruppename LEER");
+            } else {
+                client.send(new CreateConversationPacket(conversation = new Conversation(conversationNameField.getText(), userArray)));
+                closePopUpClick();
+            }
         }
     }
