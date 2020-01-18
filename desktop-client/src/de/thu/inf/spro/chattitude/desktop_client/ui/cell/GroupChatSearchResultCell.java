@@ -57,13 +57,19 @@ public class GroupChatSearchResultCell extends JFXListCell<User> {
                 return;
             }
 
+            if (user.getId() == client.getCredentials().getUserId()) {
+                addUserButton.setVisible(false);
+            } else {
+                addUserButton.setVisible(true);
+            }
+
             usernameLabel.setText(user.getName());
-            addUserButton.setVisible(true);
             setGraphic(conversationMemberCell);
         }
 
         @FXML
         private void addClick() {
+            System.out.println(user.getName());
             members.add(user);
             this.updateItem(user, false);
             System.out.println(user.getName() + " added to group!");

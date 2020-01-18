@@ -16,6 +16,7 @@ import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -135,11 +136,12 @@ public class MainScreenController implements Initializable {
         }));
         client.send(new GetConversationsPacket());
 
-        conversationsList.setCellFactory(param -> {
+         conversationsList.setCellFactory(param -> {
             var cell = new ConversationCell();
             cell.setOnMouseClicked(event -> messageField.requestFocus());
             return cell;
         });
+
         conversationsList.setItems(conversations);
         conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSelectedConversation) -> {
             selectedConversation = newSelectedConversation;

@@ -57,5 +57,4 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         controller.update(message);
         setGraphic(controller.getNode());
     }
-    
 }

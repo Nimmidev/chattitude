@@ -82,6 +82,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
         @Override
         public void initialize(URL location, ResourceBundle resources) {
 
+            usersInConversationList.setItems(usersInConversation);
             usersInConversationList.setCellFactory(param -> new GroupChatMemberCell(client, usersInConversation));
             labelError.setVisible(false);
 
@@ -94,6 +95,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
             });
 
             searchResultList.setCellFactory(param -> new GroupChatSearchResultCell(client, usersInConversation));
+
         }
 
         @FXML
@@ -104,13 +106,6 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
         @FXML
         private void createGroupChatClick() {
             createGroupChat();
-        }
-
-        @FXML
-        private void conversationNameFieldKeyPress(KeyEvent keyEvent) {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                //saveConversationName();
-            }
         }
 
         private void createGroupChat() {

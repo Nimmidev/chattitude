@@ -23,7 +23,7 @@
         </HBox>
         <HBox>
             <children>
-                <JFXTextField fx:id="conversationNameField" labelFloat="true" onKeyPressed="#conversationNameFieldKeyPress" prefHeight="35.0" prefWidth="219.0" promptText="Your group name:" HBox.hgrow="ALWAYS">
+                <JFXTextField fx:id="conversationNameField" labelFloat="true" prefHeight="35.0" prefWidth="219.0" promptText="Your group name:" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="16.0" />
                     </font></JFXTextField>

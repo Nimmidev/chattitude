@@ -16,11 +16,9 @@ import java.io.IOException;
 public class GroupChatMemberCell extends JFXListCell<User> {
 
         @FXML
-        private HBox conversationMemberCell;
+        private HBox GroupChatMemberCell;
         @FXML
         private Label usernameLabel;
-        @FXML
-        private Label adminLabel;
         @FXML
         private JFXButton removeButton;
 
@@ -33,7 +31,7 @@ public class GroupChatMemberCell extends JFXListCell<User> {
         public GroupChatMemberCell(Client client, ObservableList<User> members) {
             this.client = client;
             this.members = members;
-            mLLoader = new FXMLLoader(getClass().getResource("/jfx/ConversationMemberCell.fxml"));
+            mLLoader = new FXMLLoader(getClass().getResource("/jfx/GroupChatMemberCell.fxml"));
             mLLoader.setController(this);
 
             try {
@@ -54,7 +52,7 @@ public class GroupChatMemberCell extends JFXListCell<User> {
                 setGraphic(null);
                 return;
             }
-
+            
             usernameLabel.setText(user.getName());
 
             if (user.getId() == client.getCredentials().getUserId()) {
@@ -63,11 +61,12 @@ public class GroupChatMemberCell extends JFXListCell<User> {
                 removeButton.setVisible(true);
             }
 
-            setGraphic(conversationMemberCell);
+            setGraphic(GroupChatMemberCell);
         }
 
         @FXML
         private void removeClick() {
+            System.out.println("Remove Button clicked");
             members.remove(user);
         }
 }
