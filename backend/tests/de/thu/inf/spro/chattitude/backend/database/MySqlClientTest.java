@@ -110,10 +110,10 @@ public class MySqlClientTest extends SQLTest {
         int conversationId = mySqlClient.createConversation(null, sessionUserId, new User[]{user2});
         Assert.assertTrue(conversationId != -1);
 
-        Conversation conversation = conversationSQL.get(conversationId, -1);
+        Conversation conversation = conversationSQL.get(conversationId, sessionUserId);
         Assert.assertNotNull(conversation);
         Assert.assertEquals(conversationId, conversation.getId());
-        Assert.assertNull(conversation.getName());
+        Assert.assertEquals(user2Username, conversation.getName());
         Assert.assertEquals(2, conversation.getUsers().length);
     }
     
