@@ -22,12 +22,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LoginScreenController implements Initializable {
 
+    private static final int WINDOW_WIDTH = 1280;
+    private static final int WINDOW_HEIGHT = 720;
+    
     private Client client;
     private int minimalLength = 3; //Password and username minimal length
     private boolean toggleStatus;
@@ -149,11 +153,22 @@ public class LoginScreenController implements Initializable {
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
             secondaryStage.getIcons().add(new Image("/LogoPicRound.png"));
+            setStageLayout(secondaryStage);
             secondaryStage.show();
 
         } catch (IOException e) {
             throw new Error("Can't load ChatClient! Location not found - path invalid!", e);
         }
+    }
+    
+    private void setStageLayout(Stage stage){
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        double x = (d.getWidth() - WINDOW_WIDTH) / 2;
+        double y = (d.getHeight() - WINDOW_HEIGHT) / 2;
+        stage.setX(x);
+        stage.setY(y);
+        stage.setWidth(WINDOW_WIDTH);
+        stage.setHeight(WINDOW_HEIGHT);
     }
 
     private void onLoginSuccessful() {
