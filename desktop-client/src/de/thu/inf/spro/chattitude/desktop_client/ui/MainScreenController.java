@@ -165,6 +165,13 @@ public class MainScreenController implements Initializable {
     }
 
     @FXML
+    private void quoteMessage() {
+        ChatMessage msg = messageHistoryList.getSelectionModel().getSelectedItem();
+        String msgQuote = msg.getText();
+        System.out.println(msgQuote);
+    }
+
+    @FXML
     private void editConversation() {
         EditConversationPopUp popUp = new EditConversationPopUp(client, selectedConversation);
         stackPane.getChildren().add(popUp);
