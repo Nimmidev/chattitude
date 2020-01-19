@@ -6,6 +6,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.TextFlow?>
 <VBox fx:id="messageCell" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="150.0" prefWidth="150.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane>
@@ -27,6 +30,7 @@
             </Label>
          </right>
       </BorderPane>
-      <Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />
+      <TextFlow fx:id="contentLabel" />
+      <!--<Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />-->
    </children>
 </VBox>

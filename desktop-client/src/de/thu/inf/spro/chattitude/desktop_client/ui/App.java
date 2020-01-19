@@ -14,14 +14,21 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 public class App extends Application {
+    
     private static Client client;
+    private static App INSTANCE;
 
     public App() {
 
     }
+    
+    public static App getInstance(){
+        return INSTANCE;
+    }
 
     @Override
     public void start(Stage primaryStage) {
+        INSTANCE = this;
         try {
             client = new Client();
         } catch (URISyntaxException e) {
