@@ -5,7 +5,8 @@ import java.io.*;
 public enum FileType {
 
     UNKNOWN,
-    IMAGE;
+    IMAGE,
+    AUDIO;
     
     private static FileType[] _values = values();
 
@@ -30,6 +31,7 @@ public enum FileType {
     public static FileType get(byte[] buffer){
         if(buffer != null){
             if(checkImageHeaders(buffer)) return IMAGE;
+            if(checkAudioHeaders(buffer)) return AUDIO;
         }
 
         return UNKNOWN;
@@ -45,6 +47,15 @@ public enum FileType {
     
     private static boolean checkJPEG(byte[] buffer){
         return buffer[6] == 'J' && buffer[7] == 'F' && buffer[8] == 'I' && buffer[9] == 'F';
+    }
+    
+    private static boolean checkAudioHeaders(byte[] buffer){
+        return checkMP3(buffer);
+    }
+    
+    private static boolean checkMP3(byte[] buffer){
+        return (buffer[0] == 0xFF && buffer[1] == 0xFB) ||
+                (buffer[0] == 0x49 && buffer[1] == 0x44 && buffer[2] == 0x33);
     }
     
 }

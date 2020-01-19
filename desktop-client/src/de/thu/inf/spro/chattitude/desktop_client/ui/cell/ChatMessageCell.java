@@ -39,6 +39,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     private ImageFileMessageController imageFileMessageController;
     private ReplyMessageController replyMessageController;
     private YoutubeVideoMessageController youtubeVideoMessageController;
+    private AudioMessageController audioMessageController;
     
     private MainScreenController mainScreenController;
     
@@ -56,6 +57,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         imageFileMessageController = new ImageFileMessageController(downloadManager);
         replyMessageController = new ReplyMessageController();
         youtubeVideoMessageController = new YoutubeVideoMessageController();
+        audioMessageController = new AudioMessageController(downloadManager);
         this.mainScreenController = mainScreenController;
         
         this.sessionuserId = sessionUserId;
@@ -114,6 +116,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         else if(message.getType() == MessageType.IMAGE_FILE) controller = imageFileMessageController;
         else if(message.getType() == MessageType.REPLY) controller = replyMessageController;
         else if(message.getType() == MessageType.YOUTUBE_VIDEO) controller = youtubeVideoMessageController;
+        else if(message.getType() == MessageType.AUDIO) controller = audioMessageController;
         else throw new IllegalStateException("Invalid message type: " + message.getType().name());
 
         setDefaultContextMenuItems();

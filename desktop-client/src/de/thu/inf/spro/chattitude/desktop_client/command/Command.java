@@ -1,5 +1,7 @@
 package de.thu.inf.spro.chattitude.desktop_client.command;
 
+import de.thu.inf.spro.chattitude.desktop_client.ui.controller.MainScreenController;
+
 public abstract class Command {
     
     private String command;
@@ -10,14 +12,14 @@ public abstract class Command {
         this.description = description;
     }
 
-    public abstract String exec(String text);
+    public abstract String exec(MainScreenController controller, String text);
     
-    public String execute(String text){
-        return exec(text.replace(command + " ", ""));
+    public String execute(MainScreenController controller, String text){
+        return exec(controller, text.replace(command, "").trim());
     }
     
     public boolean match(String cmd){
-        return cmd.startsWith(command + " ");
+        return cmd.startsWith(command);
     }
     
     @Override
