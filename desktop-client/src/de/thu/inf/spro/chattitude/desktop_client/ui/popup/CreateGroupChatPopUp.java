@@ -65,7 +65,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
 
             client.setOnSearchUser(packet -> Platform.runLater(() -> {
                 if (packet.getQuery().equals(searchField.getText())) {
-                    searchResultList.getItems().setAll(packet.getResults()); // TODO User die shcon Member sind markieren
+                    searchResultList.getItems().setAll(packet.getResults());
                 } else {
                     searchResultList.getItems().clear();
                 }

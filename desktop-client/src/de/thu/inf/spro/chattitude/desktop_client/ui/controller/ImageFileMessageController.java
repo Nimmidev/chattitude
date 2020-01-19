@@ -1,9 +1,12 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 
+import de.thu.inf.spro.chattitude.desktop_client.Cache;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.ImageFileMessage;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ChatMessageCell;
+import de.thu.inf.spro.chattitude.packet.util.Pair;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
-public class ImageFileMessageController extends MessageController {
+public class ImageFileMessageController implements MessageController {
 
     private static final String FIELD_FILE_ID = "fileId";
     private static final String FIELD_FILE_NAME = "filename";
@@ -59,7 +62,7 @@ public class ImageFileMessageController extends MessageController {
     }
 
     private void createMenuItems(){
-        downloadMenuItem = createMenuItem("Download", (ActionEvent e) -> {
+        downloadMenuItem = ChatMessageCell.createMenuItem("Download", (ActionEvent e) -> {
             System.out.println("Download");
 
             String fileId = (String) imagePane.getProperties().get(FIELD_FILE_ID);
@@ -79,15 +82,27 @@ public class ImageFileMessageController extends MessageController {
         imagePane.getProperties().put(FIELD_FILE_ID, message.getFileId());
         imagePane.getProperties().put(FIELD_FILE_NAME, message.getFilename());
 
-        downloadManager.download(message.getFileId(), objData -> Platform.runLater(() -> {
-            byte[] data = downloadManager.objectDataToPrimitive(objData);
-            Image image = new Image(new ByteArrayInputStream(data));
-            BackgroundImage bgi = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(0, 0, false, false, true, false));
-            imagePane.setBackground(new Background(bgi));
-        }));
+        byte[] imageBytes = Cache.get(message.getFileId());
+        
+        if(imageBytes != null){
+            setBackgroundImage(imageBytes);
+        } else {
+            Cache.cache(message.getFileId(), downloadManager, (Pair<String, Byte[]> pair) -> {
+                String currentFileId = (String) imagePane.getProperties().get(FIELD_FILE_ID);
+                if(currentFileId.equals(pair.getKey())){
+                    setBackgroundImage(downloadManager.objectDataToPrimitive(pair.getValue()));
+                }
+            });
+        }
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
         contextMenu.getItems().add(downloadMenuItem);
+    }
+    
+    private void setBackgroundImage(byte[] data){
+        Image image = new Image(new ByteArrayInputStream(data));
+        BackgroundImage bgi = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(0, 0, false, false, true, false));
+        imagePane.setBackground(new Background(bgi));
     }
 
     @Override
