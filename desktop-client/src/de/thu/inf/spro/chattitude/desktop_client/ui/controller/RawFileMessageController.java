@@ -13,11 +13,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.util.Date;
 
-public class RawFileMessageController implements MessageController {
+public class RawFileMessageController extends MessageController {
     
     private static final String FIELD_FILE_ID = "fileId";
     
@@ -28,7 +29,7 @@ public class RawFileMessageController implements MessageController {
     private Label senderLabel;
     
     @FXML
-    private Label contentLabel;
+    private TextFlow contentLabel;
     
     @FXML
     private Label timeLabel;
@@ -71,9 +72,9 @@ public class RawFileMessageController implements MessageController {
     public void update(ChatMessage chatMessage, ContextMenu contextMenu) {
         RawFileMessage message = (RawFileMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
-        contentLabel.setText(message.getText());
         filenameLabel.setText(message.getFilename());
         downloadFileButton.getProperties().put(FIELD_FILE_ID, message.getFileId());
+        setText(contentLabel, message.getText());
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
     }

@@ -31,6 +31,5 @@
          </right>
       </BorderPane>
       <TextFlow fx:id="contentLabel" />
-      <!--<Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />-->
    </children>
 </VBox>
