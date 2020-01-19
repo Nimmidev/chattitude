@@ -3,6 +3,7 @@ package de.thu.inf.spro.chattitude.desktop_client.message;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.ParseException;
+import de.thu.inf.spro.chattitude.desktop_client.FileType;
 import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.User;
 
@@ -14,10 +15,11 @@ public abstract class ChatMessage {
     private MessageType type;
     private int conversationId;
     
-    protected Message message;
-    protected byte[] data;
-    protected String text;
     protected JsonObject content;
+    protected Message message;
+    protected String text;
+    
+    protected byte[] data;
     
     ChatMessage(MessageType type, int conversationId, String text){
         this(type, conversationId, text, null);
@@ -54,7 +56,8 @@ public abstract class ChatMessage {
             MessageType type = MessageType.from(json.getInt(FIELD_TYPE, 0));
 
             if (type == MessageType.TEXT) return new TextMessage(message, json);
-            else if (type == MessageType.FILE) return new FileMessage(message, json);
+            else if (type == MessageType.RAW_FILE) return new RawFileMessage(message, json);
+            else if(type == MessageType.IMAGE_FILE) return new ImageFileMessage(message, json);
             else throw new IllegalStateException("Invalid message type: " + type.name());
         } catch(ParseException exception) {
             System.err.println("Error parsing message");

@@ -3,13 +3,13 @@ package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
-import de.thu.inf.spro.chattitude.desktop_client.message.FileMessage;
+import de.thu.inf.spro.chattitude.desktop_client.message.RawFileMessage;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -17,7 +17,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Date;
 
-public class FileMessageController implements MessageController {
+public class RawFileMessageController extends MessageController {
     
     private static final String FIELD_FILE_ID = "fileId";
     
@@ -45,32 +45,31 @@ public class FileMessageController implements MessageController {
     private DownloadManager downloadManager;
     private FXMLLoader mLLoader;
 
-    public FileMessageController(DownloadManager downloadManager) {
+    public RawFileMessageController(DownloadManager downloadManager) {
         this.downloadManager = downloadManager;
-        mLLoader = new FXMLLoader(getClass().getResource("/jfx/FileMessageCell.fxml"));
+        mLLoader = new FXMLLoader(getClass().getResource("/jfx/RawFileMessageCell.fxml"));
         mLLoader.setController(this);
 
         try {
             mLLoader.load();
         } catch (IOException e) {
-            throw new RuntimeException("Error loading FileMessageCell", e);
+            throw new RuntimeException("Error loading RawFileMessageCell", e);
         }
     }
     
     @FXML
     public void onButtonClicked(){
         String fileId = (String) downloadFileButton.getProperties().get(FIELD_FILE_ID);
+        
         downloadManager.download(fileId, objData -> Platform.runLater(() -> {
-            byte[] data = downloadManager.objectDataToPrimitive(objData);
-            String downloadDirectory = downloadManager.chooseDirectory(downloadFileButton.getScene().getWindow());
             String filename = filenameLabel.getText();
-            downloadManager.saveTo(downloadDirectory, filename, data);
+            downloadManager.saveToFileWizard(filename, objData, downloadFileButton.getScene().getWindow());
         }));
     }
 
     @Override
-    public void update(ChatMessage chatMessage) {
-        FileMessage message = (FileMessage) chatMessage;
+    public void update(ChatMessage chatMessage, ContextMenu contextMenu) {
+        RawFileMessage message = (RawFileMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
         contentLabel.setText(message.getText());
         filenameLabel.setText(message.getFilename());

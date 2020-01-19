@@ -1,10 +1,12 @@
 package de.thu.inf.spro.chattitude.desktop_client.ui.cell;
 
 import com.jfoenix.controls.JFXListCell;
+import com.jfoenix.controls.JFXRippler;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.MessageType;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.FileMessageController;
+import de.thu.inf.spro.chattitude.desktop_client.ui.controller.ImageFileMessageController;
+import de.thu.inf.spro.chattitude.desktop_client.ui.controller.RawFileMessageController;
 import de.thu.inf.spro.chattitude.desktop_client.ui.controller.MessageController;
 import de.thu.inf.spro.chattitude.desktop_client.ui.controller.TextMessageController;
 import javafx.event.ActionEvent;
@@ -33,28 +35,39 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     }
     
     private TextMessageController textMessageController;
-    private FileMessageController fileMessageController;
+    private RawFileMessageController rawFileMessageController;
+    private ImageFileMessageController imageFileMessageController;
     
     private int sessionuserId;
     private ContextMenu contextMenu;
+    
+    private MenuItem replyMenuItem;
 
     public ChatMessageCell(int sessionUserId, DownloadManager downloadManager) {
         textMessageController = new TextMessageController();
-        fileMessageController = new FileMessageController(downloadManager);
+        rawFileMessageController = new RawFileMessageController(downloadManager);
+        imageFileMessageController = new ImageFileMessageController(downloadManager);
         
         this.sessionuserId = sessionUserId;
         contextMenu = new ContextMenu();
-
+        
+        createMenuItems();
+        setContextMenu(contextMenu);
+    }
+    
+    private void createMenuItems(){
         Label replyMenuItemLabel = new Label("Reply");
         replyMenuItemLabel.setPrefWidth(100);
-        MenuItem replyMenuItem = new MenuItem();
+        replyMenuItem = new MenuItem();
         replyMenuItem.setGraphic(replyMenuItemLabel);
         replyMenuItem.setOnAction((ActionEvent e) -> {
             System.out.println("reply");
         });
-        
+    }
+    
+    private void setDefaultContextMenuItems(){
+        contextMenu.getItems().clear();
         contextMenu.getItems().addAll(replyMenuItem);
-        setContextMenu(contextMenu);
     }
 
     @Override
@@ -71,10 +84,12 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         MessageController controller;
         
         if(message.getType() == MessageType.TEXT) controller = textMessageController;
-        else if(message.getType() == MessageType.FILE) controller = fileMessageController;
+        else if(message.getType() == MessageType.RAW_FILE) controller = rawFileMessageController;
+        else if(message.getType() == MessageType.IMAGE_FILE) controller = imageFileMessageController;
         else throw new IllegalStateException("Invalid message type: " + message.getType().name());
 
-        controller.update(message);
+        setDefaultContextMenuItems();
+        controller.update(message, contextMenu);
         
         Node node = controller.getNode();
         int columnIndex = message.asMessage().getUser().getId() == sessionuserId ? 2 : 0;
@@ -84,6 +99,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         
         GridPane gridPane = wrapNodeInGridPane(node, columnIndex);
         setGraphic(gridPane);
+        cellRippler = new JFXRippler();
     }
     
     private GridPane wrapNodeInGridPane(Node node, int columnIndex){

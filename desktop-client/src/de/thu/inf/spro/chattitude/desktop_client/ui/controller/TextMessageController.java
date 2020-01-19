@@ -3,20 +3,18 @@ package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.Date;
 
-public class TextMessageController implements MessageController {
+public class TextMessageController extends MessageController {
     
     @FXML
     private VBox messageCell;
@@ -45,7 +43,7 @@ public class TextMessageController implements MessageController {
     }
 
     @Override
-    public void update(ChatMessage chatMessage) {
+    public void update(ChatMessage chatMessage, ContextMenu contextMenu) {
         TextMessage message = (TextMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
         contentLabel.setText(message.getText());

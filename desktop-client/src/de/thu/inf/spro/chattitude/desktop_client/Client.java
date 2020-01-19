@@ -147,7 +147,7 @@ public class Client implements PacketHandler {
 
     @Override
     public void onGetAttachment(GetAttachmentPacket packet, WebSocket webSocket) {
-        System.out.println("AttachmentPacket: Size: " + packet.getData().length + ", Data: " + new String(packet.getData()));
+        System.out.println("AttachmentPacket: Size: " + packet.getData().length);
         
         if(onGetAttachment != null) onGetAttachment.call(packet);
     }

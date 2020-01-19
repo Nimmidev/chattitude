@@ -90,4 +90,10 @@ public class DownloadManager implements Callback<GetAttachmentPacket> {
         return new byte[]{};
     }
     
+    public void saveToFileWizard(String filename, Byte[] objData, Window window){
+        byte[] data = objectDataToPrimitive(objData);
+        String downloadDirectory = chooseDirectory(window);
+        saveTo(downloadDirectory, filename, data);
+    }
+    
 }

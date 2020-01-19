@@ -5,9 +5,8 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
-import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
-import de.thu.inf.spro.chattitude.desktop_client.message.FileMessage;
-import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
+import de.thu.inf.spro.chattitude.desktop_client.FileType;
+import de.thu.inf.spro.chattitude.desktop_client.message.*;
 import de.thu.inf.spro.chattitude.desktop_client.ui.App;
 import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateGroupChatPopUp;
 import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateSingleChatPopUp;
@@ -30,6 +29,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
@@ -248,7 +248,7 @@ public class MainScreenController implements Initializable {
         if(currentlySelectedFile != null){
             String filename = Paths.get(currentlySelectedFile).getFileName().toString();
             byte[] data = downloadManager.loadFrom(currentlySelectedFile);
-            message = new FileMessage(selectedConversation.getId(), messageField.getText(), filename, data);
+            message = createFileMessage(filename, data);
             clearAttachedFile();
         } else {
             message = new TextMessage(selectedConversation.getId(), messageField.getText());
@@ -256,6 +256,19 @@ public class MainScreenController implements Initializable {
         
         client.send(new MessagePacket(message.asMessage()));
         messageField.setText("");
+    }
+    
+    private ChatMessage createFileMessage(String filename, byte[] data){
+        FileType fileType = FileType.get(data);
+        int conversationId = selectedConversation.getId();
+        String text = messageField.getText();
+        
+        switch(fileType){
+            case IMAGE:
+                return new ImageFileMessage(conversationId, text, filename, data);
+            default:
+                return new RawFileMessage(conversationId, text, filename, data);
+        }
     }
 
     private Conversation getConversation(int id) {

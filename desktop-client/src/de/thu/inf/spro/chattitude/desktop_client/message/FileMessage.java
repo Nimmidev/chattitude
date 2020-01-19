@@ -3,21 +3,21 @@ package de.thu.inf.spro.chattitude.desktop_client.message;
 import com.eclipsesource.json.JsonObject;
 import de.thu.inf.spro.chattitude.packet.Message;
 
-public class FileMessage extends ChatMessage {
+public abstract class FileMessage extends ChatMessage {
     
     private static final String FIELD_FILENAME = "filename";
     
     private String filename;
     
-    public FileMessage(int conversationId, String text, String filename, byte[] data) {
-        super(MessageType.FILE, conversationId, text, data);
+    public FileMessage(MessageType messageType,  int conversationId, String text, String filename, byte[] data) {
+        super(messageType, conversationId, text, data);
         
         this.filename = filename;
         content.add(FIELD_FILENAME, filename);
     }
 
-    FileMessage(Message message, JsonObject json) {
-        super(MessageType.FILE, message, json);
+    FileMessage(MessageType messageType, Message message, JsonObject json) {
+        super(messageType, message, json);
         filename = json.getString(FIELD_FILENAME, "FILE");
     }
     

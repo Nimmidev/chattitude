@@ -4,7 +4,8 @@ public enum MessageType {
     
     INVALID,
     TEXT,
-    FILE;
+    RAW_FILE,
+    IMAGE_FILE;
 
 
     private static MessageType[] _values = values();
