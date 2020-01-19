@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public abstract class MessageController {
 
-    private static final String URL_REGEX = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+    private static final String URL_REGEX = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9öäü()]{1,6}\\b([-a-zA-Z0-9öäü()@:%_\\+.~#?&//=]*)";
     private static final Pattern REGEX_PATTERN = Pattern.compile(URL_REGEX);
     
     private String lastText = "";
