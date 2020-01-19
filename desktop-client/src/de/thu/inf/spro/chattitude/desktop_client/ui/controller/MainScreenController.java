@@ -209,7 +209,9 @@ public class MainScreenController implements Initializable {
     
     private void setSelectedFileVisibility(boolean visibility){
         attachedFileClosePane.setVisible(visibility);
+        attachedFileClosePane.setManaged(visibility);
         attachedFile.setVisible(visibility);
+        attachedFile.setManaged(visibility);
     }
     
     private void clearAttachedFile(){
