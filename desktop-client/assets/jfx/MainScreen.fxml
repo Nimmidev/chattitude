@@ -18,7 +18,7 @@
          <left>
             <VBox fx:id="vBox" maxHeight="1.7976931348623157E308" minHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="55.0" style="-fx-background-color: #4363A4;">
+                  <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="55.0" style="-fx-background-color: #4363A4; -fx-effect: null;">
                      <children>
                         <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain; -jfx-disable-visual-focus: true;">
                            <padding>
@@ -36,7 +36,7 @@
                            </HBox.margin></JFXButton>
                      </children>
                   </HBox>
-                  <JFXListView fx:id="conversationsList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-focus-color: transparent; -fx-selection-bar-non-focused: -fx-selection-bar; -fx-faint-focus-color: transparent;" VBox.vgrow="ALWAYS" />
+                  <JFXListView fx:id="conversationsList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-focus-color: transparent; -fx-selection-bar-non-focused: -fx-selection-bar; -fx-faint-focus-color: transparent; -fx-border-width: 0; -fx-border-radius: 0; -fx-background-insets: 0; -fx-background-radius: 0;" VBox.vgrow="ALWAYS" />
                </children>
                <effect>
                   <DropShadow />
@@ -49,9 +49,12 @@
                   <Insets left="2.0" />
                </BorderPane.margin>
                <top>
-                  <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="55.0" prefWidth="422.0" style="-fx-background-color: #4363A4;" BorderPane.alignment="CENTER">
+                  <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="55.0" prefWidth="422.0" style="-fx-background-color: #4363A4; -fx-effect: null;" BorderPane.alignment="CENTER">
                      <children>
-                        <JFXButton fx:id="sendFileButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#sendFileButtonClicked" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/attach.png&quot;); -fx-background-size: contain;" />
+                        <JFXButton fx:id="sendFileButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#sendFileButtonClicked" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/attach.png&quot;); -fx-background-size: contain;">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin></JFXButton>
                         <JFXButton fx:id="editConversationButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#editConversation" prefHeight="35.0" prefWidth="35.0" style="-fx-background-image: url(&quot;icons/edit.png&quot;); -fx-background-size: contain;">
                            <HBox.margin>
                               <Insets />
@@ -111,7 +114,7 @@
                   </VBox>
                </bottom>
                <center>
-                  <JFXListView fx:id="messageHistoryList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-background-color: #eaeaea; -fx-selection-bar: transparent; -fx-padding: 0px 0px 10px 0px;" BorderPane.alignment="CENTER">
+                  <JFXListView fx:id="messageHistoryList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-background-color: #eaeaea; -fx-selection-bar: transparent; -fx-padding: 0px 0px 10px 0px; -fx-background-insets: 0; -fx-border-width: 0; -fx-border-radius: 0; -fx-background-radius: 0; -fx-selection-bar-non-focused: -fx-selection-bar;" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets />
                      </BorderPane.margin>

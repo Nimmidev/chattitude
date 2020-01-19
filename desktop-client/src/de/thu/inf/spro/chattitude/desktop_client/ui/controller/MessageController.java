@@ -58,8 +58,7 @@ public abstract class MessageController {
 
     private Text createHyperlink(String url){
         Text hyperlink = new Text(url);
-        hyperlink.setUnderline(true);
-        hyperlink.setStyle("-fx-fill: blue");
+        hyperlink.setStyle("-fx-fill: #0096c9; -fx-cursor: hand;");
         hyperlink.setOnMouseClicked((MouseEvent e) -> {
             App.getInstance().getHostServices().showDocument(hyperlink.getText());
         });
