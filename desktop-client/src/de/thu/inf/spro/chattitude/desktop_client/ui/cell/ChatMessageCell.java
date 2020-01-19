@@ -135,6 +135,9 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private GridPane wrapNodeInGridPane(Node node, int columnIndex){
         GridPane gridPane = new GridPane();
+        gridPane.setMinWidth(50);
+        gridPane.setPrefWidth(50);
+        gridPane.setMaxWidth(Double.MAX_VALUE);
         gridPane.getColumnConstraints().addAll(colConst40, colConst20, colConst40);
         gridPane.add(node, columnIndex, 0);
         return gridPane;
