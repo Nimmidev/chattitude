@@ -1,42 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox fx:id="messageCell" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="150.0" prefWidth="150.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
-        <BorderPane>
-            <center>
-                <Label fx:id="senderLabel" text="Peter Parker" textFill="#333" BorderPane.alignment="CENTER_LEFT">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                    <BorderPane.margin>
-                        <Insets right="10.0" />
-                    </BorderPane.margin>
-                </Label>
-            </center>
-            <right>
-                <Label fx:id="timeLabel" text="12:34" textFill="#727272" BorderPane.alignment="TOP_RIGHT">
-                    <font>
-                        <Font size="11.0" />
-                    </font>
-                </Label>
-            </right>
-        </BorderPane>
-        <TextFlow fx:id="contentLabel" />
-        <!--<Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />-->
-    </children>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Text fx:id="txtRepliedMessage" strokeType="OUTSIDE" strokeWidth="0.0" text="Replied Message" />
+      <VBox fx:id="messageCell" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="150.0" prefWidth="150.0">
+          <children>
+              <BorderPane>
+                  <center>
+                      <Label fx:id="senderLabel" text="Peter Parker" textFill="#333" BorderPane.alignment="CENTER_LEFT">
+                          <font>
+                              <Font name="System Bold" size="15.0" />
+                          </font>
+                          <BorderPane.margin>
+                              <Insets right="10.0" />
+                          </BorderPane.margin>
+                      </Label>
+                  </center>
+                  <right>
+                      <Label fx:id="timeLabel" text="12:34" textFill="#727272" BorderPane.alignment="TOP_RIGHT">
+                          <font>
+                              <Font size="11.0" />
+                          </font>
+                      </Label>
+                  </right>
+              </BorderPane>
+              <TextFlow fx:id="contentLabel" />
+              <!--<Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />-->
+          </children>
+      </VBox>
+   </children>
 </VBox>
