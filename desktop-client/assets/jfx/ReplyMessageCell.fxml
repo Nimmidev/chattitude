@@ -11,7 +11,7 @@
 
 <VBox fx:id="messageCell" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="150.0" prefWidth="150.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Text fx:id="txtRepliedMessage" strokeType="OUTSIDE" strokeWidth="0.0" text="Replied Message" wra />
+      <Text fx:id="txtRepliedMessage" strokeType="OUTSIDE" strokeWidth="0.0" text="Replied Message" />
       <VBox>
           <children>
               <BorderPane>
