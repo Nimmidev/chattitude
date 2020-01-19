@@ -26,7 +26,7 @@ public class ExcuseCommand extends Command {
     }
     
     public ExcuseCommand() {
-        super("", "Provide a random excuse (/ex).");
+        super("/excuse, /ex", "Provide a random excuse.");
     }
 
     @Override
