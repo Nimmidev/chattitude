@@ -10,7 +10,7 @@
    <children>
       <BorderPane>
          <center>
-            <Label fx:id="senderLabel" text="Peter Parker" BorderPane.alignment="CENTER_LEFT">
+            <Label fx:id="senderLabel" text="Peter Parker" textFill="#333" BorderPane.alignment="CENTER_LEFT">
                <font>
                   <Font name="System Bold" size="15.0" />
                </font>
@@ -27,6 +27,6 @@
             </Label>
          </right>
       </BorderPane>
-      <Label fx:id="contentLabel" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />
+      <Label fx:id="contentLabel" textFill="#333" text="Hello whats popping? Do you wanna go outside?" wrapText="true" />
    </children>
 </VBox>

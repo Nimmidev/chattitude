@@ -168,7 +168,7 @@ public class MainScreenController implements Initializable {
             }
         });
 
-        messageHistoryList.setCellFactory(param -> new ChatMessageCell(downloadManager));
+        messageHistoryList.setCellFactory(param -> new ChatMessageCell(client.getCredentials().getUserId(), downloadManager));
         messageHistoryList.setItems(messagesOfSelectedConversation);
         setSelectedFileVisibility(false);
     }
