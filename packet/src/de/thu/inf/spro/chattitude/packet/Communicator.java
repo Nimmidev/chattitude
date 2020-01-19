@@ -13,7 +13,6 @@ public class Communicator {
 
     public void onPacket(Packet packet, WebSocket webSocket){
         PacketType type = packet.getType();
-        System.out.println("New " + type + " packet: " + packet);
 
         if(type == PacketType.CONNECTED) packetHandler.onConnected(webSocket);
         else if(type == PacketType.UNAUTHORIZED) packetHandler.onUnauthorized(webSocket);
