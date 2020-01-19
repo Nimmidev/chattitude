@@ -78,15 +78,18 @@ public class LoginScreenController implements Initializable {
             String userPassword2 = txtPassword2.getText();
 
             if (!userPassword.equals(userPassword2)) {
+                errorLabel.setVisible(true);
                 errorLabel.setText("Sorry, passwords don't match!");
             } else {
                 if (userName.length() < minimalLength || userPassword.length() < minimalLength) {
+                    errorLabel.setVisible(true);
                     errorLabel.setText("Username or password too short!");
                 } else {
                     client.setOnRegister(credentials -> Platform.runLater(() -> {
                         if (credentials.isAuthenticated()) {
                             showMainScreen();
                         } else {
+                            errorLabel.setVisible(true);
                             errorLabel.setText("Username already taken!");
                         }
                     }));
@@ -171,6 +174,7 @@ public class LoginScreenController implements Initializable {
                     txtPassword2.setVisible(true);
                     btnSignIn.setText("Register");
                 } else {
+                    errorLabel.setVisible(false);
                     toggleStatus = false;
                     txtPassword2.setVisible(false);
                     btnSignIn.setText("Login");
