@@ -5,6 +5,7 @@ import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.ImageFileMessage;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ChatMessageCell;
 import de.thu.inf.spro.chattitude.packet.util.Pair;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -21,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
-public class ImageFileMessageController extends MessageController {
+public class ImageFileMessageController implements MessageController {
 
     private static final String FIELD_FILE_ID = "fileId";
     private static final String FIELD_FILE_NAME = "filename";
@@ -61,7 +62,7 @@ public class ImageFileMessageController extends MessageController {
     }
 
     private void createMenuItems(){
-        downloadMenuItem = createMenuItem("Download", (ActionEvent e) -> {
+        downloadMenuItem = ChatMessageCell.createMenuItem("Download", (ActionEvent e) -> {
             System.out.println("Download");
 
             String fileId = (String) imagePane.getProperties().get(FIELD_FILE_ID);

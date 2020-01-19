@@ -17,7 +17,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Date;
 
-public class RawFileMessageController extends MessageController {
+public class RawFileMessageController implements MessageController {
     
     private static final String FIELD_FILE_ID = "fileId";
     

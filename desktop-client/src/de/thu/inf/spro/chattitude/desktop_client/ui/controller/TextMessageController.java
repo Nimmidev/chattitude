@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Date;
 
-public class TextMessageController extends MessageController {
+public class TextMessageController implements MessageController {
     
     @FXML
     private VBox messageCell;

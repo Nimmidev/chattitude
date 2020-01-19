@@ -10,6 +10,7 @@ import de.thu.inf.spro.chattitude.desktop_client.ui.controller.RawFileMessageCon
 import de.thu.inf.spro.chattitude.desktop_client.ui.controller.MessageController;
 import de.thu.inf.spro.chattitude.desktop_client.ui.controller.TextMessageController;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -55,20 +56,23 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         createMenuItems();
         setContextMenu(contextMenu);
     }
+
+
+    public static MenuItem createMenuItem(String name, EventHandler<ActionEvent> eventHandler){
+        Label menuItemLabel = new Label(name);
+        menuItemLabel.setPrefWidth(100);
+        MenuItem menuItem = new MenuItem();
+        menuItem.setGraphic(menuItemLabel);
+        menuItem.setOnAction(eventHandler);
+
+        return menuItem;
+    }
     
     private void createMenuItems(){
-        Label replyMenuItemLabel = new Label("Reply");
-        replyMenuItemLabel.setPrefWidth(100);
-        replyMenuItem = new MenuItem();
-        replyMenuItem.setGraphic(replyMenuItemLabel);
-        replyMenuItem.setOnAction((ActionEvent e) -> {
+        replyMenuItem = createMenuItem("Reply", (ActionEvent e) -> {
             System.out.println("reply");
         });
-        Label copyMenuItemLabel = new Label("copy");
-        copyMenuItemLabel.setPrefWidth(100);
-        copyMenuItem = new MenuItem();
-        copyMenuItem.setGraphic(copyMenuItemLabel);
-        copyMenuItem.setOnAction((ActionEvent e) ->{
+        copyMenuItem = createMenuItem("Copy", (ActionEvent e) ->{
             System.out.println("copy");
         });
     }
