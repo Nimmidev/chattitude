@@ -52,7 +52,7 @@ public class GroupChatMemberCell extends JFXListCell<User> {
                 setGraphic(null);
                 return;
             }
-            
+
             usernameLabel.setText(user.getName());
 
             if (user.getId() == client.getCredentials().getUserId()) {

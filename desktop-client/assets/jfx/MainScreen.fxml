@@ -4,16 +4,13 @@
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.RowConstraints?>
 
 <StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.controller.MainScreenController">
    <children>
@@ -23,7 +20,7 @@
                <children>
                   <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="55.0" style="-fx-background-color: #4363A4;">
                      <children>
-                        <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain;">
+                        <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain;">
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
@@ -70,14 +67,14 @@
                   </HBox>
                </top>
                <bottom>
-                  <VBox style="-fx-background-color: #fff;" prefHeight="35.0" prefWidth="416.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="35.0" prefWidth="416.0" style="-fx-background-color: #fff;" BorderPane.alignment="CENTER">
                      <children>
                         <BorderPane fx:id="attachedFileClosePane">
                            <right>
                               <JFXButton fx:id="attachedFileClose" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#attachedFileCloseClicked" prefHeight="16.0" prefWidth="16.0" style="-fx-background-image: url(&quot;icons/close_black.png&quot;); -fx-background-size: contain;-fx-padding: 5 5 0 0;" />
                            </right>
                         </BorderPane>
-                        <Label style="-fx-padding: 0 0 10 10" fx:id="attachedFile" text="A File is attached" />
+                        <Label fx:id="attachedFile" style="-fx-padding: 0 0 10 10" text="A File is attached" />
                         <HBox prefHeight="35.0" prefWidth="416.0" style="-fx-background-color: #4363A4;" BorderPane.alignment="CENTER">
                            <children>
                               <JFXTextField fx:id="messageField" focusColor="#93a3d300" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="100.0" onKeyPressed="#messageFieldKeyPress" promptText="Type message here" style="-fx-background-color: white;" unFocusColor="#4d4d4d00" HBox.hgrow="ALWAYS">
