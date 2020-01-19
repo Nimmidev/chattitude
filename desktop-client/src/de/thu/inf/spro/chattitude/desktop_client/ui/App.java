@@ -40,7 +40,8 @@ public class App extends Application {
             primaryStage.setResizable(false);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.getIcons().add(new Image("/logoTitleBar.png"));
+            if (!System.getProperty("os.name").toLowerCase().contains("mac"))
+                primaryStage.getIcons().add(new Image("/logoTitleBar.png"));
             primaryStage.show();
         } catch (IOException e) {
             throw new Error(e);

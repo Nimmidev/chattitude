@@ -28,6 +28,7 @@ public class DownloadManager implements Callback<GetAttachmentPacket> {
     }
     
     public void download(String fileId, Callback<Byte[]> callback){
+        System.out.println("download " + fileId);
         String identifier = fileId + System.currentTimeMillis();
         callbackMap.put(identifier, callback);
         GetAttachmentPacket packet = new GetAttachmentPacket(fileId, identifier);
