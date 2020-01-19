@@ -290,7 +290,7 @@ public class MainScreenController implements Initializable {
         ChatMessage message;
         
         if(currentReplyMessage != null){
-            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.getText(), messageField.getText());
+            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), messageField.getText());
             clearAttachedFile();
         } else if(currentlySelectedFile != null){
             String filename = Paths.get(currentlySelectedFile).getFileName().toString();
