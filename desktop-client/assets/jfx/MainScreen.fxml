@@ -111,7 +111,7 @@
                   </VBox>
                </bottom>
                <center>
-                  <JFXListView fx:id="messageHistoryList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-background-color: #eaeaea; -fx-selection-bar: transparent;" BorderPane.alignment="CENTER">
+                  <JFXListView fx:id="messageHistoryList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-background-color: #eaeaea; -fx-selection-bar: transparent; -fx-padding: 0px 0px 10px 0px;" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets />
                      </BorderPane.margin>
