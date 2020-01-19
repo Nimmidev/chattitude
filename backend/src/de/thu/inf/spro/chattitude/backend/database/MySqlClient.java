@@ -97,6 +97,10 @@ public class MySqlClient {
     public int getUserId(String username){
         return userSQL.getId(username);
     }
+    
+    public String getUserName(int id){
+        return userSQL.getUsername(id);
+    }
 
     public List<User> searchUsers(String searchQuery){
         return userSQL.search(searchQuery);

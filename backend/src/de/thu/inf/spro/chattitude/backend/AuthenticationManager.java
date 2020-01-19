@@ -35,7 +35,10 @@ class AuthenticationManager {
 
     private void updateCredentials(Credentials credentials, WebSocket webSocket, boolean success){
         int userId = mysqlClient.getUserId(credentials.getUsername());
-
+        if(success){
+            String username = mysqlClient.getUserName(userId);
+            credentials.setUsername(username);
+        }
         credentials.setUserId(userId);
         credentials.setAuthenticated(success);
         webSocket.setAttachment(credentials);

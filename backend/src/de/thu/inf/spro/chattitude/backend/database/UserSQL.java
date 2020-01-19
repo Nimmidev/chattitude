@@ -27,9 +27,12 @@ final class UserSQL extends BaseSQL {
 
     private static final String ADD = "" + 
             "INSERT INTO " + TABLE_NAME + " (" + _USERNAME + ", " + _PASSWORD + ") VALUES (?,?);";
-    
+
     private static final String GET_ID_BY_USERNAME = "" +
             "SELECT " + _ID + " FROM " + TABLE_NAME + " WHERE " + _USERNAME + "=?;";
+
+    private static final String GET_USERNAME_BY_ID = "" +
+            "SELECT " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _ID + "=?;";
 
     private static final String GET_BY_NAME = "" + 
             "SELECT " + _ID + ", " + _USERNAME + " FROM " + TABLE_NAME + " WHERE " + _USERNAME + " LIKE ?";
@@ -65,6 +68,22 @@ final class UserSQL extends BaseSQL {
         }
 
         return userId;
+    }
+
+    String getUsername(int id){
+        String username = "";
+
+        try (PreparedStatement pstmt = connection.get().prepareStatement(GET_USERNAME_BY_ID)){
+            pstmt.setInt(1, id);
+            pstmt.execute();
+            if(pstmt.getResultSet().next()){
+                username = pstmt.getResultSet().getString(_USERNAME);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return username;
     }
 
     List<User> search(String searchQuery){

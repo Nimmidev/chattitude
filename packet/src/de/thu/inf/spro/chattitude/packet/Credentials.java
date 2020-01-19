@@ -42,6 +42,10 @@ public class Credentials {
         return authenticated;
     }
 
+    public void setUsername(String username){
+        this.username = username;
+    }
+    
     public User asUser(){
         return new User(userId, username);
     }
