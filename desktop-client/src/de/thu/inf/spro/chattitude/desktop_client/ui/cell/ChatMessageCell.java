@@ -42,6 +42,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     private ContextMenu contextMenu;
     
     private MenuItem replyMenuItem;
+    private MenuItem copyMenuItem;
 
     public ChatMessageCell(int sessionUserId, DownloadManager downloadManager) {
         textMessageController = new TextMessageController();
@@ -63,11 +64,19 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         replyMenuItem.setOnAction((ActionEvent e) -> {
             System.out.println("reply");
         });
+        Label copyMenuItemLabel = new Label("copy");
+        copyMenuItemLabel.setPrefWidth(100);
+        copyMenuItem = new MenuItem();
+        copyMenuItem.setGraphic(copyMenuItemLabel);
+        copyMenuItem.setOnAction((ActionEvent e) ->{
+            System.out.println("copy");
+        });
     }
     
     private void setDefaultContextMenuItems(){
         contextMenu.getItems().clear();
-        contextMenu.getItems().addAll(replyMenuItem);
+        contextMenu.getItems().addAll(replyMenuItem,copyMenuItem);
+
     }
 
     @Override
