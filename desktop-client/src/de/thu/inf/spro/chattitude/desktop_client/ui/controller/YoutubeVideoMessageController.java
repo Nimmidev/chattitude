@@ -53,7 +53,7 @@ public class YoutubeVideoMessageController extends MessageController {
         YoutubeVideoMessage message = (YoutubeVideoMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
         webView.getEngine().load(((YoutubeVideoMessage) chatMessage).getUrl());
-        webView.prefHeightProperty().bind(Bindings.multiply(messageCell.prefWidthProperty(), 1.35));
+        webView.prefHeightProperty().bind(Bindings.divide(webView.widthProperty(), 16.0 / 9));
         setText(contentLabel, message.getText());
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
