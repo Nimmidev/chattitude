@@ -151,6 +151,9 @@ public class Server implements PacketHandler {
         if(success){
             Conversation conversation = mySqlClient.getConversation(packet.getConversationId(), -1);
             broadcastPacket(conversation.getUsers(), user -> new ConversationUpdatedPacket(mySqlClient.getConversation(packet.getConversationId(), user.getId())));
+            if (packet.getAction() == ModifyConversationUserPacket.Action.REMOVE) {
+                broadcastTo(packet.getUserId(), new ConversationUpdatedPacket(new Conversation(packet.getConversationId(), null, null, new User[0], new int[0])));
+            }
         }
     }
 
@@ -174,22 +177,21 @@ public class Server implements PacketHandler {
 
     void broadcastPacket(User[] users, Packet packet){
         for(User user : users){
-            if(connections.containsKey(user.getId())){
-                List<WebSocket> webSockets = connections.get(user.getId());
-                for(WebSocket webSocket : webSockets){
-                    if(!webSocket.isClosing() && !webSocket.isClosed()) send(webSocket, packet);
-                }
-            }
+            broadcastTo(user.getId(), packet);
         }
     }
 
     void broadcastPacket(User[] users, Function<User, Packet> fn){
         for(User user : users){
-            if(connections.containsKey(user.getId())){
-                List<WebSocket> webSockets = connections.get(user.getId());
-                for(WebSocket webSocket : webSockets){
-                    if(!webSocket.isClosing() && !webSocket.isClosed()) send(webSocket, fn.apply(user));
-                }
+            broadcastTo(user.getId(), fn.apply(user));
+        }
+    }
+
+    void broadcastTo(int userId, Packet packet) {
+        if(connections.containsKey(userId)){
+            List<WebSocket> webSockets = connections.get(userId);
+            for(WebSocket webSocket : webSockets){
+                if(!webSocket.isClosing() && !webSocket.isClosed()) send(webSocket, packet);
             }
         }
     }

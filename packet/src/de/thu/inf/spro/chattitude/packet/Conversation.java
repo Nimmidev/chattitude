@@ -54,7 +54,7 @@ public class Conversation {
         this(id, name, message, new User[]{}, new int[]{});
     }
 
-    private Conversation(int id, String name, Message message, User[] users, int[] admins){
+    public Conversation(int id, String name, Message message, User[] users, int[] admins){
         this.id = id;
         this.name = name;
         this.message = message;
