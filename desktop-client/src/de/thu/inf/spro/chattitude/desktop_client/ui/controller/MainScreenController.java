@@ -158,6 +158,9 @@ public class MainScreenController implements Initializable {
         client.setOnConversations(newConversations -> Platform.runLater(() -> {
             conversations.clear();
             conversations.addAll(newConversations);
+            if(selectedConversation == null && newConversations.length > 0){
+                conversationsList.getSelectionModel().select(0);
+            }
         }));
         client.send(new GetConversationsPacket());
 
