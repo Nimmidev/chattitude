@@ -40,6 +40,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MainScreenController implements Initializable {
@@ -296,8 +298,11 @@ public class MainScreenController implements Initializable {
             return;
         System.out.println("Send");
         ChatMessage message;
+        String youtubeURL = getYoutubeURL(messageField.getText());
         
-        if(currentReplyMessage != null){
+        if(youtubeURL != null){
+            message = new YoutubeVideoMessage(selectedConversation.getId(), youtubeURL, messageField.getText());
+        } else if(currentReplyMessage != null){
             message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), messageField.getText());
             clearAttachedFile();
         } else if(currentlySelectedFile != null){
@@ -346,4 +351,17 @@ public class MainScreenController implements Initializable {
         setSelectedFileVisibility(true);
         messageField.requestFocus();
     }
+
+    private static Pattern YOUTUBE_PATTERN = Pattern.compile("https:\\/\\/www\\.youtube\\.com\\/watch\\?v=([a-zA-Z0-9-_]+)"); 
+    
+    private String getYoutubeURL(String text){
+        Matcher matcher = YOUTUBE_PATTERN.matcher(text);
+        
+        if(matcher.find()){
+            return "https://www.youtube.com/embed/" + matcher.group(1);
+        }
+        
+        return null;
+    }
+    
 }

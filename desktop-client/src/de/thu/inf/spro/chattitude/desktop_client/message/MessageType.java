@@ -6,7 +6,8 @@ public enum MessageType {
     TEXT,
     RAW_FILE,
     IMAGE_FILE,
-    REPLY;
+    REPLY,
+    YOUTUBE_VIDEO;
 
 
     private static MessageType[] _values = values();
