@@ -238,6 +238,7 @@ public class MainScreenController implements Initializable {
     private void clearAttachedFile(){
         setSelectedFileVisibility(false);
         currentlySelectedFile = null;
+        currentReplyMessage = null;
     }
 
     private void loadMoreMessages() {
@@ -283,6 +284,7 @@ public class MainScreenController implements Initializable {
         
         if(currentReplyMessage != null){
             message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.getText(), messageField.getText());
+            clearAttachedFile();
         } else if(currentlySelectedFile != null){
             String filename = Paths.get(currentlySelectedFile).getFileName().toString();
             byte[] data = downloadManager.loadFrom(currentlySelectedFile);
@@ -324,5 +326,8 @@ public class MainScreenController implements Initializable {
 
     public void setReplyMessage(ChatMessage message) {
         currentReplyMessage = message;
+        currentlySelectedFile = null;
+        attachedFile.setText(currentReplyMessage.asMessage().getUser().getName() + ": " + currentReplyMessage.getText());
+        setSelectedFileVisibility(true);
     }
 }
