@@ -44,11 +44,12 @@ public class TextMessageController implements MessageController {
     private Label timeLabel;
 
     private FXMLLoader mLLoader;
+    private String lastText;
 
     public TextMessageController() {
         mLLoader = new FXMLLoader(getClass().getResource("/jfx/TextMessageCell.fxml"));
         mLLoader.setController(this);
-
+        lastText = "";
 
         try {
             mLLoader.load();
@@ -62,7 +63,7 @@ public class TextMessageController implements MessageController {
         TextMessage message = (TextMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
         //contentLabel.setText(message.getText());
-        parseText(message.getText());
+        if(!lastText.equals(message.getText())) parseText(message.getText());
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
     }
@@ -78,7 +79,6 @@ public class TextMessageController implements MessageController {
         int lastIndex = 0;
         
         while(matcher.find()){
-            System.out.println(matcher.group() + ", start: " + matcher.start() + ", end: " + matcher.end());
             Label label = createLabel(text.substring(lastIndex, matcher.start()));
             Hyperlink link = createHyperlink(text.substring(matcher.start(), matcher.end()));
             nodes.add(label);
