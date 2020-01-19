@@ -157,7 +157,7 @@ public class LoginScreenController implements Initializable {
 
     private void onLoginFailed() {
         System.out.println("Login failed.");
-        Platform.runLater(() -> errorLabel.setText("Wrong username or password"));
+        Platform.runLater(() -> errorLabel.setText("Wrong username or password!"));
     }
 
     @Override
