@@ -145,6 +145,7 @@ public class MainScreenController implements Initializable {
         conversationsList.setItems(conversations);
         conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSelectedConversation) -> {
             selectedConversation = newSelectedConversation;
+            if(selectedConversation == null) selectedConversation = conversations.get(0);
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
