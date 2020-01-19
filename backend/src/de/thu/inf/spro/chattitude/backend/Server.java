@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 public class Server implements PacketHandler {
 
-    public static final int MESSAGE_HISTORY_FETCH_LIMIT = 30;
+    public static final int MESSAGE_HISTORY_FETCH_LIMIT = 20;
     public static final int MAX_FILE_UPLOAD_SIZE = 10 * 1000 * 1000;
 
     private WebSocketServer webSocketServer;
