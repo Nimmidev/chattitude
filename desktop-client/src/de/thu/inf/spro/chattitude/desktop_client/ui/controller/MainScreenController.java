@@ -336,5 +336,6 @@ public class MainScreenController implements Initializable {
         currentlySelectedFile = null;
         attachedFile.setText(currentReplyMessage.asMessage().getUser().getName() + ": " + currentReplyMessage.getText());
         setSelectedFileVisibility(true);
+        messageField.requestFocus();
     }
 }
