@@ -296,24 +296,27 @@ public class MainScreenController implements Initializable {
         String text = messageField.getText();
         text = commandParser.parse(text);
         
-        ChatMessage message;
-        String youtubeURL = getYoutubeURL(text);
-        
-        if(youtubeURL != null){
-            message = new YoutubeVideoMessage(selectedConversation.getId(), youtubeURL, text);
-        } else if(currentReplyMessage != null){
-            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), text);
-            clearAttachedFile();
-        } else if(currentlySelectedFile != null){
-            String filename = Paths.get(currentlySelectedFile).getFileName().toString();
-            byte[] data = downloadManager.loadFrom(currentlySelectedFile);
-            message = createFileMessage(filename, data);
-            clearAttachedFile();
-        } else {
-            message = new TextMessage(selectedConversation.getId(), text);
+        if(text != null){
+            ChatMessage message;
+            String youtubeURL = getYoutubeURL(text);
+
+            if(youtubeURL != null){
+                message = new YoutubeVideoMessage(selectedConversation.getId(), youtubeURL, text);
+            } else if(currentReplyMessage != null){
+                message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), text);
+                clearAttachedFile();
+            } else if(currentlySelectedFile != null){
+                String filename = Paths.get(currentlySelectedFile).getFileName().toString();
+                byte[] data = downloadManager.loadFrom(currentlySelectedFile);
+                message = createFileMessage(filename, data);
+                clearAttachedFile();
+            } else {
+                message = new TextMessage(selectedConversation.getId(), text);
+            }
+
+            client.send(new MessagePacket(message.asMessage()));
         }
         
-        client.send(new MessagePacket(message.asMessage()));
         messageField.setText("");
     }
     
@@ -364,6 +367,14 @@ public class MainScreenController implements Initializable {
         }
         
         return null;
+    }
+    
+    public Client getClient(){
+        return client;
+    }
+    
+    public Conversation getSelectedConversation(){
+        return selectedConversation;
     }
     
     public ObservableList<ChatMessage> getMessagesOfSelectedConversation(){

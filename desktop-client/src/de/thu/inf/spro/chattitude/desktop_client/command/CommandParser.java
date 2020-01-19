@@ -14,6 +14,8 @@ public final class CommandParser {
         commands.add(new ReplySubstitutionCommand("/stack", "https://stackoverflow.com/search?q=", "Sends a link to the StackOverflow search results."));
         commands.add(new SubstitutionCommand("/yt", "https://www.youtube.com/results?search_query=", "Sends a link to the Youtube search results."));
         commands.add(new ReplySubstitutionCommand("/lmgtfy", "https://lmgtfy.com/?q=", "Sends a link to Let me Google that for you."));
+        commands.add(new OpenWebPageCommand("/s", "https://www.google.com/search?q=", "Opens google with the search query."));
+        commands.add(new ExcuseCommand());
     }
     
     private MainScreenController controller;
