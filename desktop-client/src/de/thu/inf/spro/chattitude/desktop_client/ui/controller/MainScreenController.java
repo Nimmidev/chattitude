@@ -17,6 +17,7 @@ import de.thu.inf.spro.chattitude.packet.Message;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -169,9 +170,29 @@ public class MainScreenController implements Initializable {
         });
 
         conversationsList.setItems(conversations);
+
+        sortConversations();
+
+        conversations.addListener((ListChangeListener<? super Conversation>) c -> {
+            boolean notOnlyPermutation = false;
+            while (c.next()) {
+                if (!c.wasPermutated()) {
+                    notOnlyPermutation = true;
+                }
+            }
+            if (notOnlyPermutation)
+                sortConversations();
+        });
+
         conversationsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSelectedConversation) -> {
+            if (newSelectedConversation == null) {
+                return;
+            }
+            if (newSelectedConversation == selectedConversation) {
+                return;
+            }
+
             selectedConversation = newSelectedConversation;
-            if(selectedConversation == null) conversationsList.getSelectionModel().select(conversations.get(0));
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
@@ -180,9 +201,13 @@ public class MainScreenController implements Initializable {
             setSelectedFileVisibility(false);
             messageField.setText("");
 
-            editConversationButton.setVisible(selectedConversation.isAdmin(client.getCredentials().getUserId()));
+            if (selectedConversation == null) {
+                editConversationButton.setVisible(false);
+            } else {
+                editConversationButton.setVisible(selectedConversation.isAdmin(client.getCredentials().getUserId()));
+            }
 
-            if (selectedConversation != null && selectedConversation.getMessage() != null) {
+            if (selectedConversation.getMessage() != null) {
                 Message rawMessage = selectedConversation.getMessage();
                 messagesOfSelectedConversation.add(ChatMessage.of(rawMessage));
 
@@ -200,6 +225,21 @@ public class MainScreenController implements Initializable {
         messageHistoryList.setItems(messagesOfSelectedConversation);
         setSelectedFileVisibility(false);
 
+    }
+
+    private void sortConversations() {
+        conversations.sort((o1, o2) -> {
+            if (o1.getMessage() == null) {
+                if (o2.getMessage() == null)
+                    return 0;
+
+                return -1;
+            }
+            if (o2.getMessage() == null)
+                return 1;
+
+            return (int) (o2.getMessage().getTimestamp() - o1.getMessage().getTimestamp());
+        });
     }
 
     @FXML
