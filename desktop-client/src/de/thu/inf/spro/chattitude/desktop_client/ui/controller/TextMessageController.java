@@ -87,6 +87,8 @@ public class TextMessageController implements MessageController {
         }
         
         if(nodes.size() == 0) nodes.add(createLabel(text));
+        else nodes.add(createLabel(text.substring(lastIndex)));
+        
         contentLabel.getChildren().clear();
         contentLabel.getChildren().addAll(nodes);
     }
