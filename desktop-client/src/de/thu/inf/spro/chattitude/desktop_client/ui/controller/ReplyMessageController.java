@@ -30,7 +30,10 @@ public class ReplyMessageController extends MessageController {
     private Label timeLabel;
 
     @FXML
-    private Text txtRepliedMessage;
+    private Label txtRepliedMessage;
+
+    @FXML
+    private Label txtRepliedSender;
 
     private FXMLLoader mLLoader;
     
@@ -51,6 +54,7 @@ public class ReplyMessageController extends MessageController {
         senderLabel.setText(message.asMessage().getUser().getName());;
         setText(contentLabel, message.getText());
         txtRepliedMessage.setText(message.getReplyMsgTxt());
+        //txtRepliedSender.setText(); TODO
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
     }
