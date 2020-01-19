@@ -15,6 +15,8 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 
@@ -44,6 +46,8 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private MenuItem replyMenuItem;
     private MenuItem copyMenuItem;
+    
+    private ChatMessage currentMessage;
 
     public ChatMessageCell(int sessionUserId, DownloadManager downloadManager) {
         textMessageController = new TextMessageController();
@@ -73,14 +77,15 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
             System.out.println("reply");
         });
         copyMenuItem = createMenuItem("Copy", (ActionEvent e) ->{
-            System.out.println("copy");
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(currentMessage.getText());
+            Clipboard.getSystemClipboard().setContent(clipboardContent);
         });
     }
     
     private void setDefaultContextMenuItems(){
         contextMenu.getItems().clear();
         contextMenu.getItems().addAll(replyMenuItem,copyMenuItem);
-
     }
 
     @Override
@@ -95,6 +100,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         }
 
         MessageController controller;
+        currentMessage = message;
         
         if(message.getType() == MessageType.TEXT) controller = textMessageController;
         else if(message.getType() == MessageType.RAW_FILE) controller = rawFileMessageController;
