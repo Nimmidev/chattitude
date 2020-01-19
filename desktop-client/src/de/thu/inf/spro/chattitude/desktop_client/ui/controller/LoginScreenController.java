@@ -20,6 +20,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -158,7 +160,7 @@ public class LoginScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         txtPassword2.setVisible(false);
         labelLogin.setOnMouseClicked(event -> {
-            btnToggle.setSelected(false);
+                btnToggle.setSelected(false);
         });
         btnToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
