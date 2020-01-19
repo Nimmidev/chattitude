@@ -60,6 +60,7 @@ public abstract class ChatMessage {
             else if(type == MessageType.IMAGE_FILE) return new ImageFileMessage(message, json);
             else if(type == MessageType.REPLY) return new ReplyMessage(message, json);
             else if(type == MessageType.YOUTUBE_VIDEO) return new YoutubeVideoMessage(message, json);
+            else if(type == MessageType.AUDIO) return new AudioMessage(message, json);
             else throw new IllegalStateException("Invalid message type: " + type.name());
         } catch(ParseException | IllegalStateException exception) {
             System.err.println("Error parsing message");

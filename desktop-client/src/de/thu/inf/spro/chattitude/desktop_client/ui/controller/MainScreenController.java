@@ -67,6 +67,7 @@ public class MainScreenController implements Initializable {
     private String currentlySelectedFile;
     private ChatMessage currentReplyMessage;
     private int lastConversationCreatedId = -1;
+    private CommandParser commandParser;
 
     public MainScreenController() {
         System.out.println("LoginScreenController");
@@ -74,6 +75,7 @@ public class MainScreenController implements Initializable {
         downloadManager = new DownloadManager(client);
         messagesOfSelectedConversation = FXCollections.observableArrayList();
         conversations = FXCollections.observableArrayList();
+        commandParser = new CommandParser(this);
 
         client.setOnMessage(message -> Platform.runLater(() -> {
             int conversationId = message.asMessage().getConversationId();
@@ -292,7 +294,7 @@ public class MainScreenController implements Initializable {
             return;
         
         String text = messageField.getText();
-        text = CommandParser.parse(text);
+        text = commandParser.parse(text);
         
         ChatMessage message;
         String youtubeURL = getYoutubeURL(text);
@@ -323,6 +325,9 @@ public class MainScreenController implements Initializable {
         switch(fileType){
             case IMAGE:
                 return new ImageFileMessage(conversationId, text, filename, data);
+            case AUDIO:
+                System.out.println("AUDIO");
+                return new AudioMessage(conversationId, text, filename, data);
             default:
                 return new RawFileMessage(conversationId, text, filename, data);
         }
@@ -359,6 +364,10 @@ public class MainScreenController implements Initializable {
         }
         
         return null;
+    }
+    
+    public ObservableList<ChatMessage> getMessagesOfSelectedConversation(){
+        return messagesOfSelectedConversation;
     }
     
 }
