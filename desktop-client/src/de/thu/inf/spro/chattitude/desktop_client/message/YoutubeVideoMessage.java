@@ -22,7 +22,7 @@ public class YoutubeVideoMessage extends ChatMessage {
 
     @Override
     public String getPreview() {
-        return text;
+        return stripPreview(text);
     }
     
     public String getUrl(){

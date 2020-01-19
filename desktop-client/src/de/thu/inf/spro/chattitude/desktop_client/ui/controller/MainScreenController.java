@@ -3,10 +3,8 @@ package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
-import de.thu.inf.spro.chattitude.desktop_client.Client;
-import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
-import de.thu.inf.spro.chattitude.desktop_client.FileType;
-import de.thu.inf.spro.chattitude.desktop_client.Notification;
+import de.thu.inf.spro.chattitude.desktop_client.*;
+import de.thu.inf.spro.chattitude.desktop_client.command.CommandParser;
 import de.thu.inf.spro.chattitude.desktop_client.message.*;
 import de.thu.inf.spro.chattitude.desktop_client.ui.App;
 import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateGroupChatPopUp;
@@ -22,18 +20,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -296,14 +290,17 @@ public class MainScreenController implements Initializable {
     public void sendMessage() {
         if (messageField.getText().equals("") && currentlySelectedFile == null)
             return;
-        System.out.println("Send");
+        
+        String text = messageField.getText();
+        text = CommandParser.parse(text);
+        
         ChatMessage message;
-        String youtubeURL = getYoutubeURL(messageField.getText());
+        String youtubeURL = getYoutubeURL(text);
         
         if(youtubeURL != null){
-            message = new YoutubeVideoMessage(selectedConversation.getId(), youtubeURL, messageField.getText());
+            message = new YoutubeVideoMessage(selectedConversation.getId(), youtubeURL, text);
         } else if(currentReplyMessage != null){
-            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), messageField.getText());
+            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.asMessage().getUser().getName(), currentReplyMessage.getText(), text);
             clearAttachedFile();
         } else if(currentlySelectedFile != null){
             String filename = Paths.get(currentlySelectedFile).getFileName().toString();
@@ -311,7 +308,7 @@ public class MainScreenController implements Initializable {
             message = createFileMessage(filename, data);
             clearAttachedFile();
         } else {
-            message = new TextMessage(selectedConversation.getId(), messageField.getText());
+            message = new TextMessage(selectedConversation.getId(), text);
         }
         
         client.send(new MessagePacket(message.asMessage()));

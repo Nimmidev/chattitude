@@ -16,6 +16,6 @@ public class TextMessage extends ChatMessage {
 
     @Override
     public String getPreview() {
-        return text;
+        return stripPreview(text);
     }
 }

@@ -29,7 +29,7 @@ public class ReplyMessage extends ChatMessage {
 
     @Override
     public String getPreview() {
-        return text;
+        return stripPreview(text);
     }
     
     public String getReplyMsgTxt(){

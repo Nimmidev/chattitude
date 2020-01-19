@@ -70,6 +70,10 @@ public abstract class ChatMessage {
     
     public abstract String getPreview();
     
+    protected String stripPreview(String preview){
+        return preview.split("\n")[0];
+    }
+    
     public String getText(){
         return text;
     }
