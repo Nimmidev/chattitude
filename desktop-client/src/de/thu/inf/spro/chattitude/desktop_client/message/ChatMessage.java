@@ -60,7 +60,7 @@ public abstract class ChatMessage {
             else if(type == MessageType.IMAGE_FILE) return new ImageFileMessage(message, json);
             else if(type == MessageType.REPLY) return new ReplyMessage(message, json);
             else throw new IllegalStateException("Invalid message type: " + type.name());
-        } catch(ParseException exception) {
+        } catch(ParseException | IllegalStateException exception) {
             System.err.println("Error parsing message");
             exception.printStackTrace();
             return new TextMessage(message, new JsonObject());

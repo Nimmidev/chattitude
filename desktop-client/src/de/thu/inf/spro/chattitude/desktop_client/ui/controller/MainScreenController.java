@@ -36,7 +36,11 @@ import javafx.scene.layout.VBox;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class MainScreenController implements Initializable {
 
@@ -133,12 +137,16 @@ public class MainScreenController implements Initializable {
                 index--;
             ChatMessage topMost = messagesOfSelectedConversation.get(index);
 
-            for (Message rawMessage : packet.getMessages()) {
-                ChatMessage message = ChatMessage.of(rawMessage);
-                if (!messagesOfSelectedConversation.contains(message)) {
-                    messagesOfSelectedConversation.add(0, message);
-                }
-            }
+
+            List<ChatMessage> messages = Arrays.stream(packet.getMessages())
+                    .map(ChatMessage::of)
+                    .filter(message -> !messagesOfSelectedConversation.contains(message))
+                    .collect(Collectors.toList());
+
+            Collections.reverse(messages);
+
+            messagesOfSelectedConversation.addAll(0, messages);
+
             messageHistoryList.scrollTo(topMost);
             checkToLoadHistory();
         }));
@@ -242,7 +250,6 @@ public class MainScreenController implements Initializable {
     }
 
     private void loadMoreMessages() {
-        System.out.println("Load more messages for " + selectedConversation);
         if (selectedConversation.getMessage() == null)
             return;
 

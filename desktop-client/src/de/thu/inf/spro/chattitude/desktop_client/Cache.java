@@ -18,8 +18,10 @@ public final class Cache {
     private static List<String> downloading = new ArrayList<>();
     
     public static byte[] get(String fileId){
-        File tmpDir = new File(System.getProperty("java.io.tmpdir")); // TODO Der lädt das halt irgendwie 15 mal alles
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         File cachedFile = new File(tmpDir, fileId);
+
+        System.out.println("Get " + fileId);
         
         if(cachedFile.exists()){
             if(downloading.contains(fileId)) return null;
