@@ -1,26 +1,30 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.popup;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
-import de.thu.inf.spro.chattitude.desktop_client.ui.cell.SingleChatSearchResultCell;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ConversationMemberCell;
+import de.thu.inf.spro.chattitude.desktop_client.ui.cell.SearchResultCell;
+import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
+import de.thu.inf.spro.chattitude.packet.packets.ConversationUpdatedPacket;
 import de.thu.inf.spro.chattitude.packet.packets.SearchUserPacket;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CreateSingleChatPopUp extends StackPane implements Initializable {
-
+public class EditConversationPopUp extends StackPane implements Initializable {
     @FXML
     private Pane parent;
     @FXML
@@ -32,18 +36,17 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
     @FXML
     private JFXListView<User> searchResultList;
     @FXML
-    private Label labelError;
+    private JFXButton saveConversationButton;
 
     private FXMLLoader mLLoader;
+    private Conversation conversation;
     private ObservableList<User> usersInConversation;
     private Client client;
-    private CreateSingleChatPopUp popUp;
 
-
-    public CreateSingleChatPopUp(Client client) {
+    public EditConversationPopUp(Client client, Conversation conversation) {
         this.client = client;
-        this.popUp = this;
-        mLLoader = new FXMLLoader(getClass().getResource("/jfx/CreateSingleChat.fxml"));
+        this.conversation = conversation;
+        mLLoader = new FXMLLoader(getClass().getResource("/jfx/EditConversationPopUp.fxml"));
         mLLoader.setController(this);
 
         setMaxHeight(Double.MAX_VALUE);
@@ -55,6 +58,8 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
             if (event.getTarget() == this)
                 closePopUpClick();
         });
+
+        usersInConversation = FXCollections.observableArrayList(conversation.getUsers());
 
         client.setOnSearchUser(packet -> Platform.runLater(() -> {
             if (packet.getQuery().equals(searchField.getText())) {
@@ -68,18 +73,20 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
             mLLoader.load();
             getChildren().add(parent);
         } catch (IOException e) {
-            throw new RuntimeException("Error loading CreateSingleChatPopUp", e);
+            throw new RuntimeException("Error loading EditConversationPopUp", e);
         }
-    }
-
-    public void displayError() {
-        labelError.setVisible(true);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        conversationNameField.setText(conversation.getName());
+        conversationNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveConversationButton.setDisable(newValue.equals(conversation.getName()));
+        });
 
-        labelError.setVisible(false);
+        usersInConversationList.setItems(usersInConversation);
+        usersInConversationList.setCellFactory(param -> new ConversationMemberCell(client, conversation, usersInConversation));
+
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals("")) {
                 searchResultList.getItems().clear();
@@ -88,12 +95,29 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
             client.send(new SearchUserPacket(newValue));
         });
 
-        searchResultList.setCellFactory(param -> new SingleChatSearchResultCell(client, popUp));
+        searchResultList.setCellFactory(param -> new SearchResultCell(client, conversation, usersInConversation));
     }
 
     @FXML
-    public void closePopUpClick() {
+    private void closePopUpClick() {
         ((Pane) getParent()).getChildren().remove(this);
     }
-}
 
+    @FXML
+    private void saveConversationNameClick() {
+        saveConversationName();
+    }
+
+    @FXML
+    private void conversationNameFieldKeyPress(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+            saveConversationName();
+        }
+    }
+
+    private void saveConversationName() {
+        conversation.setName(conversationNameField.getText());
+        client.send(new ConversationUpdatedPacket(conversation));
+        saveConversationButton.setDisable(true);
+    }
+}

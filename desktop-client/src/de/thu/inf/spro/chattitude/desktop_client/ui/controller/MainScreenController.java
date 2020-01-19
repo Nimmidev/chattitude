@@ -1,4 +1,4 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
@@ -8,34 +8,30 @@ import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.FileMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
+import de.thu.inf.spro.chattitude.desktop_client.ui.App;
+import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateGroupChatPopUp;
+import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateSingleChatPopUp;
+import de.thu.inf.spro.chattitude.desktop_client.ui.popup.EditConversationPopUp;
 import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ChatMessageCell;
 import de.thu.inf.spro.chattitude.desktop_client.ui.cell.ConversationCell;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.TextMessageController;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.Message;
-import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.*;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {

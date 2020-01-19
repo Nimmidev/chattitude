@@ -1,4 +1,4 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.popup;
 
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;

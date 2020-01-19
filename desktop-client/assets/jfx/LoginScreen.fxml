@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="loginScreen" prefHeight="434.0" prefWidth="215.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.LoginScreenController">
+<AnchorPane fx:id="loginScreen" prefHeight="434.0" prefWidth="215.0" style="-fx-background-color: #28292A;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.thu.inf.spro.chattitude.desktop_client.ui.controller.LoginScreenController">
    <children>
       <AnchorPane layoutX="3.0" layoutY="3.0" prefHeight="427.0" prefWidth="232.0" style="-fx-background-color: #4363A4;" AnchorPane.bottomAnchor="4.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="3.0">
          <children>

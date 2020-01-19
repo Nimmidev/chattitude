@@ -3,7 +3,7 @@ package de.thu.inf.spro.chattitude.desktop_client.ui.cell;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListCell;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
-import de.thu.inf.spro.chattitude.desktop_client.ui.CreateSingleChatPopUp;
+import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateSingleChatPopUp;
 import de.thu.inf.spro.chattitude.packet.Conversation;
 import de.thu.inf.spro.chattitude.packet.User;
 import de.thu.inf.spro.chattitude.packet.packets.CreateConversationPacket;

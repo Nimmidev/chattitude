@@ -1,7 +1,8 @@
-package de.thu.inf.spro.chattitude.desktop_client.ui;
+package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 
 import com.jfoenix.controls.*;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
+import de.thu.inf.spro.chattitude.desktop_client.ui.App;
 import de.thu.inf.spro.chattitude.packet.Credentials;
 import de.thu.inf.spro.chattitude.packet.packets.AuthenticationPacket;
 import de.thu.inf.spro.chattitude.packet.packets.RegisterPacket;
