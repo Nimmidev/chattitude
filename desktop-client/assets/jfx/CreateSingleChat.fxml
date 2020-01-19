@@ -29,7 +29,7 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Label>
-                <JFXTextField fx:id="searchField" labelFloat="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" promptText="Search for users to start a chat:" VBox.vgrow="NEVER">
+                <JFXTextField fx:id="searchField" labelFloat="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" promptText="Search for a user to start a chat:" VBox.vgrow="NEVER">
                     <font>
                         <Font size="16.0" />
                     </font>
