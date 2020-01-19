@@ -90,10 +90,15 @@ public class MainScreenController implements Initializable {
 
         client.setOnConversationUpdated(newConversation -> Platform.runLater(() -> {
             Conversation oldConversation = getConversation(newConversation.getId());
-            if (oldConversation == null) { // new conversation
-                conversations.add(newConversation);
+            if (newConversation.getUsers().length == 0) { // Conversation wurde gelöscht / man wurde entfernt
+                if (oldConversation != null)
+                    conversations.remove(oldConversation);
             } else {
-                replaceConversation(oldConversation, newConversation);
+                if (oldConversation == null) { // new conversation
+                    conversations.add(newConversation);
+                } else {
+                    replaceConversation(oldConversation, newConversation);
+                }
             }
         }));
 
