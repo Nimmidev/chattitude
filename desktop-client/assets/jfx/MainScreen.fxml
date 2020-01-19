@@ -16,11 +16,11 @@
    <children>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
          <left>
-            <VBox maxHeight="1.7976931348623157E308" minHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+            <VBox fx:id="vBox" maxHeight="1.7976931348623157E308" minHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">
                <children>
                   <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="55.0" style="-fx-background-color: #4363A4;">
                      <children>
-                        <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain;">
+                        <JFXButton fx:id="btnGroupChat" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#startGroupChat" prefHeight="53.0" prefWidth="53.0" style="-fx-background-image: url(&quot;icons/GroupChat.png&quot;); -fx-background-size: contain; -jfx-disable-visual-focus: true;">
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
