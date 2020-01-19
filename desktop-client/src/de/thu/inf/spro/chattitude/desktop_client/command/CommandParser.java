@@ -16,6 +16,7 @@ public final class CommandParser {
         commands.add(new ReplySubstitutionCommand("/lmgtfy", "https://lmgtfy.com/?q=", "Sends a link to Let me Google that for you."));
         commands.add(new OpenWebPageCommand("/s", "https://www.google.com/search?q=", "Opens google with the search query."));
         commands.add(new ExcuseCommand());
+        commands.add(new HelpCommand(commands));
     }
     
     private MainScreenController controller;
@@ -25,7 +26,6 @@ public final class CommandParser {
     }
     
     public String parse(String text){
-        if(text.equals("/help") || text.equals("/?")) return printHelp();
         for(Command command : commands){
             if(command.match(text)){
                 return command.execute(controller, text);
@@ -35,12 +35,5 @@ public final class CommandParser {
         return text;
     }
     
-    private String printHelp(){
-        StringBuilder builder = new StringBuilder("Available commands: \n");
-        
-        for(Command command :commands) builder.append(command);
-        
-        return builder.toString();
-    }
     
 }
