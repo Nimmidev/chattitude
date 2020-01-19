@@ -95,7 +95,6 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
             });
 
             searchResultList.setCellFactory(param -> new GroupChatSearchResultCell(client, usersInConversation));
-
         }
 
         @FXML

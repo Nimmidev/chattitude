@@ -22,13 +22,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.skin.ListViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 import java.io.File;
 import java.net.URL;
@@ -40,7 +43,7 @@ public class MainScreenController implements Initializable {
     public static boolean IS_FOCUSED = false;
     
     @FXML
-    private JFXTextField messageField;
+    public JFXTextField messageField;
     @FXML
     private JFXListView<Conversation> conversationsList;
     @FXML
@@ -168,9 +171,10 @@ public class MainScreenController implements Initializable {
             }
         });
 
-        messageHistoryList.setCellFactory(param -> new ChatMessageCell(client.getCredentials().getUserId(), downloadManager));
+        messageHistoryList.setCellFactory(param -> new ChatMessageCell(client.getCredentials().getUserId(), downloadManager, this));
         messageHistoryList.setItems(messagesOfSelectedConversation);
         setSelectedFileVisibility(false);
+
     }
 
     @FXML
@@ -297,5 +301,11 @@ public class MainScreenController implements Initializable {
     private void replaceConversation(Conversation oldConversation, Conversation newConversation) {
         int index = conversations.indexOf(oldConversation);
         conversations.set(index, newConversation); // Replace with new conversation object
+    }
+
+    public void setMessageFieldText(String text, String userName) {
+        messageField.requestFocus();
+        messageField.setText("'" + userName + " wrote: " + text + "' ");
+        messageField.positionCaret(userName.length() + text.length() + 12 );
     }
 }

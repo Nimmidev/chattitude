@@ -5,10 +5,7 @@ import com.jfoenix.controls.JFXRippler;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
 import de.thu.inf.spro.chattitude.desktop_client.message.MessageType;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.ImageFileMessageController;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.RawFileMessageController;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.MessageController;
-import de.thu.inf.spro.chattitude.desktop_client.ui.controller.TextMessageController;
+import de.thu.inf.spro.chattitude.desktop_client.ui.controller.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -40,6 +37,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     private TextMessageController textMessageController;
     private RawFileMessageController rawFileMessageController;
     private ImageFileMessageController imageFileMessageController;
+    private MainScreenController mainScreenController;
     
     private int sessionuserId;
     private ContextMenu contextMenu;
@@ -49,10 +47,12 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private ChatMessage currentMessage;
 
-    public ChatMessageCell(int sessionUserId, DownloadManager downloadManager) {
+
+    public ChatMessageCell(int sessionUserId, DownloadManager downloadManager, MainScreenController mainScreenController) {
         textMessageController = new TextMessageController();
         rawFileMessageController = new RawFileMessageController(downloadManager);
         imageFileMessageController = new ImageFileMessageController(downloadManager);
+        this.mainScreenController = mainScreenController;
         
         this.sessionuserId = sessionUserId;
         contextMenu = new ContextMenu();
@@ -74,13 +74,14 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private void createMenuItems(){
         replyMenuItem = createMenuItem("Reply", (ActionEvent e) -> {
-            System.out.println("reply");
+            mainScreenController.setMessageFieldText(currentMessage.getText(), currentMessage.asMessage().getUser().getName());
         });
         copyMenuItem = createMenuItem("Copy", (ActionEvent e) ->{
             ClipboardContent clipboardContent = new ClipboardContent();
             clipboardContent.putString(currentMessage.getText());
             Clipboard.getSystemClipboard().setContent(clipboardContent);
         });
+
     }
     
     private void setDefaultContextMenuItems(){
