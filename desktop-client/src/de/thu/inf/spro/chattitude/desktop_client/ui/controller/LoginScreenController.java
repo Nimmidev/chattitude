@@ -51,6 +51,8 @@ public class LoginScreenController implements Initializable {
     private JFXButton btnSignIn;
     @FXML
     private Label errorLabel;
+    @FXML
+    private Label labelLogin;
 
 
     public LoginScreenController() {
@@ -95,7 +97,6 @@ public class LoginScreenController implements Initializable {
             Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
             client.send(new AuthenticationPacket(credentials));
         }
-
     }
 
     @FXML
@@ -104,38 +105,6 @@ public class LoginScreenController implements Initializable {
             signIn();
         }
     }
-
-    /* BackUp-Kommentar bitte nicht löschen -- JAN
-    public void signUp() {
-        String userName = txtUsername.getText();
-        String userPassword = txtPassword.getText();
-
-
-        if (userName.length() < minimalLength || userPassword.length() < minimalLength) {
-            // Wird später ersetzt durch TextLabel
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Registration Error");
-            alert.setHeaderText("Username or password too short.");
-            alert.setContentText("Sorry, your username and password needs at least 4 characters.");
-            alert.show();
-        } else {
-            client.setOnRegister(credentials -> Platform.runLater(() ->{
-                if (credentials.isAuthenticated()) {
-                    showMainScreen();
-                } else {
-                    // Wird später ersetzt durch TextLabel
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Registration failed");
-                    alert.setHeaderText("Username already taken.");
-                    alert.setContentText("XXX");
-                    alert.show();
-                }
-            }));
-            Credentials credentials = new Credentials(txtUsername.getText(), txtPassword.getText());
-            client.send(new RegisterPacket(credentials));
-        }
-    }
-     */
 
     public void showMainScreen() {
         cleanup();
@@ -153,7 +122,7 @@ public class LoginScreenController implements Initializable {
             secondaryStage.setResizable(true);
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
-            secondaryStage.getIcons().add(new Image("/LogoPicRound.png"));
+            secondaryStage.getIcons().add(new Image("/logoTitleBar.png"));
             setStageLayout(secondaryStage);
             secondaryStage.focusedProperty().addListener((observableValue, minimized, t1) -> {
                 MainScreenController.IS_MINIMIZED = minimized;
@@ -188,6 +157,9 @@ public class LoginScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         txtPassword2.setVisible(false);
+        labelLogin.setOnMouseClicked(event -> {
+            btnToggle.setSelected(false);
+        });
         btnToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean arg1, Boolean arg2) {
@@ -195,13 +167,10 @@ public class LoginScreenController implements Initializable {
                     toggleStatus = true;
                     txtPassword2.setVisible(true);
                     btnSignIn.setText("Register");
-
-                    //TODO
                 } else {
                     toggleStatus = false;
                     txtPassword2.setVisible(false);
                     btnSignIn.setText("Login");
-                    //TODO
                 }
             }
         });

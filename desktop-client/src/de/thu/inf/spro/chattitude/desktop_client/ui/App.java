@@ -33,7 +33,7 @@ public class App extends Application {
             primaryStage.setResizable(false);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.getIcons().add(new Image("/LogoPicRound.png"));
+            primaryStage.getIcons().add(new Image("/logoTitleBar.png"));
             primaryStage.show();
         } catch (IOException e) {
             throw new Error(e);
