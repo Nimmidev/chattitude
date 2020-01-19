@@ -17,8 +17,10 @@ public class ReplySubstitutionCommand extends Command {
     public String exec(MainScreenController controller, String text) {
         ObservableList<ChatMessage> messages = controller.getMessagesOfSelectedConversation();
         ChatMessage message = messages.get(messages.size() - 1);
-        controller.setReplyMessage(message);
-        if(text.isEmpty()) text = message.getText();
+        if(text.isEmpty()){
+            text = message.getText();
+            controller.setReplyMessage(message);
+        } 
         return url + text.replace(" ", "+");
     }
 }
