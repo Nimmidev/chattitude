@@ -155,8 +155,8 @@ public class LoginScreenController implements Initializable {
             secondaryStage.setScene(scene);
             secondaryStage.getIcons().add(new Image("/LogoPicRound.png"));
             setStageLayout(secondaryStage);
-            secondaryStage.focusedProperty().addListener((observableValue, minimized, t1) -> {
-                MainScreenController.IS_MINIMIZED = minimized;
+            secondaryStage.focusedProperty().addListener((observableValue, notFocused, t1) -> {
+                MainScreenController.IS_FOCUSED = !notFocused;
             });
             secondaryStage.show();
 

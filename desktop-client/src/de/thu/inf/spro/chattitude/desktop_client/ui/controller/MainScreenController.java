@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {
 
-    public static boolean IS_MINIMIZED = false;
+    public static boolean IS_FOCUSED = false;
     
     @FXML
     private JFXTextField messageField;
@@ -73,10 +73,10 @@ public class MainScreenController implements Initializable {
         client.setOnMessage(message -> Platform.runLater(() -> {
             int conversationId = message.asMessage().getConversationId();
             if (selectedConversation != null && conversationId == selectedConversation.getId()) {
-                sendNotification(message);
                 messagesOfSelectedConversation.add(message);
             }
             Conversation conversation = getConversation(conversationId);
+            sendNotification(conversation.getName(), message);
             if (conversation == null) {
                 System.out.println("Warning: Received message for unknown conversation " + conversationId);
                 return;
@@ -198,17 +198,12 @@ public class MainScreenController implements Initializable {
         clearAttachedFile();
     }
     
-    private void sendNotification(ChatMessage message){
+    private void sendNotification(String conversationName, ChatMessage message){
         Message rawMessage = message.asMessage();
         
         if(rawMessage.getUser().getId() != client.getCredentials().getUserId()){
-            for(Conversation conversation : conversations){
-                if(conversation.getId() == rawMessage.getConversationId()){
-                    String text = String.format("%s: %s", rawMessage.getUser().getName(), message.getPreview());
-                    Notification.send(conversation.getName(), text);
-                    break;
-                }
-            }
+            String text = String.format("%s: %s", rawMessage.getUser().getName(), message.getPreview());
+            Notification.send(conversationName, text);
         }
     }
     
