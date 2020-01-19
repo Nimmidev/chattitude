@@ -77,11 +77,13 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
             } catch (IOException e) {
                 throw new RuntimeException("Error loading CreateGroupChatPopUp", e);
             }
+
+
         }
 
-        @Override
+    @Override
         public void initialize(URL location, ResourceBundle resources) {
-
+            Platform.runLater(()->conversationNameField.requestFocus());
             usersInConversationList.setItems(usersInConversation);
             usersInConversationList.setCellFactory(param -> new GroupChatMemberCell(client, usersInConversation));
             labelError.setVisible(false);
@@ -95,6 +97,7 @@ public class CreateGroupChatPopUp extends StackPane implements Initializable {
             });
 
             searchResultList.setCellFactory(param -> new GroupChatSearchResultCell(client, usersInConversation));
+            conversationNameField.requestFocus();
         }
 
         @FXML

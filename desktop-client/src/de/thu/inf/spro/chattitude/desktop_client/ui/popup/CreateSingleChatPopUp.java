@@ -78,7 +78,7 @@ public class CreateSingleChatPopUp extends StackPane implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        Platform.runLater(()->searchField.requestFocus());
         labelError.setVisible(false);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals("")) {
