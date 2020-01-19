@@ -65,6 +65,7 @@ public class MainScreenController implements Initializable {
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;
     private String currentlySelectedFile;
+    private int lastConversationCreatedId = -1;
 
     public MainScreenController() {
         System.out.println("LoginScreenController");
@@ -96,11 +97,18 @@ public class MainScreenController implements Initializable {
             } else {
                 if (oldConversation == null) { // new conversation
                     conversations.add(newConversation);
+                    if (lastConversationCreatedId != -1 && lastConversationCreatedId == newConversation.getId()) {
+                        lastConversationCreatedId = -1;
+                        conversationsList.getSelectionModel().select(newConversation);
+                        messageField.requestFocus();
+                    }
                 } else {
                     replaceConversation(oldConversation, newConversation);
                 }
             }
         }));
+
+        client.setOnConversationCreated(conversation -> lastConversationCreatedId = conversation.getId());
 
         client.setOnMessageHistory(packet -> Platform.runLater(() -> {
             loadingHistory = false;
