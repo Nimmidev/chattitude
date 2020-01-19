@@ -76,7 +76,9 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private void createMenuItems(){
         replyMenuItem = createMenuItem("Reply", (ActionEvent e) -> {
-            mainScreenController.setReplyMessage(currentMessage);
+            if(!currentMessage.getText().isEmpty()){
+                mainScreenController.setReplyMessage(currentMessage);
+            }
         });
         copyMenuItem = createMenuItem("Copy", (ActionEvent e) ->{
             ClipboardContent clipboardContent = new ClipboardContent();
