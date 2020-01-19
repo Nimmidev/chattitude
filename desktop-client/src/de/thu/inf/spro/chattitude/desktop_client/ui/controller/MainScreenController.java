@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXTextField;
 import de.thu.inf.spro.chattitude.desktop_client.Client;
 import de.thu.inf.spro.chattitude.desktop_client.DownloadManager;
 import de.thu.inf.spro.chattitude.desktop_client.FileType;
+import de.thu.inf.spro.chattitude.desktop_client.Notification;
 import de.thu.inf.spro.chattitude.desktop_client.message.*;
 import de.thu.inf.spro.chattitude.desktop_client.ui.App;
 import de.thu.inf.spro.chattitude.desktop_client.ui.popup.CreateGroupChatPopUp;
@@ -36,6 +37,8 @@ import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {
 
+    public static boolean IS_MINIMIZED = false;
+    
     @FXML
     private JFXTextField messageField;
     @FXML
@@ -70,6 +73,7 @@ public class MainScreenController implements Initializable {
         client.setOnMessage(message -> Platform.runLater(() -> {
             int conversationId = message.asMessage().getConversationId();
             if (selectedConversation != null && conversationId == selectedConversation.getId()) {
+                sendNotification(message);
                 messagesOfSelectedConversation.add(message);
             }
             Conversation conversation = getConversation(conversationId);
@@ -192,6 +196,20 @@ public class MainScreenController implements Initializable {
     @FXML
     private void attachedFileCloseClicked(){
         clearAttachedFile();
+    }
+    
+    private void sendNotification(ChatMessage message){
+        Message rawMessage = message.asMessage();
+        
+        if(rawMessage.getUser().getId() != client.getCredentials().getUserId()){
+            for(Conversation conversation : conversations){
+                if(conversation.getId() == rawMessage.getConversationId()){
+                    String text = String.format("%s: %s", rawMessage.getUser().getName(), message.getPreview());
+                    Notification.send(conversation.getName(), text);
+                    break;
+                }
+            }
+        }
     }
     
     private void setSelectedFileVisibility(boolean visibility){
