@@ -260,17 +260,22 @@ public class MainScreenController implements Initializable {
     }
 
     private void checkToLoadHistory() {
-        ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
-        VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
-        var firstVisible = vf.getFirstVisibleCell();
-        if (firstVisible == null)
-            return;
-        int first = firstVisible.getIndex();
-        if (first == 0) {
-            if (!allMessagesOfCurrentConversationLoaded && !loadingHistory) {
-                loadMoreMessages();
+        Platform.runLater(() -> {
+            ListViewSkin<?> ts = (ListViewSkin<?>) messageHistoryList.getSkin();
+            VirtualFlow<?> vf = (VirtualFlow<?>) ts.getChildren().get(0);
+            if (ts.getChildren().size() > 3) {
+                vf = (VirtualFlow<?>) ts.getChildren().get(3);
             }
-        }
+            var firstVisible = vf.getFirstVisibleCell();
+            if (firstVisible == null)
+                return;
+            int first = firstVisible.getIndex();
+            if (first == 0) {
+                if (!allMessagesOfCurrentConversationLoaded && !loadingHistory) {
+                    loadMoreMessages();
+                }
+            }
+        });
     }
 
     public void startUserChat() {
