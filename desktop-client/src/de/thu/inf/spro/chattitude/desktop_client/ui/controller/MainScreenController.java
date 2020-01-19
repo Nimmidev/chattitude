@@ -192,6 +192,7 @@ public class MainScreenController implements Initializable {
                 return;
             }
 
+            AudioMessageController.reset();
             selectedConversation = newSelectedConversation;
             messagesOfSelectedConversation.clear();
             allMessagesOfCurrentConversationLoaded = false;

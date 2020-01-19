@@ -59,7 +59,9 @@ public class AudioMessageController extends MessageController {
     private DownloadManager downloadManager;
     private FXMLLoader mLLoader;
 
-    private MediaPlayer player;
+    private static MediaPlayer player;
+    private static String source;
+    private static ImageView lastPlayIcon;
 
     public AudioMessageController(DownloadManager downloadManager) {
         this.downloadManager = downloadManager;
@@ -86,13 +88,16 @@ public class AudioMessageController extends MessageController {
     
     @FXML
     private void onPlayClicked(){
+        String fileId = (String) playButton.getProperties().get(FIELD_FILE_ID);
+        
+        if(!fileId.equals(source) && player!= null) reset();
+        
         if(player != null){
             if(player.getStatus() == MediaPlayer.Status.PLAYING) player.pause();
             else if(player.getStatus() == MediaPlayer.Status.PAUSED) player.play();
             return;
         }
         
-        String fileId = (String) playButton.getProperties().get(FIELD_FILE_ID);
         byte[] audioBytes = Cache.get(fileId);
 
         if(audioBytes != null){
@@ -107,23 +112,37 @@ public class AudioMessageController extends MessageController {
         }
     }
     
+    public static void reset(){
+        if(player != null){
+            if(player.getStatus() == MediaPlayer.Status.PLAYING) player.stop();
+            player = null;
+        }
+        if(lastPlayIcon != null) lastPlayIcon.setImage(PLAY_IMAGE);
+        source = null;
+    }
+    
     private void playAudio(String fileId){
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         Media media = new Media(new File(tmpDir, fileId).toURI().toString());
+        
+        source = fileId;
         player = new MediaPlayer(media);
+        player.setVolume(0.5);
         player.play();
 
+        lastPlayIcon = playButtonImage;
+        
         player.setOnPlaying(() -> {
-            playButtonImage.setImage(PAUSE_IMAGE);
+            lastPlayIcon.setImage(PAUSE_IMAGE);
         });
         
         player.setOnPaused(() -> {
-            playButtonImage.setImage(PLAY_IMAGE);
+            lastPlayIcon.setImage(PLAY_IMAGE);
         });
 
         player.setOnEndOfMedia(() -> {
             player = null;
-            playButtonImage.setImage(PLAY_IMAGE);
+            lastPlayIcon.setImage(PLAY_IMAGE);
         });
     }
 
