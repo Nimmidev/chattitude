@@ -11,7 +11,7 @@ public final class CommandParser {
     
     static {
         commands = new ArrayList<>();
-        commands.add(new SubstitutionCommand("/stack", "https://stackoverflow.com/search?q=", "Sends a link to the StackOverflow search results."));
+        commands.add(new ReplySubstitutionCommand("/stack", "https://stackoverflow.com/search?q=", "Sends a link to the StackOverflow search results."));
         commands.add(new SubstitutionCommand("/yt", "https://www.youtube.com/results?search_query=", "Sends a link to the Youtube search results."));
         commands.add(new ReplySubstitutionCommand("/lmgtfy", "https://lmgtfy.com/?q=", "Sends a link to Let me Google that for you."));
     }
