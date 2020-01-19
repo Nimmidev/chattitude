@@ -28,7 +28,6 @@ public class GroupChatSearchResultCell extends JFXListCell<User> {
 
         private FXMLLoader mLLoader;
         private Client client;
-        private Conversation conversation;
         private User user;
         private ObservableList<User> members;
 
@@ -57,11 +56,16 @@ public class GroupChatSearchResultCell extends JFXListCell<User> {
                 return;
             }
 
-            if (user.getId() == client.getCredentials().getUserId()) {
-                addUserButton.setVisible(false);
-            } else {
-                addUserButton.setVisible(true);
+            boolean addBtnVisible = user.getId() != client.getCredentials().getUserId(); 
+            
+            for(User u : members){
+                if(user.getId() == u.getId()){
+                    addBtnVisible = false;
+                    break;
+                }
             }
+            
+            addUserButton.setVisible(addBtnVisible);
 
             usernameLabel.setText(user.getName());
             setGraphic(conversationMemberCell);
