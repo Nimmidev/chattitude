@@ -2,7 +2,7 @@ package de.thu.inf.spro.chattitude.desktop_client.ui.controller;
 
 import de.thu.inf.spro.chattitude.desktop_client.Util;
 import de.thu.inf.spro.chattitude.desktop_client.message.ChatMessage;
-import de.thu.inf.spro.chattitude.desktop_client.message.TextMessage;
+import de.thu.inf.spro.chattitude.desktop_client.message.ReplyMessage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -15,24 +15,27 @@ import javafx.scene.text.TextFlow;
 import java.io.IOException;
 import java.util.Date;
 
-public class TextMessageController extends MessageController {
-        
+public class ReplyMessageController extends MessageController {
+    
     @FXML
     private VBox messageCell;
-    
+
     @FXML
     private Label senderLabel;
-    
+
     @FXML
     private TextFlow contentLabel;
-    
+
     @FXML
     private Label timeLabel;
 
-    private FXMLLoader mLLoader;
+    @FXML
+    private Text txtRepliedMessage;
 
-    public TextMessageController() {
-        mLLoader = new FXMLLoader(getClass().getResource("/jfx/TextMessageCell.fxml"));
+    private FXMLLoader mLLoader;
+    
+    public ReplyMessageController(){
+        mLLoader = new FXMLLoader(getClass().getResource("/jfx/ReplyMessageCell.fxml"));
         mLLoader.setController(this);
 
         try {
@@ -41,12 +44,13 @@ public class TextMessageController extends MessageController {
             throw new RuntimeException("Error loading TextMessageCell", e);
         }
     }
-
+    
     @Override
     public void update(ChatMessage chatMessage, ContextMenu contextMenu) {
-        TextMessage message = (TextMessage) chatMessage;
+        ReplyMessage message = (ReplyMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());;
         setText(contentLabel, message.getText());
+        txtRepliedMessage.setText(message.getReplyMsgTxt());
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
     }
@@ -55,5 +59,5 @@ public class TextMessageController extends MessageController {
     public Node getNode() {
         return messageCell;
     }
-
+    
 }

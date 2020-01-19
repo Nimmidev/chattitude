@@ -37,6 +37,8 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     private TextMessageController textMessageController;
     private RawFileMessageController rawFileMessageController;
     private ImageFileMessageController imageFileMessageController;
+    private ReplyMessageController replyMessageController;
+    
     private MainScreenController mainScreenController;
     
     private int sessionuserId;
@@ -47,11 +49,11 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private ChatMessage currentMessage;
 
-
     public ChatMessageCell(int sessionUserId, DownloadManager downloadManager, MainScreenController mainScreenController) {
         textMessageController = new TextMessageController();
         rawFileMessageController = new RawFileMessageController(downloadManager);
         imageFileMessageController = new ImageFileMessageController(downloadManager);
+        replyMessageController = new ReplyMessageController();
         this.mainScreenController = mainScreenController;
         
         this.sessionuserId = sessionUserId;
@@ -74,7 +76,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
     
     private void createMenuItems(){
         replyMenuItem = createMenuItem("Reply", (ActionEvent e) -> {
-            mainScreenController.setMessageFieldText(currentMessage.getText(), currentMessage.asMessage().getUser().getName());
+            mainScreenController.setReplyMessage(currentMessage);
         });
         copyMenuItem = createMenuItem("Copy", (ActionEvent e) ->{
             ClipboardContent clipboardContent = new ClipboardContent();
@@ -106,6 +108,7 @@ public class ChatMessageCell extends JFXListCell<ChatMessage> {
         if(message.getType() == MessageType.TEXT) controller = textMessageController;
         else if(message.getType() == MessageType.RAW_FILE) controller = rawFileMessageController;
         else if(message.getType() == MessageType.IMAGE_FILE) controller = imageFileMessageController;
+        else if(message.getType() == MessageType.REPLY) controller = replyMessageController;
         else throw new IllegalStateException("Invalid message type: " + message.getType().name());
 
         setDefaultContextMenuItems();

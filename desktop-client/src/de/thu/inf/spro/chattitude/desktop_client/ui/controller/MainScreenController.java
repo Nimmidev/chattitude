@@ -65,6 +65,7 @@ public class MainScreenController implements Initializable {
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;
     private String currentlySelectedFile;
+    private ChatMessage currentReplyMessage;
 
     public MainScreenController() {
         System.out.println("LoginScreenController");
@@ -158,6 +159,7 @@ public class MainScreenController implements Initializable {
             allMessagesOfCurrentConversationLoaded = false;
             loadingHistory = false;
             currentlySelectedFile = null;
+            currentReplyMessage = null;
             setSelectedFileVisibility(false);
             messageField.setText("");
 
@@ -199,6 +201,7 @@ public class MainScreenController implements Initializable {
     @FXML
     private void sendFileButtonClicked(){
         currentlySelectedFile = downloadManager.chooseFile(stackPane.getScene().getWindow());
+        currentReplyMessage = null;
         attachedFile.setText(Paths.get(currentlySelectedFile).getFileName().toString());
         setSelectedFileVisibility(true);
     }
@@ -270,7 +273,9 @@ public class MainScreenController implements Initializable {
         System.out.println("Send");
         ChatMessage message;
         
-        if(currentlySelectedFile != null){
+        if(currentReplyMessage != null){
+            message = new ReplyMessage(selectedConversation.getId(), currentReplyMessage.getText(), messageField.getText());
+        } else if(currentlySelectedFile != null){
             String filename = Paths.get(currentlySelectedFile).getFileName().toString();
             byte[] data = downloadManager.loadFrom(currentlySelectedFile);
             message = createFileMessage(filename, data);
@@ -309,9 +314,7 @@ public class MainScreenController implements Initializable {
         conversations.set(index, newConversation); // Replace with new conversation object
     }
 
-    public void setMessageFieldText(String text, String userName) {
-        messageField.requestFocus();
-        messageField.setText("'" + userName + " wrote: " + text + "' ");
-        messageField.positionCaret(userName.length() + text.length() + 12 );
+    public void setReplyMessage(ChatMessage message) {
+        currentReplyMessage = message;
     }
 }
