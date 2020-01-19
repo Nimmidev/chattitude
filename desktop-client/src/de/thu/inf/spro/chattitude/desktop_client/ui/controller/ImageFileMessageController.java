@@ -17,12 +17,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextFlow;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
-public class ImageFileMessageController implements MessageController {
+public class ImageFileMessageController extends MessageController {
 
     private static final String FIELD_FILE_ID = "fileId";
     private static final String FIELD_FILE_NAME = "filename";
@@ -34,7 +35,7 @@ public class ImageFileMessageController implements MessageController {
     private Label senderLabel;
 
     @FXML
-    private Label contentLabel;
+    private TextFlow contentLabel;
 
     @FXML
     private Label timeLabel;
@@ -78,9 +79,9 @@ public class ImageFileMessageController implements MessageController {
     public void update(ChatMessage chatMessage, ContextMenu contextMenu) {
         ImageFileMessage message = (ImageFileMessage) chatMessage;
         senderLabel.setText(message.asMessage().getUser().getName());
-        contentLabel.setText(message.getText());
         imagePane.getProperties().put(FIELD_FILE_ID, message.getFileId());
         imagePane.getProperties().put(FIELD_FILE_NAME, message.getFilename());
+        setText(contentLabel, message.getText());
 
         byte[] imageBytes = Cache.get(message.getFileId());
         
