@@ -61,7 +61,7 @@ public class MainScreenController implements Initializable {
     private Client client;
     private DownloadManager downloadManager;
     private Conversation selectedConversation;
-    private ObservableList<Conversation> conversations; // TODO automaatisch sortieren nach Datum
+    private ObservableList<Conversation> conversations;
     private ObservableList<ChatMessage> messagesOfSelectedConversation;
     private boolean allMessagesOfCurrentConversationLoaded = false;
     private boolean loadingHistory = false;

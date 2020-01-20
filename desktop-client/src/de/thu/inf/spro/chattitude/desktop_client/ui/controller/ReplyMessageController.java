@@ -55,7 +55,6 @@ public class ReplyMessageController extends MessageController {
         setText(contentLabel, message.getText());
         txtRepliedMessage.setText(message.getReplyMsgTxt());
         txtRepliedSender.setText(message.getReplyMsgSender());
-        //txtRepliedSender.setText(); TODO
 
         timeLabel.setText(Util.getRelativeDateTime(new Date(message.asMessage().getTimestamp())));
     }
