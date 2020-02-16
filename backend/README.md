@@ -1,5 +1,7 @@
 # Backend
-Server of Chattitude
+Server of Chattitude.
+
+Requires a MariaDB database, see 'Running' for specifing connection details.
 
 ## Running
 * Add all jars in libs folder to "Project structure" > Modules > Dependencies > + > Jars Or Directories
@@ -12,7 +14,7 @@ Server of Chattitude
         `MYSQL_HOSTNAME=localhost;MYSQL_DATABASE=chattitude;MYSQL_USER=chattitudeUser;MYSQL_PASSWORD=1234`
 
 ## Debugging
-* Remove all tables: 
+* Remove all tables (incomplete): 
     ```
     USE chattitude;
     SET FOREIGN_KEY_CHECKS = 0;
