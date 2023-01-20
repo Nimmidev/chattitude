@@ -1,0 +1,17 @@
+
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
+}
+
+jar {
+    archiveBaseName = "packet"
+}
