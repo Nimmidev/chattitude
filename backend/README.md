@@ -1,27 +1,57 @@
 # Backend
-Server of Chattitude.
+Chattitude backend.
 
-Requires a MariaDB database, see 'Running' for specifing connection details.
+## Run
 
-## Running
-* Add all jars in libs folder to "Project structure" > Modules > Dependencies > + > Jars Or Directories
-* Alle Jars auch unter Artifacts als extracted hinzufügen
-* Build artifact
-* `docker-compose up`, sollte dann den MySQL-Server und den Chattitude-Server starten
-    * Alternativ: Man kann auch den MySQL-Server in Docker laufen lassen und den Chattitude-Server direkt ohne Docker starten, dann muss man aber die MySQL-Credentials anpassen, die in den Enviroment-Variablen übergeben werden
-        * MySQL starten: `docker run --env-file .env -e MYSQL_RANDOM_ROOT_PASSWORD='yes' -p 3306:3306 mariadb` (Inhalt von DB bleibt nur bis zum beenden erhalten)
-        * Edit configuration > In 'Enviroment Variables' folgendes einfügen:
-        `MYSQL_HOSTNAME=localhost;MYSQL_DATABASE=chattitude;MYSQL_USER=chattitudeUser;MYSQL_PASSWORD=1234`
+#### Docker Compose
+```bash
+docker-compose up
+```
+Will start mariadb and the backand at once.
 
-## Debugging
-* Remove all tables (incomplete): 
-    ```
-    USE chattitude;
-    SET FOREIGN_KEY_CHECKS = 0;
-    DROP TABLE ChatMessage;
-    DROP TABLE Conversation;
-    DROP TABLE ConversationMember;
-    DROP TABLE User;
-    SET FOREIGN_KEY_CHECKS = 1;
-    
-    ```
+#### Development/Database only
+On linux/macos:
+```bash
+./start_mysql_docker.sh
+```
+or in general
+```bash
+docker run \
+    --name mysql \
+    --rm \
+    --env-file .env \
+    -e MYSQL_RANDOM_ROOT_PASSWORD='yes' \
+    -p 3306:3306 \
+    mariadb
+```
+Will only run mariadb. The backend can then be started manually with:
+```bash
+./gradlew run
+```
+
+The backend and mariadb will use the credentials specified by the environment variables `MYSQL_HOSTNAME`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`. If not provided they will fallback to the values in the `.env` file.
+
+## Build
+The backend can be build/exported in two different ways:
+
+#### Runnable Jar
+```bash
+# build
+./gradlew shadowJar
+
+# run
+java -jar ./app/build/libs/backend-all.jar
+```
+
+#### Zip/Tar
+```bash
+# build
+./gradlew assembleDist
+
+# run
+unzip app/build/distributions/backend.zip
+./backend/bin/app
+```
+
+## Note
+It could be the case that on the first `docker compose` start, the backend errors out because it could not connect to the database. This is because of the initial setup time for all tables etc. If this happens just restart and everything should work from now on.

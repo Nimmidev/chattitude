@@ -1,6 +1,7 @@
 
 plugins {
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -14,15 +15,21 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation "org.mariadb.jdbc:mariadb-java-client:2.5.2"
 
-    implementation files("../../packet/lib/build/libs/packet.jar")
+    implementation project(":packet")
 }
 
 application {
-    mainClass = 'de.thu.in.spro.chattitude.backend.Main'
+    mainClass = 'de.thu.inf.spro.chattitude.backend.Main'
 }
 
-jar {
+shadowJar {
     archiveBaseName = "backend"
+}
+
+distributions {
+    main {
+        distributionBaseName = "backend"
+    }
 }
 
 test {

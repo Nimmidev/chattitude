@@ -9,3 +9,5 @@
 
 rootProject.name = 'backend'
 include('app')
+include ":packet"
+project(":packet").projectDir = file("../packet/lib/")

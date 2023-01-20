@@ -3,7 +3,7 @@ services:
   database:
     image: mariadb
     volumes:
-      - ./db:/var/lib/mysql
+      - ./docker-mariadb-volume:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -12,10 +12,13 @@ services:
   server:
     image: "openjdk:11"
     volumes:
-      - ./app/build/libs/backend.jar:/app/backend.jar
+      - ./app/build/libs/backend-all.jar:/app/backend.jar
     command: "java -jar /app/backend.jar"
     ports:
       - 8080:8080
+    depends_on:
+      database:
+        condition: service_started
     environment:
       MYSQL_HOSTNAME: database
       MYSQL_DATABASE: ${MYSQL_DATABASE}

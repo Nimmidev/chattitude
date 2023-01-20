@@ -63,7 +63,9 @@ public class MySqlClient {
         HashMap<String, String> map = new HashMap<>();
 
         try {
-            var lines = Files.readAllLines(Path.of("../.env"));
+            var path = Path.of("../.env");
+            if(!path.toFile().exists()) return map;
+            var lines = Files.readAllLines(path);
 
             for(String line : lines){
                 String[] parts = line.split("=");
