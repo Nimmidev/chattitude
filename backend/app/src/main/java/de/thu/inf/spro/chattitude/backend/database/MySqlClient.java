@@ -9,9 +9,12 @@ import org.mariadb.jdbc.MariaDbDataSource;
 
 import java.sql.*;
 import java.util.*;
+import java.nio.file.*;
+import java.io.*;
 
 public class MySqlClient {
 
+    private static Map<String, String> dotEnvConfig = parseDotEnvFile();
     private ValidConnection connection;
 
     private UserSQL userSQL;
@@ -56,12 +59,36 @@ public class MySqlClient {
         }
     }
 
+    private static HashMap<String, String> parseDotEnvFile() {
+        HashMap<String, String> map = new HashMap<>();
+
+        try {
+            var lines = Files.readAllLines(Path.of("../.env"));
+
+            for(String line : lines){
+                String[] parts = line.split("=");
+                map.put(parts[0], parts[1]);
+            }
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
+    static String getConfigVar(String key, Map<String, String> dotEnvConfig){
+        String value = System.getenv(key);
+        if(value == null) value = dotEnvConfig.get(key);
+        return value;
+    }
+
     static Connection connect() throws SQLException {
         MariaDbDataSource dataSource = new MariaDbDataSource();
-        dataSource.setUser(System.getenv("MYSQL_USER"));
-        dataSource.setPassword(System.getenv("MYSQL_PASSWORD"));
-        dataSource.setServerName(System.getenv("MYSQL_HOSTNAME"));
-        dataSource.setDatabaseName(System.getenv("MYSQL_DATABASE"));
+
+        dataSource.setUser(getConfigVar("MYSQL_USER", dotEnvConfig));
+        dataSource.setPassword(getConfigVar("MYSQL_PASSWORD", dotEnvConfig));
+        dataSource.setServerName(getConfigVar("MYSQL_HOSTNAME", dotEnvConfig));
+        dataSource.setDatabaseName(getConfigVar("MYSQL_DATABASE", dotEnvConfig));
 
         return dataSource.getConnection();
     }

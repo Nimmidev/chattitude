@@ -1,0 +1,32 @@
+
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+
+    implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation "org.mariadb.jdbc:mariadb-java-client:2.5.2"
+
+    implementation files("../../packet/lib/build/libs/packet.jar")
+}
+
+application {
+    mainClass = 'de.thu.in.spro.chattitude.backend.Main'
+}
+
+jar {
+    archiveBaseName = "backend"
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}

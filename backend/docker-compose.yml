@@ -12,7 +12,7 @@ services:
   server:
     image: "openjdk:11"
     volumes:
-      - ./out/artifacts/backend_jar/backend.jar:/app/backend.jar
+      - ./app/build/libs/backend.jar:/app/backend.jar
     command: "java -jar /app/backend.jar"
     ports:
       - 8080:8080
