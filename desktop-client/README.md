@@ -1,9 +1,32 @@
 # Desktop Client
-Desktop app of Chattitude
+Chattitude desktop client.
 
-Intellij Run Configuration:
-- VM options: --module-path PATH_TO_JAVAFX_LIB_DIR --add-modules=javafx.controls,javafx.fxml
+## Run
+```bash
+./gradlew run
+```
+By default the client tries to a backend running on `ws://localhost:8080`. This can be changed by setting the environment variable `SERVER_URL` i.e.:
+```bash
+SERVER_URL=wss://some.url:port ./gradlew run
+```
 
-         e.g. --module-path "C:\Program Files\JavaFX\lib" --add-modules=javafx.controls,javafx.fxml
+## Build
 
-* Set enviroment variable to set server url (default is `wss://chattitude.brk.st`) e.g.: `SERVER_URL=ws://localhost:8080`
+#### Runnable Jar
+```bash
+# build
+./gradlew jar
+
+# run
+java -jar ./app/build/libs/desktop-client.jar
+```
+
+#### Zip/Tar
+```bash
+# build
+./gradlew assembleDist
+
+# run
+unzip app/build/distributions/desktop-client.zip
+./desktop-client/bin/app
+```

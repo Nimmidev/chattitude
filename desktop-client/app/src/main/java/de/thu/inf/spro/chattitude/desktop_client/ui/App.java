@@ -41,7 +41,7 @@ public class App extends Application {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             if (!System.getProperty("os.name").toLowerCase().contains("mac"))
-                primaryStage.getIcons().add(new Image("/logoTitleBar.png"));
+                primaryStage.getIcons().add(new Image("/logoTitleBar.PNG"));
             primaryStage.show();
         } catch (IOException e) {
             throw new Error(e);

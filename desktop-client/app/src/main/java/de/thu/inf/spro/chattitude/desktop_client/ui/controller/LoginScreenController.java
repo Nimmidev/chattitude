@@ -128,7 +128,7 @@ public class LoginScreenController implements Initializable {
             Scene scene = new Scene(root);
             secondaryStage.setScene(scene);
             if (!System.getProperty("os.name").toLowerCase().contains("mac"))
-                secondaryStage.getIcons().add(new Image("/logoTitleBar.png"));
+                secondaryStage.getIcons().add(new Image("/logoTitleBar.PNG"));
             setStageLayout(secondaryStage);
             secondaryStage.focusedProperty().addListener((observableValue, notFocused, t1) -> {
                 MainScreenController.IS_FOCUSED = !notFocused;

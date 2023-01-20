@@ -33,8 +33,9 @@ public class Client implements PacketHandler {
     public Client() throws URISyntaxException {
         URI uri;
         String uriStr = System.getenv("SERVER_URL");
+        System.out.println(uriStr);
         if (uriStr == null) {
-            uri = new URI("wss://chattitude.brk.st");
+            uri = new URI("ws://localhost:8080");
         } else {
             uri = new URI(uriStr);
         }
