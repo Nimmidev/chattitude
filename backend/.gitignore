@@ -5,3 +5,10 @@
 build
 
 docker-mariadb-volume/
+
+.project
+.settings/
+app/bin/
+app/.classpath
+app/.project
+app/.settings/

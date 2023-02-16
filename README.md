@@ -7,6 +7,10 @@ Chattitude was developed for the software project module of computer science in 
 ![Chattitude screenshot with images](_readme_images/screenshot2.png)
 ![Chattitude screenshot edit group](_readme_images/screenshot3.png)
 
+## Requirements
+- Java 11 with JavaFx
+- Gradle
+
 ## Main Features
 * Self-hosted
 * Group chats

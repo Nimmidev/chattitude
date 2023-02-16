@@ -5,7 +5,7 @@ Chattitude desktop client.
 ```bash
 ./gradlew run
 ```
-By default the client tries to a backend running on `ws://localhost:8080`. This can be changed by setting the environment variable `SERVER_URL` i.e.:
+By default the client tries to connect to a backend running on `ws://localhost:8080`. This can be changed by setting the environment variable `SERVER_URL` i.e.:
 ```bash
 SERVER_URL=wss://some.url:port ./gradlew run
 ```
